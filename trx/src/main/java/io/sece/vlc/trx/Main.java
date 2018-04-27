@@ -17,7 +17,7 @@ public class Main {
       ExecutorService threadPool = Executors.newCachedThreadPool();
 
       System.out.println("Initializing pigpio library");
-      PiGPIO.gpioInitialize();
+      PiGPIO.gpioInitialise();
       Runtime.getRuntime().addShutdownHook(new Thread() {
               @Override
               public void run() {

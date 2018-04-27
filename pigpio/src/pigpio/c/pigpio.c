@@ -49,7 +49,7 @@ throw(JNIEnv *e, const char *name, const char *fmt, ...)
 
 
 static void
-jni_gpioInitialize(JNIEnv *e, jclass lib) {
+jni_gpioInitialise(JNIEnv *e, jclass lib) {
     int rc = gpioInitialise();
     if (rc < 0) {
         throw(e, PIGPIO_EXCEPTION, "Can't initialize pigpio: %d", rc);
@@ -60,6 +60,22 @@ jni_gpioInitialize(JNIEnv *e, jclass lib) {
 static void
 jni_gpioTerminate(JNIEnv *e, jclass lib) {
     gpioTerminate();
+}
+
+
+static jint
+jni_gpioHardwareRevision(JNIEnv *e, jclass lib) {
+    int rc = gpioHardwareRevision();
+    if (rc == 0) {
+        throw(e, PIGPIO_EXCEPTION, "Can't obtain hardware revision");
+    }
+    return rc;
+}
+
+
+static jint
+jni_gpioVersion(JNIEnv *e, jclass lib) {
+    return gpioVersion();
 }
 
 
@@ -136,16 +152,66 @@ jni_gpioGetPWMdutycycle(JNIEnv *e, jclass lib, jint gpio)
 }
 
 
+static jint
+jni_gpioGetPWMrange(JNIEnv *e, jclass lib, jint gpio)
+{
+    int rc = gpioGetPWMrange(gpio);
+    if (rc < 0) {
+        throw(e, PIGPIO_EXCEPTION, "Error code: %d", rc);
+    }
+    return rc;
+}
+
+
+static jint
+jni_gpioGetPWMrealRange(JNIEnv *e, jclass lib, jint gpio)
+{
+    int rc = gpioGetPWMrealRange(gpio);
+    if (rc < 0) {
+        throw(e, PIGPIO_EXCEPTION, "Error code: %d", rc);
+    }
+    return rc;
+}
+
+
+static jint
+jni_gpioSetPWMfrequency(JNIEnv *e, jclass lib, jint gpio, jint frequency)
+{
+    int rc = gpioSetPWMfrequency(gpio, frequency);
+    if (rc < 0) {
+        throw(e, PIGPIO_EXCEPTION, "Error code: %d", rc);
+    }
+    return rc;
+}
+
+
+static jint
+jni_gpioGetPWMfrequency(JNIEnv *e, jclass lib, jint gpio)
+{
+    int rc = gpioGetPWMfrequency(gpio);
+    if (rc < 0) {
+        throw(e, PIGPIO_EXCEPTION, "Error code: %d", rc);
+    }
+    return rc;
+}
+
+
 static JNINativeMethod natives[] = {
-    {"gpioInitialize",      "()V",   jni_gpioInitialize      },
+    {"gpioInitialise",      "()V",   jni_gpioInitialise      },
     {"gpioTerminate",       "()V",   jni_gpioTerminate       },
+    {"gpioHardwareRevision","()I",   jni_gpioHardwareRevision},
+    {"gpioVersion",         "()I",   jni_gpioVersion         },
     {"gpioSetMode",         "(II)V", jni_gpioSetMode         },
     {"gpioGetMode",         "(I)I",  jni_gpioGetMode         },
     {"gpioSetPullUpDown",   "(II)V", jni_gpioSetPullUpDown   },
     {"gpioRead",            "(I)I",  jni_gpioRead            },
     {"gpioWrite",           "(II)V", jni_gpioWrite           },
     {"gpioPWM",             "(II)V", jni_gpioPWM             },
-    {"gpioGetPWMdutycycle", "(I)I",  jni_gpioGetPWMdutycycle }
+    {"gpioGetPWMdutycycle", "(I)I",  jni_gpioGetPWMdutycycle },
+    {"gpioGetPWMrange",     "(I)I",  jni_gpioGetPWMrange     },
+    {"gpioGetPWMrealRange", "(I)I",  jni_gpioGetPWMrealRange },
+    {"gpioSetPWMfrequency", "(II)I", jni_gpioSetPWMfrequency },
+    {"gpioGetPWMfrequency", "(I)I",  jni_gpioGetPWMfrequency }
 };
 
 

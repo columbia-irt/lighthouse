@@ -53,15 +53,21 @@ public class PiGPIO {
 
     private PiGPIO() { }
 
-    public static native void gpioInitialize()                     throws PiGPIOException;
-    public static native void gpioTerminate();
-    public static native void gpioSetMode(int gpio, int mode)      throws PiGPIOException;
-    public static native int  gpioGetMode(int gpio)                throws PiGPIOException;
-    public static native void gpioSetPullUpDown(int gpio, int pud) throws PiGPIOException;
-    public static native int  gpioRead(int gpio)                   throws PiGPIOException;
-    public static native void gpioWrite(int gpio, int level)       throws PiGPIOException;
-    public static native void gpioPWM(int gpio, int dutycycle)     throws PiGPIOException;
-    public static native int  gpioGetPWMdutycycle(int gpio)        throws PiGPIOException;
+    public static native void gpioInitialise      ()                        throws PiGPIOException;
+    public static native void gpioTerminate       ();
+    public static native int  gpioHardwareRevision()                        throws PiGPIOException;
+    public static native int  gpioVersion();
+    public static native void gpioSetMode         (int gpio, int mode)      throws PiGPIOException;
+    public static native int  gpioGetMode         (int gpio)                throws PiGPIOException;
+    public static native void gpioSetPullUpDown   (int gpio, int pud)       throws PiGPIOException;
+    public static native int  gpioRead            (int gpio)                throws PiGPIOException;
+    public static native void gpioWrite           (int gpio, int level)     throws PiGPIOException;
+    public static native void gpioPWM             (int gpio, int dutycycle) throws PiGPIOException;
+    public static native int  gpioGetPWMdutycycle (int gpio)                throws PiGPIOException;
+    public static native int  gpioGetPWMrange     (int gpio)                throws PiGPIOException;
+    public static native int  gpioGetPWMrealRange (int gpio)                throws PiGPIOException;
+    public static native int  gpioSetPWMfrequency (int gpio, int frequency) throws PiGPIOException;
+    public static native int  gpioGetPWMfrequency (int gpio)                throws PiGPIOException;
 
     static {
         System.loadLibrary("pigpio-java");
