@@ -1,0 +1,21 @@
+apply plugin: 'application'
+
+mainClassName = 'io.sece.vlc.trx.Main'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+applicationDefaultJvmArgs = ["-Djava.library.path=${rootDir}/build/native"]
+
+jar {
+  manifest {
+    attributes(
+      'Main-Class': 'io.sece.vlc.trx.Main'
+    )
+  }
+}
+
+dependencies {
+    compile project(':unix')
+    compile project(':pigpio')
+}
