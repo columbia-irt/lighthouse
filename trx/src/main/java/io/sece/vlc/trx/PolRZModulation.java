@@ -4,9 +4,9 @@ import io.sece.pigpio.PiGPIO;
 
 class PolRZModulation implements LEDModulation
 {    
-    LEDInterface led;
+    TriColorLED led;
     int delay;
-    public PolRZModulation(LEDInterface led, int delay)
+    public PolRZModulation(TriColorLED led, int delay)
     {
         this.led = led;
         this.delay = delay;
@@ -14,6 +14,7 @@ class PolRZModulation implements LEDModulation
     
     public void setSymbols(String symbols)
     {
+        // modulate each symbol into a color here eather red = '0' or blue = '1'
         for(int i = 0; i < symbols.length(); i++)
         {
             System.out.println(System.currentTimeMillis());
@@ -35,7 +36,7 @@ class PolRZModulation implements LEDModulation
             } catch (InterruptedException ex) {
                 System.out.println("Error case in Sleep: " + ex);
             }
-            
+            //after each symbol the LED is turned off => returns too its neutral state
             led.setColor(0,0,0);
             
             try {
@@ -44,7 +45,7 @@ class PolRZModulation implements LEDModulation
                 System.out.println("Error case in Sleep: " + ex);
             }
         }
-        
+        // end bit green
         led.setColor(0,255,0);
         
         try {
@@ -52,7 +53,7 @@ class PolRZModulation implements LEDModulation
             } catch (InterruptedException ex) {
                 System.out.println("Error case in Sleep: " + ex);
             }
-        
+        //reset led to off after done with modulation
         led.setColor(0,0,0);
     }
 }

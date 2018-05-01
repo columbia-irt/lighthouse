@@ -2,17 +2,12 @@ package io.sece.vlc.trx;
 
 import io.sece.pigpio.PiGPIO;
 
-class TriColorLED implements LEDInterface
+class MonoColorLED implements LEDInterface
 {
-    int redPin;
-    int greenPin;
-    int bluePin;
-    public TriColorLED(int redPin, int greenPin, int bluePin)
+    int pin; // the GPIO pin which is connected to the LED
+    public MonoColorLED(int pin)
     {
-        //GPIO pins which are connected to the specific pins of the LED
-        this.redPin = redPin;
-        this.greenPin = greenPin;
-        this.bluePin = bluePin;
+        this.pin = pin;
     }
     public void setIntensity(boolean onoff)
     {
@@ -28,9 +23,7 @@ class TriColorLED implements LEDInterface
     {
         try
         {
-                PiGPIO.gpioPWM(redPin, red);
-                PiGPIO.gpioPWM(greenPin, green);
-                PiGPIO.gpioPWM(bluePin, blue);
+                PiGPIO.gpioPWM(pin, red); // MonoColor can only handle one value. ANY IDEA? Or schould setIntensity be used for that?
         }
         catch(Exception e)
         {
