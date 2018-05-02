@@ -1,33 +1,28 @@
 package io.sece.vlc.trx;
 
 import io.sece.pigpio.PiGPIO;
+import io.sece.pigpio.PiGPIOException;
+import io.sece.pigpio.PiGPIOPin;
 
 class MonoColorLED implements LEDInterface
 {
-    int pin; // the GPIO pin which is connected to the LED
-    public MonoColorLED(int pin)
+    PiGPIOPin pin; // the GPIO pin which is connected to the LED
+    public MonoColorLED(PiGPIOPin pin)
     {
         this.pin = pin;
     }
-    public void setIntensity(boolean onoff)
+    public void setIntensity(boolean on) throws PiGPIOException
     {
-            throw new UnsupportedOperationException();
+        pin.setState(on);
     }
 
-    public void setIntensity(int value)
+    public void setIntensity(int value) throws PiGPIOException
     {
-            throw new UnsupportedOperationException();
+        pin.setPWM(value);
     }
 
-    public void setColor(int red, int green, int blue)
+    public void setColor(int red, int green, int blue) 
     {
-        try
-        {
-                PiGPIO.gpioPWM(pin, red); // MonoColor can only handle one value. ANY IDEA? Or schould setIntensity be used for that?
-        }
-        catch(Exception e)
-        {
-                System.out.println("error in setColor: " + e);
-        }
+        
     }
 }

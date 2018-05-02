@@ -1,18 +1,19 @@
 package io.sece.vlc.trx;
 
 import io.sece.pigpio.PiGPIO;
+import io.sece.pigpio.PiGPIOException;
 
-class PolRZModulation implements LEDModulation
+class PolRZModulator implements LEDModulator
 {    
     TriColorLED led;
     int delay;
-    public PolRZModulation(TriColorLED led, int delay)
+    public PolRZModulator(TriColorLED led, int delay)
     {
         this.led = led;
         this.delay = delay;
     }
     
-    public void setSymbols(String symbols)
+    public void setSymbols(String symbols) throws PiGPIOException
     {
         // modulate each symbol into a color here eather red = '0' or blue = '1'
         for(int i = 0; i < symbols.length(); i++)

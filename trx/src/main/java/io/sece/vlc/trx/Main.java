@@ -15,7 +15,7 @@ public class Main {
 	
     
     public static LEDInterface piLED; 
-    public static LEDModulation piMod;
+    public static LEDModulator piMod;
     public static PiGPIOPin redPin;
     public static PiGPIOPin greenPin;
     public static PiGPIOPin bluePin;
@@ -36,11 +36,11 @@ public class Main {
         API api = new API(8000);
         api.start(threadPool);
 
-        redPin = new PiGPIOPin(22, PiGPIO.PI_OUTPUT); // red
-        greenPin = new PiGPIOPin(27,PiGPIO.PI_OUTPUT); // green
-        bluePin = new PiGPIOPin(17,PiGPIO.PI_OUTPUT); // blue
+        redPin = new PiGPIOPin(22); // red
+        greenPin = new PiGPIOPin(27); // green
+        bluePin = new PiGPIOPin(17); // blue
         
-        piLED = new TriColorLED(redPin.getGpio(), greenPin.getGpio(), bluePin.getGpio());
+        piLED = new TriColorLED(redPin, greenPin, bluePin);
         //piLED = new MonoColorLED(redPin.getGpio());
         
         final int delay = 50; //amount of time for sleep
@@ -57,7 +57,7 @@ public class Main {
         String finalString = "01010100011001010111001101110100";
         System.out.println("LED transmitter is running");
         
-        piMod = new OOKModulation(piLED, delay); // new On Off Key Modulation which need the led and the sleep time
+        piMod = new OOKModulator(piLED, delay); // new On Off Key Modulation which need the led and the sleep time
         //piMod = new PolRZModulation((TriColorLED)piLED, delay);// new polar Return to Zero Modulation which need the led and the sleep time, only works with TriColorLED because at least three states are needed
         piMod.setSymbols(finalString); // setSymbols will set the led to the values from the inputString
     }  

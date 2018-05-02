@@ -1,13 +1,15 @@
 package io.sece.vlc.trx;
 
 import io.sece.pigpio.PiGPIO;
+import io.sece.pigpio.PiGPIOException;
+import io.sece.pigpio.PiGPIOPin;
 
 class TriColorLED implements LEDInterface
 {
-    int redPin;
-    int greenPin;
-    int bluePin;
-    public TriColorLED(int redPin, int greenPin, int bluePin)
+    PiGPIOPin redPin;
+    PiGPIOPin greenPin;
+    PiGPIOPin bluePin;
+    public TriColorLED(PiGPIOPin redPin, PiGPIOPin greenPin, PiGPIOPin bluePin)
     {
         //GPIO pins which are connected to the specific pins of the LED
         this.redPin = redPin;
@@ -24,17 +26,10 @@ class TriColorLED implements LEDInterface
             throw new UnsupportedOperationException();
     }
 
-    public void setColor(int red, int green, int blue)
+    public void setColor(int red, int green, int blue) throws PiGPIOException
     {
-        try
-        {
-                PiGPIO.gpioPWM(redPin, red);
-                PiGPIO.gpioPWM(greenPin, green);
-                PiGPIO.gpioPWM(bluePin, blue);
-        }
-        catch(Exception e)
-        {
-                System.out.println("error in setColor: " + e);
-        }
+        redPin.setPWM(red);
+        greenPin.setPWM(green);
+        bluePin.setPWM(blue);
     }
 }
