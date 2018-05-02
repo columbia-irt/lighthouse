@@ -43,8 +43,8 @@ public class Main {
         piLED = new TriColorLED(redPin.getGpio(), greenPin.getGpio(), bluePin.getGpio());
         //piLED = new MonoColorLED(redPin.getGpio());
         
-        final int delay = 100; //amount of time for sleep
-        final int amount = 10; //amount for the for-loop 
+        final int delay = 50; //amount of time for sleep
+        final int amount = 100; //amount for the for-loop 
         final String input = "10"; //input string which gets multiplied in for-loop and stored in inputString
 
         String inputString = "";
@@ -53,11 +53,12 @@ public class Main {
         {
                 inputString += input;
         }
-
+        
+        String finalString = "01010100011001010111001101110100";
         System.out.println("LED transmitter is running");
         
         piMod = new OOKModulation(piLED, delay); // new On Off Key Modulation which need the led and the sleep time
         //piMod = new PolRZModulation((TriColorLED)piLED, delay);// new polar Return to Zero Modulation which need the led and the sleep time, only works with TriColorLED because at least three states are needed
-        piMod.setSymbols(inputString); // setSymbols will set the led to the values from the inputString
+        piMod.setSymbols(finalString); // setSymbols will set the led to the values from the inputString
     }  
 }
