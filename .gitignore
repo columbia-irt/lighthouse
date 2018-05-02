@@ -5,3 +5,6 @@
 build
 /captures
 .externalNativeBuild
+/nbproject/
+build.xml
+manifest.mf
