@@ -1,10 +1,61 @@
 package io.sece.vlc.trx;
 
+import java.awt.Color;
 import io.sece.pigpio.PiGPIO;
 import io.sece.pigpio.PiGPIOException;
 
-class OOKModulator implements LEDModulator
+class OOKModulator extends AmpModulator implements ModulatorInterface<BinSymbol>
 {
+    private static final Color on  = RGBColor.red;
+    private static final Color off = RGBColor.off;
+    private LEDInterface piLED;
+    private String input;
+    private long delay;
+    private BinSymbol symbol;
+    
+
+    public OOKModulator(String input, LEDInterface led, int delay) throws PiGPIOException, InterruptedException
+    {
+        this.piLED = led;
+        this.input = input;
+        this.delay = delay;
+        
+        this.run();
+    }
+    
+    public Color modulate(BinSymbol symbol) {
+        switch(symbol.value) {
+        case ONE:
+            return on;
+
+        case ZERO:
+            return off;
+        }
+        throw new AssertionError();
+    }
+    
+    private void run() throws PiGPIOException, InterruptedException
+    {
+        for(int i = 0; i < input.length(); i++)
+        {
+            switch(input.charAt(i))
+            {
+                case ('0') :
+                    symbol = new BinSymbol(BinSymbol.Value.ZERO);
+                    break;
+                case ('1') :
+                    symbol = new BinSymbol(BinSymbol.Value.ONE);
+                    break;
+                default :
+                    System.out.println("Error case in Switch");                    
+                    break;                
+            }
+            piLED.setColor(this.modulate(symbol));
+            Sleeper.sleepNanos(delay * 1000000);
+        }
+    }
+}
+    /*
     LEDInterface led;
     int delay;
     long timeBefore = 0; //the sleep will depend on the real delay time
@@ -61,4 +112,4 @@ class OOKModulator implements LEDModulator
         //reset led to off after done with modulation
         led.setColor(0,0,0);
     }
-}
+}*/

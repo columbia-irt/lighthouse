@@ -3,6 +3,7 @@ package io.sece.vlc.trx;
 import io.sece.pigpio.PiGPIO;
 import io.sece.pigpio.PiGPIOException;
 import io.sece.pigpio.PiGPIOPin;
+import java.awt.Color;
 
 class TriColorLED implements LEDInterface
 {
@@ -26,10 +27,10 @@ class TriColorLED implements LEDInterface
             throw new UnsupportedOperationException();
     }
 
-    public void setColor(int red, int green, int blue) throws PiGPIOException
+    public void setColor(Color color) throws PiGPIOException
     {
-        redPin.setPWM(red);
-        greenPin.setPWM(green);
-        bluePin.setPWM(blue);
+        redPin.setValue(color.getRed());
+        greenPin.setValue(color.getGreen());
+        bluePin.setValue(color.getBlue());
     }
 }

@@ -30,11 +30,22 @@ public class PiGPIOPin
             PiGPIO.gpioWrite(this.gpio, 0);
         }
     }
-    public void setPWM(int value) throws PiGPIOException
+    public void setValue(int value) throws PiGPIOException
     {
         if(value >= 0 && value <=255)
         {
-            PiGPIO.gpioPWM(this.gpio, value);
+            switch(value)
+            {
+                case 0:
+                    this.setState(false);
+                    break;
+                case 255:
+                    this.setState(true);
+                    break;
+                default:
+                    PiGPIO.gpioPWM(this.gpio, value);
+                    break;
+            }
         }
         else
         {

@@ -3,6 +3,7 @@ package io.sece.vlc.trx;
 import io.sece.pigpio.PiGPIO;
 import io.sece.pigpio.PiGPIOException;
 import io.sece.pigpio.PiGPIOPin;
+import java.awt.Color;
 
 class MonoColorLED implements LEDInterface
 {
@@ -18,11 +19,11 @@ class MonoColorLED implements LEDInterface
 
     public void setIntensity(int value) throws PiGPIOException
     {
-        pin.setPWM(value);
+        pin.setValue(value);
     }
 
-    public void setColor(int red, int green, int blue) 
+    public void setColor(Color color) 
     {
-        
+            throw new UnsupportedOperationException();
     }
 }

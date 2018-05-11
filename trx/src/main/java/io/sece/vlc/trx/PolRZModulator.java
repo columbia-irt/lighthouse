@@ -1,4 +1,4 @@
-package io.sece.vlc.trx;
+/*package io.sece.vlc.trx;
 
 import io.sece.pigpio.PiGPIO;
 import io.sece.pigpio.PiGPIOException;
@@ -57,4 +57,4 @@ class PolRZModulator implements LEDModulator
         //reset led to off after done with modulation
         led.setColor(0,0,0);
     }
-}
+}*/

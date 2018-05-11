@@ -2,6 +2,8 @@ package io.sece.vlc.trx;
 
 import io.sece.pigpio.PiGPIO;
 import io.sece.pigpio.PiGPIOPin;
+import java.awt.Color;
+import java.lang.IllegalArgumentException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 // PiGPIO.gpioSetMode(22, PiGPIO.PI_OUTPUT);
@@ -15,7 +17,7 @@ public class Main {
 	
     
     public static LEDInterface piLED; 
-    public static LEDModulator piMod;
+    public static ModulatorInterface<BinSymbol> piMod;
     public static PiGPIOPin redPin;
     public static PiGPIOPin greenPin;
     public static PiGPIOPin bluePin;
@@ -43,8 +45,8 @@ public class Main {
         piLED = new TriColorLED(redPin, greenPin, bluePin);
         //piLED = new MonoColorLED(redPin.getGpio());
         
-        final int delay = 50; //amount of time for sleep
-        final int amount = 100; //amount for the for-loop 
+        final int delay = 100; //amount of time for sleep
+        final int amount = 500; //amount for the for-loop 
         final String input = "10"; //input string which gets multiplied in for-loop and stored in inputString
 
         String inputString = "";
@@ -54,11 +56,16 @@ public class Main {
                 inputString += input;
         }
         
-        String finalString = "01010100011001010111001101110100";
+        String finalString = "101011001100";
         System.out.println("LED transmitter is running");
-        
-        piMod = new OOKModulator(piLED, delay); // new On Off Key Modulation which need the led and the sleep time
-        //piMod = new PolRZModulation((TriColorLED)piLED, delay);// new polar Return to Zero Modulation which need the led and the sleep time, only works with TriColorLED because at least three states are needed
-        piMod.setSymbols(finalString); // setSymbols will set the led to the values from the inputString
+      
+        if(finalString.matches("[0-1]+"))
+        {
+            piMod = new OOKModulator(finalString, piLED, delay); 
+        }
+        else
+        {
+            throw new IllegalArgumentException();
+        }
     }  
 }
