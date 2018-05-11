@@ -46,7 +46,7 @@ public class Main {
         //piLED = new MonoColorLED(redPin.getGpio());
         
         final int delay = 100; //amount of time for sleep
-        final int amount = 500; //amount for the for-loop 
+        final int amount = 100; //amount for the for-loop 
         final String input = "10"; //input string which gets multiplied in for-loop and stored in inputString
 
         String inputString = "";
@@ -59,9 +59,9 @@ public class Main {
         String finalString = "101011001100";
         System.out.println("LED transmitter is running");
       
-        if(finalString.matches("[0-1]+"))
+        if(inputString.matches("[0-1]+"))
         {
-            piMod = new OOKModulator(finalString, piLED, delay); 
+            piMod = new FSK2Modulator(inputString, piLED, delay); 
         }
         else
         {

@@ -23,7 +23,7 @@ class OOKModulator extends AmpModulator implements ModulatorInterface<BinSymbol>
         this.run();
     }
     
-    public Color modulate(BinSymbol symbol) {
+    /*public Color modulate(BinSymbol symbol) {
         switch(symbol.value) {
         case ONE:
             return on;
@@ -32,25 +32,24 @@ class OOKModulator extends AmpModulator implements ModulatorInterface<BinSymbol>
             return off;
         }
         throw new AssertionError();
-    }
+    }*/
     
-    private void run() throws PiGPIOException, InterruptedException
+    public void run() throws PiGPIOException, InterruptedException
     {
         for(int i = 0; i < input.length(); i++)
         {
             switch(input.charAt(i))
             {
                 case ('0') :
-                    symbol = new BinSymbol(BinSymbol.Value.ZERO);
+                    piLED.setColor(on);
                     break;
                 case ('1') :
-                    symbol = new BinSymbol(BinSymbol.Value.ONE);
+                    piLED.setColor(off);
                     break;
                 default :
-                    System.out.println("Error case in Switch");                    
+                    piLED.setColor(RGBColor.white);                   
                     break;                
             }
-            piLED.setColor(this.modulate(symbol));
             Sleeper.sleepNanos(delay * 1000000);
         }
     }
