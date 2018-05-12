@@ -1,4 +1,9 @@
 rootProject.name = "lighthouse"
+
 include ':unix'
 include ':pigpio'
 include ':trx'
+include ':opencv'
+include ':app'
+
+project(':opencv').projectDir = new File(System.properties['user.home'] + '/OpenCV-android-sdk/sdk')

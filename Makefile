@@ -1,9 +1,12 @@
 pkg:=io.sece.vlc
+trx_pkg:=$(pkg).trx
+app_pkg:=$(pkg).rcvr
 apk_dir:=app/build/outputs/apk
 native_dir:=build/native
 jvm:=/usr/lib/jvm/jdk-8-oracle-arm32-vfp-hflt
 
 alldep:=Makefile
+gradle:=./gradlew
 CFLAGS:=-I$(jvm)/include -I$(jvm)/include/linux
 
 all: build-trx
@@ -14,24 +17,28 @@ app-debug: $(apk_dir)/debug/app-debug.apk $(alldep)
 
 app-release: $(apk_dir)/app-release-unsigned.apk $(alldep)
 
-uninstall: $(alldep)
-	adb uninstall $(pkg)
+uninstall-app: $(alldep)
+	adb uninstall $(app_pkg)
 
-install: $(apk_dir)/debug/app-debug.apk $(alldep)
-	adb uninstall $(pkg) >/dev/null 2>&1 || true
+install-app: $(apk_dir)/debug/app-debug.apk $(alldep)
+	adb uninstall $(app_pkg) >/dev/null 2>&1 || true
 	adb install $(apk_dir)/debug/app-debug.apk
 
 .PHONY: $(apk_dir)/debug/app-debug.apk
 $(apk_dir)/debug/app-debug.apk: $(alldep)
-	./gradlew assembleDebug
+	$(gradle) assembleDebug
 
 .PHONY: $(apk_dir)/app-release-unsigned.apk
 $(apk_dir)/app-release-unsigned.apk: $(alldep)
-	./gradlew assembleRelease
+	$(gradle) assembleRelease
 
 .PHONY:
-log logcat: $(alldep)
-	scripts/pidlog.sh $(pkg) -v color -b all
+logcat: $(alldep)
+	scripts/pidlog.sh $(app_pkg) -v color -b all
+
+.PHONY:
+clean-app: $(alldep)
+	$(gradle) :app:clean :opencv:clean
 
 
 ##### JNI native libraries targets #####
@@ -49,17 +56,15 @@ $(native_dir)/libpigpio-java.so: pigpio/src/pigpio/c/pigpio.c $(alldep)
 
 ##### LED transmitter targets #####
 
-.PHONY: build-trx
+PHONY: build-trx
 build-trx: build-native
-	./gradlew :trx:assemble
+	$(gradle) --configure-on-demand :trx:assemble
 
 .PHONY: run
 run: build-trx $(alldep)
-	sudo java -Djava.library.path=$(native_dir) -cp ./pigpio/build/libs/pigpio.jar:trx/build/libs/trx.jar $(pkg).trx.Main
+	sudo java -Djava.library.path=$(native_dir) -cp ./pigpio/build/libs/pigpio.jar:trx/build/libs/trx.jar $(trx_pkg).Main
 
-
-##### Other #####
-
-.PHONY: clean
-clean: $(alldep)
-	./gradlew clean
+.PHONY: clean-trx
+clean-trx: $(alldep)
+	$(gradle) --configure-on-demand :trx:clean :pigpio:clean :unix:clean
+	rm -rf $(native_dir)
