@@ -56,8 +56,11 @@ $(native_dir)/libpigpio-java.so: pigpio/src/pigpio/c/pigpio.c $(alldep)
 
 ##### LED transmitter targets #####
 
-PHONY: build-trx
-build-trx: build-native
+.PHONY: build-trx
+build-trx: build-native build-trx-java 
+
+.PHONY: build-trx-java
+build-trx-java: 
 	$(gradle) --configure-on-demand :trx:assemble
 
 .PHONY: run
