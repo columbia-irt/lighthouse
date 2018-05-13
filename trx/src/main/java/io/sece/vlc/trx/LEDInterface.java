@@ -1,11 +1,11 @@
 package io.sece.vlc.trx;
 
-import io.sece.pigpio.PiGPIO;
-import io.sece.pigpio.PiGPIOException;
-import java.awt.Color;
 
-interface LEDInterface {
-    void setIntensity(boolean off) throws PiGPIOException;
-    void setIntensity(int value) throws PiGPIOException;
-    void setColor(Color color) throws PiGPIOException;
+/**
+ * An abstract base class for all LED drivers that provide a means to set some
+ * parameters of the emitted light. The method set (which must be parametrized
+ * by the driver) provides an interface to set those parameters.
+ */
+interface LEDInterface<T> {
+    void set(T value) throws LEDException;
 }

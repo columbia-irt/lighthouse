@@ -1,24 +1,19 @@
 package io.sece.vlc.trx;
 
-import io.sece.pigpio.PiGPIO;
-import io.sece.pigpio.PiGPIOPin;
-import java.awt.Color;
+import java.util.BitSet;
 import java.lang.IllegalArgumentException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
-// PiGPIO.gpioSetMode(22, PiGPIO.PI_OUTPUT);
-// PiGPIO.gpioSetMode(27, PiGPIO.PI_OUTPUT);
-// PiGPIO.gpioSetMode(17, PiGPIO.PI_OUTPUT);
-// PiGPIO.gpioPWM(22, 255);
-// PiGPIO.gpioPWM(27, 100);
-// PiGPIO.gpioPWM(17, 100);
+
+import io.sece.pigpio.PiGPIO;
+import io.sece.pigpio.PiGPIOPin;
+import io.sece.vlc.OOKModulator;
+import io.sece.vlc.FSK2Modulator;
+import io.sece.vlc.FSK4Modulator;
+import io.sece.vlc.FSK8Modulator;
+
 
 public class Main {
-    public static LEDInterface piLED;
-    public static ModulatorInterface<BinSymbol> piMod;
-    public static PiGPIOPin redPin;
-    public static PiGPIOPin greenPin;
-    public static PiGPIOPin bluePin;
 
     public static void main(String[] args) throws Exception {
         System.out.println("Starting LED transmitter");
@@ -36,34 +31,39 @@ public class Main {
         API api = new API(8000);
         api.start(threadPool);
 
-        redPin = new PiGPIOPin(22); // red
-        greenPin = new PiGPIOPin(27); // green
-        bluePin = new PiGPIOPin(17); // blue
+        PiGPIOPin r = new PiGPIOPin(22);
+        PiGPIOPin g = new PiGPIOPin(27);
+        PiGPIOPin b = new PiGPIOPin(17);
 
-        piLED = new TriColorLED(redPin, greenPin, bluePin);
-        //piLED = new MonoColorLED(redPin.getGpio());
+        // Create an instance of a mono color GPIO-only (no PWM) LED. This is
+        // just for development and testing purposes.
+        PiBasicLED led1 = new PiBasicLED(r);
+        // Create an instance of a mono color PWM-controllable LED. This is
+        // just for development and testing purposes
+        PiPwmLED   led2 = new PiPwmLED(g);
+        PiRgbLED   led3 = new PiRgbLED(r, g, b);
 
-        final int delay = 100; //amount of time for sleep
-        final int amount = 100; //amount for the for-loop
-        final String input = "10"; //input string which gets multiplied in for-loop and stored in inputString
-
-        String inputString = "";
-
-        for(int i = 0; i < amount; i++)
-        {
-                inputString += input;
+        BitSet data = new BitSet();
+        for(int i = 0; i < 200; i += 2) {
+            data.set(i, true);
+            data.set(i + 1, false);
         }
 
         String finalString = "101011001100";
         System.out.println("LED transmitter is running");
 
-        if(inputString.matches("[0-1]+"))
-        {
-            piMod = new FSK2Modulator(inputString, piLED, delay);
-        }
-        else
-        {
-            throw new IllegalArgumentException();
-        }
+        FSK2Modulator mod1 = new FSK2Modulator();
+        FSK4Modulator mod2 = new FSK4Modulator();
+        FSK8Modulator mod3 = new FSK8Modulator();
+        OOKModulator  mod4 = new OOKModulator();
+
+        // Create an transmitter implementation which connects a particular
+        // LEDInterface object to a particular Modulator. Note this should
+        // enforce strict type checking and it should not be possible to
+        // connect LEDs with incompatible modulators. That should generate a compile-time error.
+        Transmitter<?> t = new Transmitter<>(new Ook2Amp(led2), mod4, 100);
+
+        // Transmit the data stored in the buffer.
+        t.tx(data);
     }
 }
