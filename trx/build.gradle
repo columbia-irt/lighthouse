@@ -1,5 +1,9 @@
 apply plugin: 'application'
 
+compileJava {
+    options.compilerArgs << '-Xlint:unchecked'
+}
+
 mainClassName = 'io.sece.vlc.trx.Main'
 
 sourceCompatibility = 1.8
