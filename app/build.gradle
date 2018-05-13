@@ -25,6 +25,7 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
+    implementation project(':shared')
     implementation project(':opencv')
 
     implementation 'com.android.support:appcompat-v7:27.1.0'

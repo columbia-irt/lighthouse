@@ -1,5 +1,6 @@
 rootProject.name = "lighthouse"
 
+include ':shared'
 include ':unix'
 include ':pigpio'
 include ':trx'

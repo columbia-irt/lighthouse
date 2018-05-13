@@ -16,6 +16,7 @@ jar {
 }
 
 dependencies {
+    compile project(':shared')
     compile project(':unix')
     compile project(':pigpio')
 }

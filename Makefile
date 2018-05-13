@@ -38,7 +38,7 @@ logcat: $(alldep)
 
 .PHONY:
 clean-app: $(alldep)
-	$(gradle) :app:clean :opencv:clean
+	$(gradle) :app:clean :opencv:clean :shared:clean
 
 
 ##### JNI native libraries targets #####
@@ -65,9 +65,9 @@ build-trx-java:
 
 .PHONY: run
 run: build-trx $(alldep)
-	sudo java -Djava.library.path=$(native_dir) -cp ./pigpio/build/libs/pigpio.jar:trx/build/libs/trx.jar $(trx_pkg).Main
+	sudo java -Djava.library.path=$(native_dir) -cp pigpio/build/libs/pigpio.jar:shared/build/libs/shared.jar:trx/build/libs/trx.jar $(trx_pkg).Main
 
 .PHONY: clean-trx
 clean-trx: $(alldep)
-	$(gradle) --configure-on-demand :trx:clean :pigpio:clean :unix:clean
+	$(gradle) --configure-on-demand :trx:clean :pigpio:clean :unix:clean :shared:clean
 	rm -rf $(native_dir)
