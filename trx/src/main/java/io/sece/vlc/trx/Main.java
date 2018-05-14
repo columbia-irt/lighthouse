@@ -61,7 +61,7 @@ public class Main {
         // LEDInterface object to a particular Modulator. Note this should
         // enforce strict type checking and it should not be possible to
         // connect LEDs with incompatible modulators. That should generate a compile-time error.
-        Transmitter<?> t = new Transmitter<>(new Ook2Amp(led2), mod4, 100);
+        Transmitter<?> t = new Transmitter<>(led3, mod1, 100);
 
         // Transmit the data stored in the buffer.
         t.tx(data);
