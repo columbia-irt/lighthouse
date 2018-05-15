@@ -6,6 +6,7 @@
       <module fileurl="file://$PROJECT_DIR$/lighthouse.iml" filepath="$PROJECT_DIR$/lighthouse.iml" />
       <module fileurl="file://$USER_HOME$/OpenCV-android-sdk/sdk/opencv.iml" filepath="$USER_HOME$/OpenCV-android-sdk/sdk/opencv.iml" />
       <module fileurl="file://$PROJECT_DIR$/pigpio/pigpio.iml" filepath="$PROJECT_DIR$/pigpio/pigpio.iml" />
+      <module fileurl="file://$PROJECT_DIR$/shared/shared.iml" filepath="$PROJECT_DIR$/shared/shared.iml" />
       <module fileurl="file://$PROJECT_DIR$/trx/trx.iml" filepath="$PROJECT_DIR$/trx/trx.iml" />
       <module fileurl="file://$PROJECT_DIR$/unix/unix.iml" filepath="$PROJECT_DIR$/unix/unix.iml" />
     </modules>

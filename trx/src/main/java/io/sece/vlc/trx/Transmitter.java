@@ -1,6 +1,5 @@
 package io.sece.vlc.trx;
 
-import java.util.BitSet;
 import io.sece.vlc.Modulator;
 
 /**
@@ -20,11 +19,20 @@ class Transmitter<T> {
         this.interval = interval;
     }
 
-    public void tx(BitSet data) throws LEDException, InterruptedException
+    public void tx(String data) throws LEDException, InterruptedException
     {
-        for(int i = 0; i < data.length(); i += modulator.bits) {
-            led.set(modulator.modulate(data, i));
-            Sleeper.sleepNanos(interval * 1000000);
+        if(data.length() % modulator.bits == 0)
+        {
+            for(int i = 0; i < data.length(); i += modulator.bits)
+            {
+                led.set(modulator.modulate(data, i));
+
+                Sleeper.sleepNanos(interval * 1000000);
+            }
+        }
+        else
+        {
+            throw new IllegalArgumentException();
         }
     }
 }

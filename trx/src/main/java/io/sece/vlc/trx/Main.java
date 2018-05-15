@@ -1,12 +1,13 @@
 package io.sece.vlc.trx;
 
-import java.util.BitSet;
 import java.lang.IllegalArgumentException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 
 import io.sece.pigpio.PiGPIO;
 import io.sece.pigpio.PiGPIOPin;
+import io.sece.vlc.CalibrationModulator;
+import io.sece.vlc.Color;
 import io.sece.vlc.OOKModulator;
 import io.sece.vlc.FSK2Modulator;
 import io.sece.vlc.FSK4Modulator;
@@ -43,27 +44,30 @@ public class Main {
         PiPwmLED   led2 = new PiPwmLED(g);
         PiRgbLED   led3 = new PiRgbLED(r, g, b);
 
-        BitSet data = new BitSet();
-        for(int i = 0; i < 200; i += 2) {
-            data.set(i, true);
-            data.set(i + 1, false);
-        }
+        //String which
+        String data = "11111";
 
-        String finalString = "101011001100";
+
         System.out.println("LED transmitter is running");
 
         FSK2Modulator mod1 = new FSK2Modulator();
         FSK4Modulator mod2 = new FSK4Modulator();
         FSK8Modulator mod3 = new FSK8Modulator();
         OOKModulator  mod4 = new OOKModulator();
+        CalibrationModulator mod5 = new CalibrationModulator(180,100,100);
 
         // Create an transmitter implementation which connects a particular
         // LEDInterface object to a particular Modulator. Note this should
         // enforce strict type checking and it should not be possible to
         // connect LEDs with incompatible modulators. That should generate a compile-time error.
-        Transmitter<?> t = new Transmitter<>(led3, mod1, 100);
+        Transmitter<?> t = new Transmitter<>(led3, mod5, 2000);
 
         // Transmit the data stored in the buffer.
         t.tx(data);
+
+        //testing purpose, make sure that the LED is off after any transmission
+        led3.set(Color.BLACK);
+
+        System.out.println("Done!");
     }
 }

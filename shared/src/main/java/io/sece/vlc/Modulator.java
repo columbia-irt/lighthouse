@@ -1,6 +1,5 @@
 package io.sece.vlc;
 
-import java.util.BitSet;
 
 
 /**
@@ -19,14 +18,16 @@ import java.util.BitSet;
 public abstract class Modulator<V> {
     public int bits;
 
-    public BitSet demodulate(BitSet data, V value) {
+
+    public String demodulate(String data, V value) {
         return demodulate(data, 0, value);
     }
 
-    public V modulate(BitSet data) {
+    public V modulate(String data) {
         return modulate(data, 0);
     }
 
-    public abstract BitSet demodulate(BitSet data, int offset, V value);
-    public abstract V modulate(BitSet data, int offset);
+    public abstract String demodulate(String data, int offset, V value);
+    public abstract V modulate(String data, int offset);
+
 }

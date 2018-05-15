@@ -1,6 +1,5 @@
 package io.sece.vlc;
 
-import java.util.BitSet;
 
 
 public class FSK4Modulator extends FreqModulator {
@@ -24,18 +23,22 @@ public class FSK4Modulator extends FreqModulator {
     }
 
     @Override
-    public Color modulate(BitSet data, int offset) {
+    public Color modulate(String data, int offset) {
         switch(symbol.fromBits(data, offset)) {
-        case 0: return n;
-        case 1: return e;
-        case 2: return s;
-        case 3: return w;
+        case 0:
+            return n;
+        case 1:
+            return e;
+        case 2:
+            return s;
+        case 3:
+            return w;
         }
         throw new AssertionError();
     }
 
     @Override
-    public BitSet demodulate(BitSet data, int offset, Color value) {
+    public String demodulate(String data, int offset, Color value) {
         // Not yet implemented
         throw new UnsupportedOperationException();
     }
