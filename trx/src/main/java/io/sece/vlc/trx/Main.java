@@ -50,7 +50,7 @@ public class Main {
         PiRgbLED   led3 = new PiRgbLED(r, g, b);
 
         //String which
-        String data = "11111";
+        String data = "101001010011";
 
 
         System.out.println("LED transmitter is running");
@@ -78,6 +78,7 @@ public class Main {
                 // connect LEDs with incompatible modulators. That should generate a compile-time error.
                 Transmitter<?> t = new Transmitter<>(led3, mod5, 2000);
 
+                data = "11";
                 // Transmit the data stored in the buffer.
                 t.tx(data);
 
@@ -93,7 +94,7 @@ public class Main {
             // LEDInterface object to a particular Modulator. Note this should
             // enforce strict type checking and it should not be possible to
             // connect LEDs with incompatible modulators. That should generate a compile-time error.
-            Transmitter<?> t = new Transmitter<>(led3, mod3, 2000);
+            Transmitter<?> t = new Transmitter<>(led3, mod1, 100);
 
             // Transmit the data stored in the buffer.
             t.tx(data);
