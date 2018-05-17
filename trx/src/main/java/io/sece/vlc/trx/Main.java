@@ -20,7 +20,7 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
 
-        boolean calibrate = true;
+        boolean calibrate = false;
 
         System.out.println("Starting LED transmitter");
         ExecutorService threadPool = Executors.newCachedThreadPool();
@@ -50,7 +50,7 @@ public class Main {
         PiRgbLED   led3 = new PiRgbLED(r, g, b);
 
         //String which
-        String data = "101001010011";
+        String data = "101001010011101001010011101001010011101001010011101001010011101001010011101001010011101001010011";
 
 
         System.out.println("LED transmitter is running");
@@ -65,10 +65,10 @@ public class Main {
 
         if(calibrate) {
             while (true) {
-                System.out.println("Hue Wert eingeben");
+                System.out.println("Insert Hue Value");
                 String hueFromLine = in.nextLine();
                 int hue = Integer.parseInt(hueFromLine);
-                System.out.println("Hue Wert: " + hue);
+                System.out.println("Hue Value: " + hue);
 
                 CalibrationModulator mod5 = new CalibrationModulator(hue, 100, 100);
 
