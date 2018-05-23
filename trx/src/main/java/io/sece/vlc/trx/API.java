@@ -5,6 +5,7 @@ import java.net.URI;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -12,6 +13,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
@@ -21,16 +24,23 @@ import io.sece.vlc.CalibrationModulator;
 import io.sece.vlc.Color;
 
 
+
+
 public class API {
     private int port;
     private HttpServer server;
+    private static String tID;
+    private static boolean active;
 
     public API(int port) throws IOException {
+        tID = "";
+        active = false;
         this.port = port;
         server = HttpServer.create(new InetSocketAddress(port), 0);
         server.createContext("/", new RootHandler());
         server.createContext("/calibration", new calibrationHandler());
-        server.createContext("/calibrationJson", new hueValueHandler());
+        server.createContext("/transmit", new transmissionHandler());
+        server.createContext("/off", new offHandler());
         server.setExecutor(null);
     }
 
@@ -47,7 +57,7 @@ public class API {
 
     static class RootHandler implements HttpHandler {
         public void handle(HttpExchange t) throws IOException {
-            byte [] response = "works".getBytes();
+            byte[] response = "works".getBytes();
             t.sendResponseHeaders(200, response.length);
             OutputStream os = t.getResponseBody();
             os.write(response);
@@ -113,9 +123,52 @@ public class API {
     }
 
 
-    static class hueValueHandler implements HttpHandler {
+    static class transmissionHandler implements HttpHandler {
         public void handle(HttpExchange t) throws IOException {
-            byte [] response = "Json".getBytes();
+            byte [] response;
+            if(active)
+            {
+                response = "Currently Running".getBytes();
+            }
+            else
+            {
+                active = true;
+                tID = String.valueOf((int)(Math.random() * 901 + 100));
+                response = tID.getBytes();
+            }
+
+            t.sendResponseHeaders(200, response.length);
+            OutputStream os = t.getResponseBody();
+            os.write(response);
+            os.close();
+        }
+    }
+
+    static class offHandler implements HttpHandler {
+        public void handle(HttpExchange t) throws IOException {
+            Gson gson = new Gson();
+            String jsonString;
+            byte [] response;
+            if(!active)
+            {
+                jsonString = "Not active";
+            }
+            else
+            {
+                if (true)//tID muss be transmitted by client
+                {
+                    jsonString = "its turned off";
+                    tID = "";
+                    active = false;
+                }
+                else
+                {
+                    jsonString = "you are not allowed to turn the device off!";
+                }
+            }
+
+            response = gson.toJson(jsonString).getBytes();
+
             t.sendResponseHeaders(200, response.length);
             OutputStream os = t.getResponseBody();
             os.write(response);
@@ -161,3 +214,4 @@ public class API {
         }
     }
 }
+
