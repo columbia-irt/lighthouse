@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
     CircularBuffer<Mat> circularBuffer;
     LinkedBlockingQueue syncBlockingQueue;
 
-    int delay = 50;
+    int delay = 1000;
     long firstTimeStamp = 0;
     int bqCounter = 0;
 
