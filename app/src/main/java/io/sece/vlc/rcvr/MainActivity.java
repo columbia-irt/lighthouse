@@ -15,13 +15,19 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.SurfaceView;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.Semaphore;
 
 public class MainActivity extends AppCompatActivity implements CvCameraViewListener2 {
     private static final String TAG = "MainActivity";
@@ -30,6 +36,7 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
     /*
         Matrices used for storing images to different colors
      */
+
     Mat imgRed, imgBlue, imgGreen, imgYellow, imgPurple, imgTurquoise;
 
     /*
@@ -55,18 +62,17 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
 
     /*
         Variables needed for synchronized Thread Approach
-        - currentFrameFGBA contains the latest preview frame matrix
-        - synchronizedFrames contains all frames matrices in periodically intervals
+        - circularBuffer contains the latest Frames in form of a matrix
+        - syncBlockingQueue contains all frames matrices in periodically intervals
      */
-    Mat currentFrameRGBA;
-    ArrayList<Mat> synchronizedFrames;
 
-    /*
-        ReceivingClockThread stores in defined intervals the latestFrame to synchronizedFrames
-        FrameProcessingThread is a workerthread waiting for frames stored in synchronizedFrames to process and remove from it
-     */
-    ReceivingClockThread clockThread;
-    FrameProcessingThread frameProcessingThread;
+    CircularBuffer<Mat> circularBuffer;
+    LinkedBlockingQueue syncBlockingQueue;
+
+    int delay = 50;
+    long firstTimeStamp = 0;
+    int bqCounter = 0;
+
 
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         @Override
@@ -99,7 +105,18 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_main);
 
-        synchronizedFrames = new ArrayList<Mat>();
+        circularBuffer = new CircularBuffer(20);
+
+        syncBlockingQueue =  new LinkedBlockingQueue<CvCameraViewFrame>();
+
+
+ /*
+            Start Background-Thread for:
+             - Processing frames as soon as they are stored in syncBlockingQueue
+ */
+        SyncFramesProcessor syncFramesProcessor = new SyncFramesProcessor(syncBlockingQueue);
+        Thread SyncFrameProcessorThread = new Thread(syncFramesProcessor);
+        SyncFrameProcessorThread.start();
 
         colors[RED] = 0;
         colors[GREEN] = 0;
@@ -108,12 +125,33 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
         colors[PURPLE] = 0;
         colors[TURQUOISE] = 0;
 
+        if (checkSelfPermission(Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_GRANTED){
+            initCamera();
+        }else{
+            requestPermissions(new String[] {Manifest.permission.CAMERA}, 100);
+        }
+
+    }
+
+    public void initCamera() {
         mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.JCV);
         mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
         mOpenCvCameraView.setCvCameraViewListener(this);
 
-//        mOpenCvCameraView.enableFpsMeter();
+    }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 100) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                initCamera();
+            }else{
+                Toast.makeText(this, "Camera permission denied - Application closing", Toast.LENGTH_LONG).show();
+                finish();
+            }
+        }
     }
 
     @Override
@@ -164,19 +202,6 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
 
         imgRectangleContent = new Mat(rHeight,rWidth, CvType.CV_8UC4);
 
-        /*
-            Start Background-Threads for:
-             - regular Interval Frame Receiving
-             - Processing as soon as they are stored in synchronizedFrames
-         */
-
-        int fps = 10;
-        clockThread = new ReceivingClockThread();
-        clockThread.delay = 1000 / fps;
-        clockThread.start();
-
-        frameProcessingThread = new FrameProcessingThread();
-        frameProcessingThread.start();
     }
 
     public void onCameraViewStopped()
@@ -186,21 +211,53 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
 
     public Mat onCameraFrame(CvCameraViewFrame inputFrame)
     {
-//      Store a copy of the current frame matrix into currentFrameRGBA variable
-        mRgba = inputFrame.rgba();
-        currentFrameRGBA = mRgba.clone();
+    /**
+     *  This is called on a seperate Thread created by JavaCamera2View (CV) Class
+     */
+        circularBuffer.put(inputFrame.rgba().clone());
 
+
+        long currDiff = (System.currentTimeMillis() - firstTimeStamp - ((bqCounter - 1) * delay));
+//        System.out.println("Curr: " + currDiff);
+
+        if(firstTimeStamp == 0){
+//            for synchronization of following frames we need to store the first timestamp
+            firstTimeStamp = System.currentTimeMillis();
+            System.out.println("first " + firstTimeStamp);
+            bqCounter++;
+            addToBlockingQueue();
+        }else if (currDiff >= 0) {
+            bqCounter++;
+            addToBlockingQueue();
+        }
+
+        mRgba = inputFrame.rgba();
 //      Draw the rectangle frame for led in entire matrix for preview
         Imgproc.rectangle(mRgba, new Point(mRgba.cols() / 2 - rWidth / 2, mRgba.rows() / 2 - rHeight / 2), new Point(mRgba.cols() / 2 + rWidth / 2, mRgba.rows() / 2 + rHeight / 2), new Scalar(255, 255, 255), 1);
 
         return mRgba;
     }
 
-    public void processFrame(Mat pFrameRGBA) {
+    public void addToBlockingQueue() {
+        /*
+            Limitation of BlockingQueue Size ?
+            -> BlockingQueue put() waiting if necessary for space to become available
+         */
+        System.out.println(Thread.currentThread().getId() + " " + System.currentTimeMillis()+" SyncFramesReceived " + bqCounter);
 
+        try{
+            syncBlockingQueue.put(circularBuffer.get());
+        }catch(InterruptedException e){
+            System.out.println(e);
+        }
+     }
+
+    public void processFrame(Mat pFrameRGBA) throws InterruptedException{
+        System.out.println("## Processing Frame ## " + System.currentTimeMillis());
 //      Define the small area to be processed as rectangle and store this submatrix
-        Rect rect = new Rect(((pFrameRGBA.cols() / 2) - (rWidth / 2)), ((pFrameRGBA.rows() / 2) - (rHeight / 2)), rWidth, rHeight);
-        Mat imgRectangleContent = pFrameRGBA.submat(rect);
+        AreaOfInterest areaOfInterest = new AreaOfInterest(((pFrameRGBA.cols() / 2) - (rWidth / 2)), ((pFrameRGBA.rows() / 2) - (rHeight / 2)), rWidth, rHeight);
+
+        Mat imgRectangleContent = pFrameRGBA.submat(areaOfInterest.getRectangle());
 
 //      Write HSV-Colors from submatrix into imgHSV
         Imgproc.cvtColor(imgRectangleContent, imgHSV, Imgproc.COLOR_BGR2HSV);
@@ -247,9 +304,9 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
                     /*
                         STOP Condition
                      */
-                    clockThread.stopThread();
+//                    clockThread.stopThread();
                     System.out.println("BLUE");
-                    measureErrorRateByOrder(output);
+//                    measureErrorRateByOrder(output);
                     System.out.println(output.length() + " " + output);
                     break;
                 }
@@ -267,6 +324,7 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
             }
         }
 
+
         /*
             Temporary solution to delete leading '0' in output
             (all frames are stored currently)
@@ -278,98 +336,6 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
 
 
 
-    /*
-        This Thread is in Charge to store the current frame in a regular interval
-     */
-
-    class ReceivingClockThread extends Thread {
-        int delay;
-        int counter = 0;
-        long startTime = 0;
-        long currTime = 0;
-        long diff = 0;
-        int diffCounter = 0;
-        boolean running = true;
-        public void stopThread() {
-            running = false;
-        }
-        public void run() {
-            while(running){
 
 
-                try{
-                    if(currentFrameRGBA != null){
-                        counter++;
-
-                        /*
-                            Save timestamp of first received frame for synchronization of following frames
-                         */
-
-                        if(startTime == 0){
-                            startTime = System.currentTimeMillis();
-                        }
-                        currTime = System.currentTimeMillis();
-
-                        System.out.println(Thread.currentThread().getId() + "## Adding Frame ## " + System.currentTimeMillis() + " " + counter);
-
-                        /*
-                            Calculating the difference between currentframe and startframe
-                         */
-                        diff = currTime - startTime - ((counter - 1) * delay);
-                        /*
-                            Adding latest frame to synchronizedFrames
-                         */
-                        synchronizedFrames.add(currentFrameRGBA);
-
-
-//                        Measuring the avg error of sleep
-//                        System.out.println("DIFF: " + diff);
-//                        diffCounter += diff;
-//                        if(counter == 1000){
-//                            System.out.println("AVG Diff: " + ((float)diffCounter / (float) counter));
-//                        }
-
-                    }
-                  sleep(delay - diff);
-                }catch(Exception e){
-                    System.out.println(e);
-                }
-            }
-
-        }
-    }
-
-
-    /*
-        This Thread is waiting for stored Frames to be processed
-     */
-
-    class FrameProcessingThread extends Thread {
-        public void run() {
-            while(true){
-                if(synchronizedFrames.size() > 0 && synchronizedFrames.get(0) != null){
-                    System.out.println("## Processing Frame ## " + System.currentTimeMillis());
-                    processFrame(synchronizedFrames.get(0));
-                    synchronizedFrames.remove(0);
-                }
-            }
-
-        }
-    }
-
-
-
-    public void measureErrorRateByOrder(String receivedBits){
-        int errors = 0;
-
-        char prev = '0';
-        for(int i = 0; i < receivedBits.length(); i++){
-            if(receivedBits.charAt(i) == prev){
-                errors++;
-            }
-            prev = receivedBits.charAt(i);
-        }
-        System.out.println("Total: " + receivedBits.length() + " ErrorCount: " +errors);
-
-    }
 }
