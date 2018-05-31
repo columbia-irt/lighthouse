@@ -19,10 +19,15 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.view.MotionEventCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.SurfaceView;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.SeekBar;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -46,6 +51,10 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
 
     int rHeight = 40;
     int rWidth = 40;
+    int areaX = 200;
+    int areaY = 200;
+
+
 
     /*
         Array to store amount of pixels to different colors in each frame
@@ -58,7 +67,6 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
     final int PURPLE = 4;
     final int TURQUOISE = 5;
 
-    String output = "";
 
     /*
         Variables needed for synchronized Thread Approach
@@ -69,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
     CircularBuffer<Mat> circularBuffer;
     LinkedBlockingQueue syncBlockingQueue;
 
-    int delay = 1000;
+    int delay = 50;
     long firstTimeStamp = 0;
     int bqCounter = 0;
 
@@ -110,10 +118,11 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
         syncBlockingQueue =  new LinkedBlockingQueue<CvCameraViewFrame>();
 
 
- /*
-            Start Background-Thread for:
-             - Processing frames as soon as they are stored in syncBlockingQueue
- */
+     /*
+                Start Background-Thread for:
+                 - Processing frames as soon as they are stored in syncBlockingQueue
+     */
+
         SyncFramesProcessor syncFramesProcessor = new SyncFramesProcessor(syncBlockingQueue);
         Thread SyncFrameProcessorThread = new Thread(syncFramesProcessor);
         SyncFrameProcessorThread.start();
@@ -131,16 +140,57 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
         }else{
             requestPermissions(new String[] {Manifest.permission.CAMERA}, 100);
         }
-
+        enableRectangleSelection();
+        enableRectangleSizing();
     }
 
     public void initCamera() {
         mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.JCV);
         mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
         mOpenCvCameraView.setCvCameraViewListener(this);
-
     }
 
+    public void enableRectangleSelection(){
+        /*
+            OnTouch Listener for Changing Area to be selected
+         */
+        JavaCamera2View view = findViewById(R.id.JCV);
+        view.setOnTouchListener(new View.OnTouchListener() {
+            public boolean onTouch(View v, MotionEvent event) {
+                int action = event.getActionMasked();
+                if(action == MotionEvent.ACTION_DOWN) {
+                    DisplayMetrics dm = getResources().getDisplayMetrics();
+                    areaX = (int)(event.getX() / dm.widthPixels  * 640);
+                    areaY = (int)(event.getY()/ dm.heightPixels  * 480);
+//                    areaY = (int)event.getY();
+
+                    System.out.println("X " + dm.widthPixels);
+                    System.out.println("Y " + dm.heightPixels);
+                    System.out.println("CLICKED DOWN " + areaX + " " + areaY);
+                }
+                return true;
+            }
+        });
+    }
+
+    public void enableRectangleSizing() {
+        SeekBar seekbarSize = (SeekBar)findViewById(R.id.seekbarSize);
+        seekbarSize.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                rWidth = progress + 8;
+                rHeight = progress + 8;
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
+    }
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -214,7 +264,12 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
     /**
      *  This is called on a seperate Thread created by JavaCamera2View (CV) Class
      */
-        circularBuffer.put(inputFrame.rgba().clone());
+
+        mRgba = inputFrame.rgba();
+        AreaOfInterest areaOfInterest = new AreaOfInterest(areaX, areaY, rWidth, rHeight);
+
+        Rect currRect = areaOfInterest.getRectangle();
+        circularBuffer.put(mRgba.submat(currRect).clone());
 
 
         long currDiff = (System.currentTimeMillis() - firstTimeStamp - ((bqCounter - 1) * delay));
@@ -224,16 +279,15 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
 //            for synchronization of following frames we need to store the first timestamp
             firstTimeStamp = System.currentTimeMillis();
             System.out.println("first " + firstTimeStamp);
-            bqCounter++;
-            addToBlockingQueue();
         }else if (currDiff >= 0) {
             bqCounter++;
             addToBlockingQueue();
         }
 
-        mRgba = inputFrame.rgba();
+
 //      Draw the rectangle frame for led in entire matrix for preview
-        Imgproc.rectangle(mRgba, new Point(mRgba.cols() / 2 - rWidth / 2, mRgba.rows() / 2 - rHeight / 2), new Point(mRgba.cols() / 2 + rWidth / 2, mRgba.rows() / 2 + rHeight / 2), new Scalar(255, 255, 255), 1);
+        Imgproc.rectangle(mRgba, new Point(currRect.x, currRect.y), new Point(currRect.x + currRect.width, currRect.y + currRect.height), new Scalar(255, 255, 255), 1);
+//        Imgproc.rectangle(mRgba, new Point(mRgba.cols() / 2 - rWidth / 2, mRgba.rows() / 2 - rHeight / 2), new Point(mRgba.cols() / 2 + rWidth / 2, mRgba.rows() / 2 + rHeight / 2), new Scalar(255, 255, 255), 1);
 
         return mRgba;
     }
@@ -253,85 +307,83 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
      }
 
     public void processFrame(Mat pFrameRGBA) throws InterruptedException{
-        System.out.println("## Processing Frame ## " + System.currentTimeMillis());
-//      Define the small area to be processed as rectangle and store this submatrix
-        AreaOfInterest areaOfInterest = new AreaOfInterest(((pFrameRGBA.cols() / 2) - (rWidth / 2)), ((pFrameRGBA.rows() / 2) - (rHeight / 2)), rWidth, rHeight);
-
-        Mat imgRectangleContent = pFrameRGBA.submat(areaOfInterest.getRectangle());
-
-//      Write HSV-Colors from submatrix into imgHSV
-        Imgproc.cvtColor(imgRectangleContent, imgHSV, Imgproc.COLOR_BGR2HSV);
-
-//      imgHSV is seperated into specific Color-Ranges and saved into Matrixes for every Color
-        Core.inRange(imgHSV, new Scalar(100, 20, 10), new Scalar(130, 255, 255), imgRed);
-        Core.inRange(imgHSV, new Scalar(0, 20, 10), new Scalar(10, 255, 255), imgBlue);
-        Core.inRange(imgHSV, new Scalar(55, 30, 15), new Scalar(65, 255, 255), imgGreen);
-        Core.inRange(imgHSV, new Scalar(80, 50, 50), new Scalar(90, 255, 255), imgYellow);
-        Core.inRange(imgHSV, new Scalar(140, 20, 10), new Scalar(160, 255, 255), imgPurple);
-        Core.inRange(imgHSV, new Scalar(27, 20, 10), new Scalar(33, 255, 255), imgTurquoise);
-
-//      Count all Pixels matching specific Colors
-        colors[RED] = Core.countNonZero(imgRed);
-        colors[GREEN] = Core.countNonZero(imgGreen);
-        colors[BLUE] = Core.countNonZero(imgBlue);
-        colors[YELLOW] = Core.countNonZero(imgYellow);
-        colors[PURPLE] = Core.countNonZero(imgPurple);
-        colors[TURQUOISE] = Core.countNonZero(imgTurquoise);
-
-        /*
-            Read out the index of the color which is most likely
-         */
-        int maxIndex = 0;
-        for (int i = 0; i < colors.length; i++) {
-            if (colors[i] > colors[maxIndex]) {
-                maxIndex = i;
-            }
-        }
-
-//      Regarding the experienced limits of the value of different colors we can check if all of them are off
-//      values: last Average values from tests divided by 2
-        if (colors[RED] < 188 && colors[GREEN] < 217 && colors[BLUE] < 308){
-            System.out.println("OFF");
-            output += 0;
-        } else {
-            switch (maxIndex) {
-                case RED: {
-                    System.out.println("RED");
-                    output += 1;
-                    break;
-                }
-                case BLUE: {
-                    /*
-                        STOP Condition
-                     */
-//                    clockThread.stopThread();
-                    System.out.println("BLUE");
-//                    measureErrorRateByOrder(output);
-                    System.out.println(output.length() + " " + output);
-                    break;
-                }
-                case GREEN: {
-                     /*
-                        START Condition
-                     */
-                    System.out.println("GREEN");
-                    break;
-                }
-                case PURPLE: {
-                    System.out.println("PURPLE");
-                    break;
-                }
-            }
-        }
-
-
-        /*
-            Temporary solution to delete leading '0' in output
-            (all frames are stored currently)
-         */
-        if(output.length() > 0 && output.charAt(0) == '0'){
-            output = output.substring(1, output.length());
-        }
+//        System.out.println("## Processing Frame ## " + System.currentTimeMillis());
+//
+//        Mat imgRectangleContent = pFrameRGBA;
+//
+////      Write HSV-Colors from submatrix into imgHSV
+//        Imgproc.cvtColor(imgRectangleContent, imgHSV, Imgproc.COLOR_BGR2HSV);
+//
+////      imgHSV is seperated into specific Color-Ranges and saved into Matrixes for every Color
+//        Core.inRange(imgHSV, new Scalar(100, 20, 10), new Scalar(130, 255, 255), imgRed);
+//        Core.inRange(imgHSV, new Scalar(0, 20, 10), new Scalar(10, 255, 255), imgBlue);
+//        Core.inRange(imgHSV, new Scalar(55, 30, 15), new Scalar(65, 255, 255), imgGreen);
+//        Core.inRange(imgHSV, new Scalar(80, 50, 50), new Scalar(90, 255, 255), imgYellow);
+//        Core.inRange(imgHSV, new Scalar(140, 20, 10), new Scalar(160, 255, 255), imgPurple);
+//        Core.inRange(imgHSV, new Scalar(27, 20, 10), new Scalar(33, 255, 255), imgTurquoise);
+//
+////      Count all Pixels matching specific Colors
+//        colors[RED] = Core.countNonZero(imgRed);
+//        colors[GREEN] = Core.countNonZero(imgGreen);
+//        colors[BLUE] = Core.countNonZero(imgBlue);
+//        colors[YELLOW] = Core.countNonZero(imgYellow);
+//        colors[PURPLE] = Core.countNonZero(imgPurple);
+//        colors[TURQUOISE] = Core.countNonZero(imgTurquoise);
+//
+//        /*
+//            Read out the index of the color which is most likely
+//         */
+//        int maxIndex = 0;
+//        for (int i = 0; i < colors.length; i++) {
+//            if (colors[i] > colors[maxIndex]) {
+//                maxIndex = i;
+//            }
+//        }
+//
+////      Regarding the experienced limits of the value of different colors we can check if all of them are off
+////      values: last Average values from tests divided by 2
+//        if (colors[RED] < 188 && colors[GREEN] < 217 && colors[BLUE] < 308){
+//            System.out.println("OFF");
+//            output += 0;
+//        } else {
+//            switch (maxIndex) {
+//                case RED: {
+//                    System.out.println("RED");
+//                    output += 1;
+//                    break;
+//                }
+//                case BLUE: {
+//                    /*
+//                        STOP Condition
+//                     */
+////                    clockThread.stopThread();
+//                    System.out.println("BLUE");
+////                    measureErrorRateByOrder(output);
+//                    System.out.println(output.length() + " " + output);
+//                    break;
+//                }
+//                case GREEN: {
+//                     /*
+//                        START Condition
+//                     */
+//                    System.out.println("GREEN");
+//                    break;
+//                }
+//                case PURPLE: {
+//                    System.out.println("PURPLE");
+//                    break;
+//                }
+//            }
+//        }
+//
+//
+//        /*
+//            Temporary solution to delete leading '0' in output
+//            (all frames are stored currently)
+//         */
+//        if(output.length() > 0 && output.charAt(0) == '0'){
+//            output = output.substring(1, output.length());
+//        }
     }
 
 
