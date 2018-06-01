@@ -1,5 +1,9 @@
 package io.sece.vlc.trx;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLDecoder;
@@ -22,8 +26,11 @@ import com.sun.net.httpserver.HttpServer;
 import io.sece.pigpio.PiGPIOPin;
 import io.sece.vlc.CalibrationModulator;
 import io.sece.vlc.Color;
-
-
+import io.sece.vlc.FSK2Modulator;
+import io.sece.vlc.FSK4Modulator;
+import io.sece.vlc.FSK8Modulator;
+import io.sece.vlc.Modulator;
+import io.sece.vlc.OOKModulator;
 
 
 public class API {
@@ -31,6 +38,10 @@ public class API {
     private HttpServer server;
     private static String tID;
     private static boolean active;
+    private static Thread threadCali;
+    private static Thread threadTrans;
+    private static Thread threadDog = new Thread();
+
 
     public API(int port) throws IOException {
         tID = "";
@@ -56,10 +67,10 @@ public class API {
     }
 
     static class RootHandler implements HttpHandler {
-        public void handle(HttpExchange t) throws IOException {
+        public void handle(HttpExchange he) throws IOException {
             byte[] response = "works".getBytes();
-            t.sendResponseHeaders(200, response.length);
-            OutputStream os = t.getResponseBody();
+            he.sendResponseHeaders(200, response.length);
+            OutputStream os = he.getResponseBody();
             os.write(response);
             os.close();
         }
@@ -67,150 +78,159 @@ public class API {
 
     static class calibrationHandler implements HttpHandler {
         public void handle(HttpExchange he) throws IOException {
-            Map<String, Object> parameters = new HashMap<String, Object>();
-            URI requestedUri = he.getRequestURI();
-            String query = requestedUri.getRawQuery();
-            parseQuery(query, parameters);
-            int hue = 300;
-            int duration = 2000;
-            // send response
-            String response = "";
-            for (String key : parameters.keySet()) {
-                response += key + " = " + parameters.get(key) + "\n";
-                if(key.equals("hueValue"))
-                {
-                    hue = Integer.parseInt(parameters.get(key).toString());
-                }
-                else if(key.equals("duration"))
-                {
-                    duration = Integer.parseInt(parameters.get(key).toString());
-                }
-            }
-            he.sendResponseHeaders(200, response.length());
-            OutputStream os = he.getResponseBody();
-            os.write(response.toString().getBytes());
 
-            try
-            {
-                PiGPIOPin r = new PiGPIOPin(22);
-                PiGPIOPin g = new PiGPIOPin(27);
-                PiGPIOPin b = new PiGPIOPin(17);
-                PiRgbLED   led3 = new PiRgbLED(r, g, b);
-
-                CalibrationModulator mod5 = new CalibrationModulator(hue, 100, 100);
-
-                // Create an transmitter implementation which connects a particular
-                // LEDInterface object to a particular Modulator. Note this should
-                // enforce strict type checking and it should not be possible to
-                // connect LEDs with incompatible modulators. That should generate a compile-time error.
-                Transmitter<?> t = new Transmitter<>(led3, mod5, duration);
-
-                String data = "11";
-                // Transmit the data stored in the buffer.
-
-                t.tx(data);
-                led3.set(Color.BLACK);
-            }
-            catch (Exception e)
-            {
-                System.out.println(e.getMessage());
-            }
-
-            //testing purpose, make sure that the LED is off after any transmission
-
-            os.close();
-        }
-    }
-
-
-    static class transmissionHandler implements HttpHandler {
-        public void handle(HttpExchange t) throws IOException {
             byte [] response;
+
+            OutputStream os = he.getResponseBody();
+
+            if(threadDog != null && !threadDog.isAlive())
+            {
+                active = false;
+                tID = "";
+            }
+
             if(active)
             {
                 response = "Currently Running".getBytes();
+
+
+                he.sendResponseHeaders(200, response.length);
+                os.write(response);
             }
             else
             {
                 active = true;
                 tID = String.valueOf((int)(Math.random() * 901 + 100));
                 response = tID.getBytes();
+
+
+                he.sendResponseHeaders(200, response.length);
+
+
+                try (Reader isr =  new InputStreamReader(he.getRequestBody(),"utf-8")) {
+                    Gson gson = new GsonBuilder().create();
+                    calibrationClass calC = gson.fromJson(isr, calibrationClass.class);
+                    System.out.println(calC);
+
+                    threadCali = new Thread(calC);
+                    threadDog = new Thread(new watchDog(threadCali, calC.getDuration()*(calC.getHueValue().length + 1)));
+                    threadDog.start();
+                    threadCali.start();
+                    os.write(response);
+                    //testing purpose, make sure that the LED is off after any transmission
+                }
+                catch (Exception e)
+                {
+                    active = false;
+                    tID = "";
+                    System.out.println(e.getMessage());
+                    response = "Failed reading json".getBytes();
+                    os.write(response);
+                }
+            }
+            os.close();
+        }
+    }
+
+
+    static class transmissionHandler implements HttpHandler {
+        public void handle(HttpExchange he) throws IOException {
+            byte [] response;
+
+            if(threadDog != null && !threadDog.isAlive())
+            {
+                active = false;
+                tID = "";
             }
 
-            t.sendResponseHeaders(200, response.length);
-            OutputStream os = t.getResponseBody();
-            os.write(response);
+            OutputStream os = he.getResponseBody();
+            if(active)
+            {
+                response = "Currently Running".getBytes();
+                he.sendResponseHeaders(200, response.length);
+                os.write(response);
+            }
+            else
+            {
+                active = true;
+                tID = String.valueOf((int)(Math.random() * 901 + 100));
+                response = tID.getBytes();
+                he.sendResponseHeaders(200, response.length);
+
+                try (Reader isr =  new InputStreamReader(he.getRequestBody(),"utf-8")) {
+                    Gson gson = new GsonBuilder().create();
+                    transmissionClass transC = gson.fromJson(isr, transmissionClass.class);
+                    System.out.println(transC);
+
+                    threadTrans = new Thread(transC);
+                    threadDog = new Thread(new watchDog(threadCali, transC.getTimeout()));
+                    threadDog.start();
+                    threadTrans.start();
+
+                    os.write(response);
+                    //testing purpose, make sure that the LED is off after any transmission
+                }
+                catch (Exception e)
+                {
+                    active = false;
+                    tID = "";
+                    System.out.println(e.getMessage());
+                    response = "Failed reading json".getBytes();
+                    os.write(response);
+                }
+            }
             os.close();
         }
     }
 
     static class offHandler implements HttpHandler {
-        public void handle(HttpExchange t) throws IOException {
-            Gson gson = new Gson();
-            String jsonString;
+        public void handle(HttpExchange he) throws IOException {
+            String jsonString = "";
             byte [] response;
-            if(!active)
-            {
-                jsonString = "Not active";
-            }
-            else
-            {
-                if (true)//tID muss be transmitted by client
-                {
-                    jsonString = "its turned off";
-                    tID = "";
-                    active = false;
-                }
-                else
-                {
-                    jsonString = "you are not allowed to turn the device off!";
-                }
-            }
+            transmissionID transID;
 
-            response = gson.toJson(jsonString).getBytes();
 
-            t.sendResponseHeaders(200, response.length);
-            OutputStream os = t.getResponseBody();
+
+            try (Reader isr =  new InputStreamReader(he.getRequestBody(),"utf-8")) {
+                Gson gson = new GsonBuilder().create();
+                transID = gson.fromJson(isr, transmissionID.class);
+                PiGPIOPin r = new PiGPIOPin(22);
+                PiGPIOPin g = new PiGPIOPin(27);
+                PiGPIOPin b = new PiGPIOPin(17);
+                PiRgbLED led = new PiRgbLED(r, g, b);
+                if (!active) {
+                    jsonString = "Not active";
+                } else {
+                    if (tID.equals(String.valueOf(transID.getID())))//tID muss be transmitted by client
+                    {
+                        jsonString = "you turned it off";
+                        if (threadCali != null && threadCali.isAlive()) {
+                            threadCali.stop();
+                        }
+                        if (threadTrans != null && threadTrans.isAlive()) {
+                            threadTrans.stop();
+                        }
+                        if (threadDog != null && threadDog.isAlive()) {
+                            threadDog.stop();
+                        }
+                        tID = "";
+                        active = false;
+                    } else {
+                        jsonString = "you are not allowed to turn the device off!";
+                    }
+                }
+            }
+            catch(Exception e)
+                {
+                    System.out.println(e.getMessage());
+                }
+
+            response = jsonString.getBytes();
+
+            he.sendResponseHeaders(200, response.length);
+            OutputStream os = he.getResponseBody();
             os.write(response);
             os.close();
-        }
-    }
-
-    public static void parseQuery(String query, Map<String,
-            Object> parameters) throws UnsupportedEncodingException {
-
-        if (query != null) {
-            String pairs[] = query.split("[&]");
-            for (String pair : pairs) {
-                String param[] = pair.split("[=]");
-                String key = null;
-                String value = null;
-                if (param.length > 0) {
-                    key = URLDecoder.decode(param[0],
-                            System.getProperty("file.encoding"));
-                }
-
-                if (param.length > 1) {
-                    value = URLDecoder.decode(param[1],
-                            System.getProperty("file.encoding"));
-                }
-
-                if (parameters.containsKey(key)) {
-                    Object obj = parameters.get(key);
-                    if (obj instanceof List<?>) {
-                        List<String> values = (List<String>) obj;
-                        values.add(value);
-
-                    } else if (obj instanceof String) {
-                        List<String> values = new ArrayList<String>();
-                        values.add((String) obj);
-                        values.add(value);
-                        parameters.put(key, values);
-                    }
-                } else {
-                    parameters.put(key, value);
-                }
-            }
         }
     }
 }
