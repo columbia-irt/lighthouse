@@ -1,6 +1,9 @@
 package io.sece.vlc.rcvr;
 
 
+
+
+import org.json.JSONObject;
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
 import org.opencv.android.LoaderCallbackInterface;
@@ -16,6 +19,7 @@ import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -27,8 +31,17 @@ import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.Toast;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 
 import java.util.ArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -54,18 +67,13 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
     int areaX = 200;
     int areaY = 200;
 
+    Context context;
 
 
     /*
         Array to store amount of pixels to different colors in each frame
      */
     Integer[] colors= new Integer[6];
-    final int RED = 0;
-    final int GREEN = 1;
-    final int BLUE = 2;
-    final int YELLOW = 3;
-    final int PURPLE = 4;
-    final int TURQUOISE = 5;
 
 
     /*
@@ -77,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
     CircularBuffer<Mat> circularBuffer;
     LinkedBlockingQueue syncBlockingQueue;
 
-    int delay = 50;
+    int delay = 500;
     long firstTimeStamp = 0;
     int bqCounter = 0;
 
@@ -117,22 +125,17 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
 
         syncBlockingQueue =  new LinkedBlockingQueue<CvCameraViewFrame>();
 
+        context = this;
 
      /*
                 Start Background-Thread for:
                  - Processing frames as soon as they are stored in syncBlockingQueue
      */
 
-        SyncFramesProcessor syncFramesProcessor = new SyncFramesProcessor(syncBlockingQueue);
+        SyncFramesProcessor syncFramesProcessor = new SyncFramesProcessor(syncBlockingQueue, this);
         Thread SyncFrameProcessorThread = new Thread(syncFramesProcessor);
         SyncFrameProcessorThread.start();
 
-        colors[RED] = 0;
-        colors[GREEN] = 0;
-        colors[BLUE] = 0;
-        colors[YELLOW] = 0;
-        colors[PURPLE] = 0;
-        colors[TURQUOISE] = 0;
 
         if (checkSelfPermission(Manifest.permission.CAMERA)
                 == PackageManager.PERMISSION_GRANTED){
@@ -142,8 +145,49 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
         }
         enableRectangleSelection();
         enableRectangleSizing();
-    }
 
+        initTransmitterUI();
+    }
+    public void initTransmitterUI(){
+        EditText editText = (EditText)findViewById(R.id.etTransmitterColorValue);
+        ((Button)findViewById(R.id.btSetTransmitterColor)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                RequestQueue queue = Volley.newRequestQueue(context);
+                String url ="http://192.168.1.102:8000/calibration";
+                int[] hueValues = new int[1];
+                hueValues[0] = 180;
+                JSONObject jsonObject = new JSONObject();
+                try{
+                    jsonObject = new JSONObject("{duration:5,hueValue:[" + editText.getText() + "]}");
+                }catch(Exception e) {
+                    System.out.println(e);
+                }
+                System.out.println("Folgendes:" + jsonObject.toString());
+
+                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                        (Request.Method.POST, url, jsonObject, new Response.Listener<JSONObject>() {
+
+                            @Override
+                            public void onResponse(JSONObject response) {
+                                Toast.makeText(context, "Request sent", Toast.LENGTH_SHORT).show();
+                            }
+                        }, new Response.ErrorListener() {
+
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+//                                Toast.makeText(context, "Request failed " + error, Toast.LENGTH_SHORT).show();
+
+                            }
+                        });
+                queue.add(jsonObjectRequest);
+
+            }
+        });
+
+
+    }
     public void initCamera() {
         mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.JCV);
         mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
@@ -162,7 +206,6 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
                     DisplayMetrics dm = getResources().getDisplayMetrics();
                     areaX = (int)(event.getX() / dm.widthPixels  * 640);
                     areaY = (int)(event.getY()/ dm.heightPixels  * 480);
-//                    areaY = (int)event.getY();
 
                     System.out.println("X " + dm.widthPixels);
                     System.out.println("Y " + dm.heightPixels);
@@ -237,8 +280,8 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
             Size of the rectangle frame for led
          */
 
-        rHeight = height/12;
-        rWidth = width/16;
+//        rHeight = height/12;
+//        rWidth = width/16;
 
         mRgba = new Mat(height, width, CvType.CV_8UC4);
 
@@ -250,7 +293,7 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
         imgTurquoise= new Mat(rHeight,rWidth, mRgba.type());
         imgHSV = new Mat(rHeight,rWidth, CvType.CV_8UC4);
 
-        imgRectangleContent = new Mat(rHeight,rWidth, CvType.CV_8UC4);
+//        imgRectangleContent = new Mat(rHeight,rWidth, CvType.CV_8UC4);
 
     }
 
@@ -287,7 +330,6 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
 
 //      Draw the rectangle frame for led in entire matrix for preview
         Imgproc.rectangle(mRgba, new Point(currRect.x, currRect.y), new Point(currRect.x + currRect.width, currRect.y + currRect.height), new Scalar(255, 255, 255), 1);
-//        Imgproc.rectangle(mRgba, new Point(mRgba.cols() / 2 - rWidth / 2, mRgba.rows() / 2 - rHeight / 2), new Point(mRgba.cols() / 2 + rWidth / 2, mRgba.rows() / 2 + rHeight / 2), new Scalar(255, 255, 255), 1);
 
         return mRgba;
     }
@@ -305,88 +347,6 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
             System.out.println(e);
         }
      }
-
-    public void processFrame(Mat pFrameRGBA) throws InterruptedException{
-//        System.out.println("## Processing Frame ## " + System.currentTimeMillis());
-//
-//        Mat imgRectangleContent = pFrameRGBA;
-//
-////      Write HSV-Colors from submatrix into imgHSV
-//        Imgproc.cvtColor(imgRectangleContent, imgHSV, Imgproc.COLOR_BGR2HSV);
-//
-////      imgHSV is seperated into specific Color-Ranges and saved into Matrixes for every Color
-//        Core.inRange(imgHSV, new Scalar(100, 20, 10), new Scalar(130, 255, 255), imgRed);
-//        Core.inRange(imgHSV, new Scalar(0, 20, 10), new Scalar(10, 255, 255), imgBlue);
-//        Core.inRange(imgHSV, new Scalar(55, 30, 15), new Scalar(65, 255, 255), imgGreen);
-//        Core.inRange(imgHSV, new Scalar(80, 50, 50), new Scalar(90, 255, 255), imgYellow);
-//        Core.inRange(imgHSV, new Scalar(140, 20, 10), new Scalar(160, 255, 255), imgPurple);
-//        Core.inRange(imgHSV, new Scalar(27, 20, 10), new Scalar(33, 255, 255), imgTurquoise);
-//
-////      Count all Pixels matching specific Colors
-//        colors[RED] = Core.countNonZero(imgRed);
-//        colors[GREEN] = Core.countNonZero(imgGreen);
-//        colors[BLUE] = Core.countNonZero(imgBlue);
-//        colors[YELLOW] = Core.countNonZero(imgYellow);
-//        colors[PURPLE] = Core.countNonZero(imgPurple);
-//        colors[TURQUOISE] = Core.countNonZero(imgTurquoise);
-//
-//        /*
-//            Read out the index of the color which is most likely
-//         */
-//        int maxIndex = 0;
-//        for (int i = 0; i < colors.length; i++) {
-//            if (colors[i] > colors[maxIndex]) {
-//                maxIndex = i;
-//            }
-//        }
-//
-////      Regarding the experienced limits of the value of different colors we can check if all of them are off
-////      values: last Average values from tests divided by 2
-//        if (colors[RED] < 188 && colors[GREEN] < 217 && colors[BLUE] < 308){
-//            System.out.println("OFF");
-//            output += 0;
-//        } else {
-//            switch (maxIndex) {
-//                case RED: {
-//                    System.out.println("RED");
-//                    output += 1;
-//                    break;
-//                }
-//                case BLUE: {
-//                    /*
-//                        STOP Condition
-//                     */
-////                    clockThread.stopThread();
-//                    System.out.println("BLUE");
-////                    measureErrorRateByOrder(output);
-//                    System.out.println(output.length() + " " + output);
-//                    break;
-//                }
-//                case GREEN: {
-//                     /*
-//                        START Condition
-//                     */
-//                    System.out.println("GREEN");
-//                    break;
-//                }
-//                case PURPLE: {
-//                    System.out.println("PURPLE");
-//                    break;
-//                }
-//            }
-//        }
-//
-//
-//        /*
-//            Temporary solution to delete leading '0' in output
-//            (all frames are stored currently)
-//         */
-//        if(output.length() > 0 && output.charAt(0) == '0'){
-//            output = output.substring(1, output.length());
-//        }
-    }
-
-
 
 
 

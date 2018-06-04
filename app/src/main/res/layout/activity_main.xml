@@ -46,7 +46,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        android:text="-" />
+        android:text="-"
+        android:id="@+id/textView2" />
     <TextView
         android:textSize="30dp"
         android:textColor="#FFFFFF"
@@ -56,6 +57,37 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:text="+" />
+
+    <TextView
+        android:id="@+id/tvColorDetected"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="6dp"
+        android:layout_marginTop="8dp"
+        android:textColor="#FFFFFF"
+        android:text="Color" />
+
+    <Button
+        android:id="@+id/btSetTransmitterColor"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="6dp"
+        android:layout_marginBottom="6dp"
+        android:text="Set" />
+
+    <EditText
+        android:id="@+id/etTransmitterColorValue"
+        android:inputType="number"
+        android:layout_width="100dp"
+        android:text="180"
+        android:textColor="#FFFFFF"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/btSetTransmitterColor"
+        android:layout_alignStart="@+id/btSetTransmitterColor" />
 
 
 </RelativeLayout>
