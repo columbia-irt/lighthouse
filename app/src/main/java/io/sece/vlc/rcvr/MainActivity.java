@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
     int areaY = 200;
 
     Context context;
-
+     static int currHueValue = -1;
 
     /*
         Array to store amount of pixels to different colors in each frame
@@ -159,8 +159,9 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
                 int[] hueValues = new int[1];
                 hueValues[0] = 180;
                 JSONObject jsonObject = new JSONObject();
+                currHueValue = Integer.parseInt(editText.getText().toString());
                 try{
-                    jsonObject = new JSONObject("{duration:5,hueValue:[" + editText.getText() + "]}");
+                    jsonObject = new JSONObject("{duration:15,hueValue:[" + editText.getText() + "]}");
                 }catch(Exception e) {
                     System.out.println(e);
                 }

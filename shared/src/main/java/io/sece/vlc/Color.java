@@ -135,9 +135,9 @@ public class Color {
             }
         }
 
-        var3[0] = var4 * 360;
-        var3[1] = var5 * 100;
-        var3[2] = var6 * 100;
+        var3[0] = ((int)(var4 * 360)*100)/100;
+        var3[1] = ((int)(var5 * 100)*100)/100;
+        var3[2] = ((int)(var6 * 100)*100)/100;
         return var3;
     }
 }
