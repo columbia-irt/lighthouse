@@ -13,13 +13,18 @@ import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.hardware.camera2.CameraCharacteristics;
+import android.hardware.camera2.CaptureRequest;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.Range;
+import android.util.Rational;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
@@ -59,13 +64,8 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
     int areaX = 200;
     int areaY = 200;
 
-    Context context;
-     static int currHueValue = -1;
-
-    /*
-        Array to store amount of pixels to different colors in each frame
-     */
-    Integer[] colors= new Integer[6];
+    public static Context context;
+    static int currHueValue = -1;
 
 
     /*
@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
     CircularBuffer<Mat> circularBuffer;
     LinkedBlockingQueue syncBlockingQueue;
 
-    int delay = 500;
+    int delay = 300;
     long firstTimeStamp = 0;
     int bqCounter = 0;
 
@@ -119,12 +119,14 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
         enableRectangleSizing();
 
         initTransmitterUI();
+
     }
     public void initTransmitterUI(){
         EditText editText = (EditText)findViewById(R.id.etTransmitterColorValue);
         ((Button)findViewById(R.id.btSetTransmitterColor)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
 
                 RequestQueue queue = Volley.newRequestQueue(context);
                 String url ="http://192.168.1.102:8000/calibration";
@@ -144,13 +146,13 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
 
                             @Override
                             public void onResponse(JSONObject response) {
-                                Toast.makeText(context, "Request sent", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, "Response received: " + response.toString(), Toast.LENGTH_SHORT).show();
                             }
                         }, new Response.ErrorListener() {
 
                             @Override
                             public void onErrorResponse(VolleyError error) {
-//                                Toast.makeText(context, "Request failed " + error, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, "Request failed " + error, Toast.LENGTH_SHORT).show();
 
                             }
                         });
@@ -207,6 +209,8 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
             }
         });
     }
+
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -247,9 +251,6 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
             Size of the rectangle frame for led
          */
 
-//        rHeight = height/12;
-//        rWidth = width/16;
-
         mRgba = new Mat(height, width, CvType.CV_8UC4);
 
         imgRed = new Mat(rHeight,rWidth, mRgba.type());
@@ -259,8 +260,6 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
         imgPurple= new Mat(rHeight,rWidth, mRgba.type());
         imgTurquoise= new Mat(rHeight,rWidth, mRgba.type());
         imgHSV = new Mat(rHeight,rWidth, CvType.CV_8UC4);
-
-//        imgRectangleContent = new Mat(rHeight,rWidth, CvType.CV_8UC4);
 
     }
 
@@ -306,7 +305,7 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
             Limitation of BlockingQueue Size ?
             -> BlockingQueue put() waiting if necessary for space to become available
          */
-        System.out.println(Thread.currentThread().getId() + " " + System.currentTimeMillis()+" SyncFramesReceived " + bqCounter);
+//        System.out.println(Thread.currentThread().getId() + " " + System.currentTimeMillis()+" SyncFramesReceived " + bqCounter);
 
         try{
             syncBlockingQueue.put(circularBuffer.get());
