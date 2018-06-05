@@ -113,7 +113,7 @@ public class API {
                     System.out.println(calC);
 
                     threadCali = new Thread(calC);
-                    threadDog = new Thread(new watchDog(threadCali, calC.getDuration()*(calC.getHueValue().length + 1)));
+                    threadDog = new Thread(new watchDog(threadCali, calC.getDuration()*(calC.getHueValue().length)));
                     threadDog.start();
                     threadCali.start();
                     os.write(response);

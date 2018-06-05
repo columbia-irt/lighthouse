@@ -88,4 +88,54 @@ public class Color {
 
         return new Color(red, green, blue);
     }
+
+    public static float[] RGBtoHSB(int var0, int var1, int var2, float[] var3) {
+        if (var3 == null) {
+            var3 = new float[3];
+        }
+
+        int var7 = var0 > var1 ? var0 : var1;
+        if (var2 > var7) {
+            var7 = var2;
+        }
+
+        int var8 = var0 < var1 ? var0 : var1;
+        if (var2 < var8) {
+            var8 = var2;
+        }
+
+        float var6 = (float)var7 / 255.0F;
+        float var5;
+        if (var7 != 0) {
+            var5 = (float)(var7 - var8) / (float)var7;
+        } else {
+            var5 = 0.0F;
+        }
+
+        float var4;
+        if (var5 == 0.0F) {
+            var4 = 0.0F;
+        } else {
+            float var9 = (float)(var7 - var0) / (float)(var7 - var8);
+            float var10 = (float)(var7 - var1) / (float)(var7 - var8);
+            float var11 = (float)(var7 - var2) / (float)(var7 - var8);
+            if (var0 == var7) {
+                var4 = var11 - var10;
+            } else if (var1 == var7) {
+                var4 = 2.0F + var9 - var11;
+            } else {
+                var4 = 4.0F + var10 - var9;
+            }
+
+            var4 /= 6.0F;
+            if (var4 < 0.0F) {
+                ++var4;
+            }
+        }
+
+        var3[0] = ((int)(var4 * 360)*100)/100;
+        var3[1] = ((int)(var5 * 100)*100)/100;
+        var3[2] = ((int)(var6 * 100)*100)/100;
+        return var3;
+    }
 }
