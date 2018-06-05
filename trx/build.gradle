@@ -23,4 +23,5 @@ dependencies {
     compile project(':shared')
     compile project(':unix')
     compile project(':pigpio')
+    implementation 'com.google.code.gson:gson:2.8.4'
 }

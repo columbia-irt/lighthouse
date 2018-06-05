@@ -1,6 +1,5 @@
 package io.sece.vlc;
 
-import java.util.BitSet;
 
 
 public class ASK8Modulator extends AmpModulator {
@@ -32,7 +31,7 @@ public class ASK8Modulator extends AmpModulator {
     }
 
     @Override
-    public Integer modulate(BitSet data, int offset) {
+    public Integer modulate(String data, int offset) {
         switch(symbol.fromBits(data, offset)) {
         case 0: return l1;
         case 1: return l2;
@@ -47,7 +46,7 @@ public class ASK8Modulator extends AmpModulator {
     }
 
     @Override
-    public BitSet demodulate(BitSet data, int offset, Integer value) {
+    public String demodulate(String data, int offset, Integer value) {
         // Not yet implemented
         throw new UnsupportedOperationException();
     }

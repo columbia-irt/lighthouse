@@ -1,6 +1,5 @@
 package io.sece.vlc;
 
-import java.util.BitSet;
 
 
 /**
@@ -39,7 +38,7 @@ class Symbol {
     /**
      * Convert the bits at the beginning of the buffer data into a symbol value.
      */
-    public int fromBits(BitSet data) {
+    public int fromBits(String data) {
         return fromBits(data, 0);
     }
 
@@ -48,11 +47,11 @@ class Symbol {
      * Convert n bits starting at index offset in the buffer data into a
      * symbol value.
      */
-    public int fromBits(BitSet data, int offset) {
+    public int fromBits(String data, int offset) {
         int rv = 0;
-        for(int i = offset + bits - 1; i >= offset; i--) {
+        for(int i = offset; i < offset + bits; i++) {
             rv <<= 1;
-            if (data.get(i)) rv += 1;
+            if (data.charAt(i) == '1') rv += 1;
         }
         return rv;
     }
@@ -62,7 +61,7 @@ class Symbol {
      * Convert the given modulation symbol value into bits and store the bits
      * at the beginning of buffer out. Return buffer out.
      */
-    public BitSet toBits(BitSet data, int symbol) {
+    public String toBits(String data, int symbol) {
         return toBits(data, 0, symbol);
     }
 
@@ -71,9 +70,19 @@ class Symbol {
      * Convert the given modulation symbol value into bits and store the bits
      * in buffer out starting at index offset. Return the output buffer.
      */
-    public BitSet toBits(BitSet data, int offset, int symbol) {
+    public String toBits(String data, int offset, int symbol) {
+            StringBuilder str = new StringBuilder(data);
         for(int i = 0; i < bits; i++)
-            data.set(offset + i, ((symbol >> i) & 1L) == 1L);
-        return data;
+        {
+            if(((symbol >> i) & 1L) == 1L)
+            {
+                str.insert(offset + i, '1');
+            }
+            else
+            {
+                str.insert(offset + i, '0');
+            }
+        }
+        return str.toString();
     }
 }

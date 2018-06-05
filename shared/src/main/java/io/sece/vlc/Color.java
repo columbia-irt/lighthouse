@@ -88,9 +88,7 @@ public class Color {
 
         return new Color(red, green, blue);
     }
-
-
-
+  
     public static float[] RGBtoHSB(int var0, int var1, int var2, float[] var3) {
         if (var3 == null) {
             var3 = new float[3];

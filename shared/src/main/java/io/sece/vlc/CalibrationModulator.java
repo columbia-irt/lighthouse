@@ -1,28 +1,27 @@
 package io.sece.vlc;
 
+import static io.sece.vlc.Color.hsvToRGB;
 
-public class FSK2Modulator extends FreqModulator {
+public class CalibrationModulator extends FreqModulator
+{
     private Color u;
     private Color d;
     private Symbol symbol;
 
-    public FSK2Modulator() {
-        this(Color.RED, Color.BLACK);
-    }
+    public CalibrationModulator(float hue, float saturation, float brightness) {
 
-    public FSK2Modulator(Color u, Color d) {
-
-        this.u = u;
-        this.d = d;
+        this.u = hsvToRGB(hue, saturation, brightness);
+        this.d = Color.BLACK;
         symbol = new Symbol(2);
         bits = symbol.bits;
+        System.out.println("Red: " + u.getRed() + " Green: " + u.getGreen() + " Blue: " + u.getBlue());
     }
 
     @Override
     public Color modulate(String data, int offset) {
         switch(symbol.fromBits(data, offset)) {
-        case 0: return u;
-        case 1: return d;
+            case 0: return d;
+            case 1: return u;
         }
         throw new AssertionError();
     }

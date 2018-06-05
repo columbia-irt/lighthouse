@@ -1,7 +1,5 @@
 package io.sece.vlc;
 
-import java.util.BitSet;
-
 
 /**
  * An implementation of an On-Off Keying (OOK) modulator. This is the simplest
@@ -19,7 +17,7 @@ public class OOKModulator extends Modulator<Boolean> {
     }
 
     @Override
-    public Boolean modulate(BitSet data, int offset) {
+    public Boolean modulate(String data, int offset) {
         switch(symbol.fromBits(data, offset)) {
         case 0: return false;
         case 1: return true;
@@ -28,7 +26,7 @@ public class OOKModulator extends Modulator<Boolean> {
     }
 
     @Override
-    public BitSet demodulate(BitSet data, int offset, Boolean value) {
+    public String demodulate(String data, int offset, Boolean value) {
         // Not yet implemented
         throw new UnsupportedOperationException();
     }
