@@ -22,3 +22,4 @@
 build
 /captures
 .externalNativeBuild
+.idea/codeStyles/Project.xml

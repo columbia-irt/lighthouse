@@ -7,7 +7,7 @@ public class FSK2Modulator extends FreqModulator {
     private Symbol symbol;
 
     public FSK2Modulator() {
-        this(Color.RED, Color.BLACK);
+        this(Color.BLACK, Color.RED);
     }
 
     public FSK2Modulator(Color u, Color d) {
@@ -28,8 +28,15 @@ public class FSK2Modulator extends FreqModulator {
     }
 
     @Override
-    public String demodulate(String data, int offset, Color value) {
-        // Not yet implemented
-        throw new UnsupportedOperationException();
+    public String demodulate(Color value) {
+        if(value == u)
+        {
+            return symbol.toBits(0);
+        }
+        else if( value == d)
+        {
+            return symbol.toBits(1);
+        }
+        throw new IllegalArgumentException();
     }
 }

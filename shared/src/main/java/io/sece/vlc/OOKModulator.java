@@ -26,7 +26,7 @@ public class OOKModulator extends Modulator<Boolean> {
     }
 
     @Override
-    public String demodulate(String data, int offset, Boolean value) {
+    public String demodulate(Boolean value) {
         // Not yet implemented
         throw new UnsupportedOperationException();
     }

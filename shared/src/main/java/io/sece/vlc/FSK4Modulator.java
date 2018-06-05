@@ -38,8 +38,23 @@ public class FSK4Modulator extends FreqModulator {
     }
 
     @Override
-    public String demodulate(String data, int offset, Color value) {
-        // Not yet implemented
-        throw new UnsupportedOperationException();
+    public String demodulate(Color value) {
+        if(value == n)
+        {
+            return symbol.toBits(0);
+        }
+        else if( value == e)
+        {
+            return symbol.toBits(1);
+        }
+        else if( value == s)
+        {
+            return symbol.toBits(2);
+        }
+        else if( value == w)
+        {
+            return symbol.toBits(3);
+        }
+        throw new IllegalArgumentException();
     }
 }

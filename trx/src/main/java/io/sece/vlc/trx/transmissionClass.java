@@ -66,13 +66,17 @@ public class transmissionClass implements Runnable {
             // connect LEDs with incompatible modulators. That should generate a compile-time error.
             t = new Transmitter<>(led, mod, (1000/this.getFPS()));
 
-            String data = "000001010011100101110111";
+            String data = "111011101101";
 
 
             // Transmit the data stored in the buffer.
             t.tx(data);
             led.set(Color.BLACK);
 
+        }
+        catch (IllegalArgumentException e)
+        {
+            throw new IllegalArgumentException();
         }
         catch (Exception e)
         {

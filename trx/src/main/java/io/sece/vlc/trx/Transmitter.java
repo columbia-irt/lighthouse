@@ -1,5 +1,6 @@
 package io.sece.vlc.trx;
 
+import io.sece.vlc.Color;
 import io.sece.vlc.Modulator;
 
 /**
@@ -39,4 +40,23 @@ class Transmitter<T> {
             throw new IllegalArgumentException();
         }
     }
+
+    //rx isnt in the transmitter but should look like this.
+    //public String demodulate(String data, int offset, Color value)
+    /*
+    public String rx(T value) throws LEDException, InterruptedException
+    {
+        return modulator.demodulate(value);
+    }
+
+    it should be used like this:
+
+    List<Color> colorList
+    String data = "";
+    for(int i = 0; i < colorList.lenght(); i++)
+    {
+        data += rx(colorList[i]);
+    }
+
+    */
 }

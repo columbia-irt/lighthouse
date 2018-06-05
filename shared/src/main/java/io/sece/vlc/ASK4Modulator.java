@@ -34,8 +34,18 @@ public class ASK4Modulator extends AmpModulator {
     }
 
     @Override
-    public String demodulate(String data, int offset, Integer value) {
-        // Not yet implemented
-        throw new UnsupportedOperationException();
+    public String demodulate(Integer value) {
+        switch (value)
+        {
+            case 11:
+                return symbol.toBits(0);
+            case 12:
+                return symbol.toBits(1);
+            case 13:
+                return symbol.toBits(2);
+            case 14:
+                return symbol.toBits(3);
+        }
+        throw new IllegalArgumentException();
     }
 }

@@ -18,16 +18,11 @@ package io.sece.vlc;
 public abstract class Modulator<V> {
     public int bits;
 
-
-    public String demodulate(String data, V value) {
-        return demodulate(data, 0, value);
-    }
-
     public V modulate(String data) {
         return modulate(data, 0);
     }
 
-    public abstract String demodulate(String data, int offset, V value);
+    public abstract String demodulate(V value);
     public abstract V modulate(String data, int offset);
 
 }

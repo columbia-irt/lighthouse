@@ -11,8 +11,6 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
 
-        boolean calibrate = false;
-
         System.out.println("Starting LED transmitter");
         ExecutorService threadPool = Executors.newCachedThreadPool();
 

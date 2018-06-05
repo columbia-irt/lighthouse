@@ -91,7 +91,7 @@ public class API {
 
             if(active)
             {
-                response = "Currently Running".getBytes();
+                response = ("{ response: \"Currently Running\" }").getBytes();
 
 
                 he.sendResponseHeaders(200, response.length);
@@ -101,7 +101,7 @@ public class API {
             {
                 active = true;
                 tID = String.valueOf((int)(Math.random() * 901 + 100));
-                response = tID.getBytes();
+                response = ("{ tID:" + tID + " }").getBytes();
 
 
                 he.sendResponseHeaders(200, response.length);
@@ -124,7 +124,7 @@ public class API {
                     active = false;
                     tID = "";
                     System.out.println(e.getMessage());
-                    response = "Failed reading json".getBytes();
+                    response = ("{ response: \"Failed reading json\" }").getBytes();
                     os.write(response);
                 }
             }
@@ -146,7 +146,7 @@ public class API {
             OutputStream os = he.getResponseBody();
             if(active)
             {
-                response = "Currently Running".getBytes();
+                response = ("{ response: \"Currently Running\" }").getBytes();
                 he.sendResponseHeaders(200, response.length);
                 os.write(response);
             }
@@ -154,7 +154,7 @@ public class API {
             {
                 active = true;
                 tID = String.valueOf((int)(Math.random() * 901 + 100));
-                response = tID.getBytes();
+                response = ("{ tID:" + tID + " }").getBytes();
                 he.sendResponseHeaders(200, response.length);
 
                 try (Reader isr =  new InputStreamReader(he.getRequestBody(),"utf-8")) {
@@ -175,7 +175,7 @@ public class API {
                     active = false;
                     tID = "";
                     System.out.println(e.getMessage());
-                    response = "Failed reading json".getBytes();
+                    response = ("{ response: \"Failed reading json\" }").getBytes();
                     os.write(response);
                 }
             }
