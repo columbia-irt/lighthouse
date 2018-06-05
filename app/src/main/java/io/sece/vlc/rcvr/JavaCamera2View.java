@@ -226,7 +226,7 @@ public class JavaCamera2View extends CameraBridgeViewBase {
                             mCaptureSession.setRepeatingRequest(mPreviewRequestBuilder.build(), null, mBackgroundHandler);
                             Log.i(LOGTAG, "CameraPreviewSession has been started");
                         } catch (Exception e) {
-                            Log.e(LOGTAG, "createCaptureSession failed", e);
+//                            Log.e(LOGTAG, "createCaptureSession failed", e);
                         }
                     }
 
