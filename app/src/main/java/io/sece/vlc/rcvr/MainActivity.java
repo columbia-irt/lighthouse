@@ -89,26 +89,6 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
     long firstTimeStamp = 0;
     int bqCounter = 0;
 
-
-    private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
-        @Override
-        public void onManagerConnected(int status) {
-            switch (status) {
-                case LoaderCallbackInterface.SUCCESS:
-                {
-                    Log.i(TAG, "OpenCV loaded successfully");
-                    mOpenCvCameraView.enableView();
-                    break;
-                }
-                default:
-                {
-                    super.onManagerConnected(status);
-                    break;
-                }
-            }
-        }
-    };
-
     public MainActivity() {
         Log.i(TAG, "Instantiated new " + this.getClass());
     }
@@ -260,13 +240,7 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
     public void onResume()
     {
         super.onResume();
-        if (!OpenCVLoader.initDebug()) {
-            Log.d(TAG, "Internal OpenCV library not found. Using OpenCV Manager for initialization");
-            OpenCVLoader.initDebug();
-        } else {
-            Log.d(TAG, "OpenCV library found inside package. Using it!");
-            mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
-        }
+        mOpenCvCameraView.enableView();
     }
 
     public void onDestroy() {
