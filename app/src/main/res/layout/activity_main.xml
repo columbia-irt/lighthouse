@@ -15,7 +15,7 @@
         android:layout_marginRight="50dp"
         />
     <FrameLayout
-        android:id="@+id/seekbarFrame"
+        android:id="@+id/seekbarSizeFrame"
         android:layout_width="32dp"
         android:layout_height="180dp"
         android:layout_marginRight="10dp"
@@ -30,6 +30,30 @@
             android:progressTint="#FFFFFF"
             android:thumbTint="#FFFFFF"
             android:colorControlActivated="#FFFFFF"
+            android:progress="40"
+            android:max="80"
+            android:layout_width="180dp"
+            android:layout_height="32dp"
+            android:layout_gravity="center"
+            android:rotation="270" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/seekbarExposureFrame"
+        android:layout_width="32dp"
+        android:layout_height="180dp"
+        android:layout_toLeftOf="@+id/seekbarSizeFrame"
+        android:layout_marginRight="5dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true"
+        android:orientation="vertical">
+
+        <SeekBar
+            android:id="@+id/seekbarExposure"
+            android:progressBackgroundTint="#FF00FF"
+            android:progressTint="#FF00FF"
+            android:thumbTint="#FF00FF"
+            android:colorControlActivated="#FF00FF"
             android:progress="40"
             android:max="80"
             android:layout_width="180dp"
@@ -58,6 +82,16 @@
         android:layout_alignParentEnd="true"
         android:text="+" />
 
+    <TextView
+        android:id="@+id/tvExposure"
+        android:textSize="15dp"
+        android:textColor="#FFFFFF"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/seekbarSizeFrame"
+        android:layout_marginRight="5dp"
+        android:text="Exp:\n0" />
     <TextView
         android:id="@+id/tvColorDetected"
         android:layout_width="wrap_content"

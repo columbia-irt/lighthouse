@@ -4,8 +4,10 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.ImageFormat;
+import android.graphics.Rect;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
@@ -20,8 +22,11 @@ import android.os.HandlerThread;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.Range;
+import android.util.Rational;
 import android.view.Surface;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
@@ -55,13 +60,20 @@ public class JavaCamera2View extends CameraBridgeViewBase {
     public int heightP = 480;
 
     public CameraDevice mCameraDevice;
-    private CameraCaptureSession mCaptureSession;
-    private CaptureRequest.Builder mPreviewRequestBuilder;
+
     private String mCameraID;
     private android.util.Size mPreviewSize = new android.util.Size(-1, -1);
 
     private HandlerThread mBackgroundThread;
+
+    /*
+        Need to be accessible from MainActivty in order to do runtime camera configuration
+     */
+
+    private CameraCaptureSession mCaptureSession;
+    private CaptureRequest.Builder mPreviewRequestBuilder;
     private Handler mBackgroundHandler;
+    private CameraCharacteristics  characteristics;
 
     public JavaCamera2View(Context context, int cameraId) {
         super(context, cameraId);
@@ -106,7 +118,7 @@ public class JavaCamera2View extends CameraBridgeViewBase {
                 mCameraID = camList[0];
             } else {
                 for (String cameraID : camList) {
-                    CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraID);
+                    characteristics = manager.getCameraCharacteristics(cameraID);
                     if ((mCameraIndex == CameraBridgeViewBase.CAMERA_ID_BACK &&
                             characteristics.get(CameraCharacteristics.LENS_FACING) == CameraCharacteristics.LENS_FACING_BACK) ||
                         (mCameraIndex == CameraBridgeViewBase.CAMERA_ID_FRONT &&
@@ -118,8 +130,6 @@ public class JavaCamera2View extends CameraBridgeViewBase {
                 }
             }
             if (mCameraID != null) {
-                //CameraCharacteristics characteristics = manager.getCameraCharacteristics(mCameraID);
-                //characteristics = manager.
                 Log.i(LOGTAG, "Opening camera: " + mCameraID);
                 manager.openCamera(mCameraID, mStateCallback, mBackgroundHandler);
             }
@@ -205,7 +215,6 @@ public class JavaCamera2View extends CameraBridgeViewBase {
 
             mPreviewRequestBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
             mPreviewRequestBuilder.addTarget(surface);
-
             mCameraDevice.createCaptureSession(Arrays.asList(surface),
                 new CameraCaptureSession.StateCallback() {
                     @Override
@@ -216,10 +225,29 @@ public class JavaCamera2View extends CameraBridgeViewBase {
                         }
                         mCaptureSession = cameraCaptureSession;
                         try {
+                            /**
+                             * Setting device's auto focus off
+                             */
                             mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE,
                                     CaptureRequest.CONTROL_AF_MODE_OFF);
+
+                            /**
+                             * Setting device auto exposure Routine
+                             */
                             mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
-                                    CaptureRequest.CONTROL_AE_MODE_OFF);
+                                    CaptureRequest.CONTROL_AE_MODE_ON);
+
+//                            Rect zoom = new Rect(0, 0,
+//                                    320,240);
+//                            mPreviewRequestBuilder.set(CaptureRequest.SCALER_CROP_REGION, zoom);
+
+                            /**
+                             * Setting device's auto white balancing routine
+                             *
+                             *
+                                mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AWB_MODE, CaptureRequest.CONTROL_AWB_MODE_OFF);
+                             */
+
 
                             mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, new Range<Integer>(30,30));
 
@@ -272,8 +300,10 @@ public class JavaCamera2View extends CameraBridgeViewBase {
         }
         CameraManager manager = (CameraManager) getContext().getSystemService(Context.CAMERA_SERVICE);
         try {
-            CameraCharacteristics characteristics = manager.getCameraCharacteristics(mCameraID);
+            characteristics = manager.getCameraCharacteristics(mCameraID);
             StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+
+
             int bestWidth = 0, bestHeight = 0;
             float aspect = (float) width / height;
             android.util.Size[] sizes = map.getOutputSizes(ImageReader.class);
@@ -334,6 +364,8 @@ public class JavaCamera2View extends CameraBridgeViewBase {
         } catch (RuntimeException e) {
             throw new RuntimeException("Interrupted while setCameraPreviewSize.", e);
         }
+
+        enableExposureSettingUI();
         return true;
     }
 
@@ -387,4 +419,49 @@ public class JavaCamera2View extends CameraBridgeViewBase {
         private int mWidth;
         private int mHeight;
     };
+
+    public void enableExposureSettingUI() {
+        // Getting compensation characteristics
+
+        Rational controlAECompensationStep = characteristics.get(CameraCharacteristics.CONTROL_AE_COMPENSATION_STEP);
+//        double compensationStep = controlAECompensationStep.doubleValue();
+        Range<Integer> controlAECompensationRange = characteristics.get(CameraCharacteristics.CONTROL_AE_COMPENSATION_RANGE);
+        System.out.println("CompensationRange: " + controlAECompensationRange.toString());
+        double minCompensationRange = controlAECompensationRange.getLower();
+        double maxCompensationRange = controlAECompensationRange.getUpper();
+
+        Activity activity = (Activity)MainActivity.context;
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                SeekBar seekbarExposure = (SeekBar)activity.findViewById(R.id.seekbarExposure);
+                seekbarExposure.setProgress((int)maxCompensationRange);
+                seekbarExposure.setMax((int)(Math.abs(minCompensationRange) + maxCompensationRange));
+                seekbarExposure.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                        try{
+                            System.out.println(progress);
+                            mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AE_EXPOSURE_COMPENSATION, progress - (int)maxCompensationRange);
+
+                            mCaptureSession.setRepeatingRequest(mPreviewRequestBuilder.build(), null, mBackgroundHandler);
+                            ((TextView)activity.findViewById(R.id.tvExposure)).setText("Exp:\n" + (progress - (int)maxCompensationRange));
+                        }catch(Exception e) {
+                            System.out.println(e);
+                        }
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+                    }
+                });
+            }
+        });
+
+
+    }
 }
