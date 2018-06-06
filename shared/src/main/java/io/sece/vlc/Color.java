@@ -13,7 +13,7 @@ public class Color {
     public static final Color BLUE = new Color(0, 0, 255);
     public static final Color PURPLE = new Color(255, 0, 190);
     public static final Color YELLOW = new Color(255, 185, 0);
-    public static final Color TURQUIOSE = new Color(0, 255, 150);
+    public static final Color TURQUOISE = new Color(0, 255, 150);
     public static final Color BLACK = new Color(0, 0, 0);
     public static final Color WHITE = new Color(255, 255, 255);
 
@@ -36,7 +36,7 @@ public class Color {
     }
 
 
-    public static int HSBtoRGB(float var0, float var1, float var2) {
+    private static int HSBtoRGB(float var0, float var1, float var2) {
         int var3 = 0;
         int var4 = 0;
         int var5 = 0;

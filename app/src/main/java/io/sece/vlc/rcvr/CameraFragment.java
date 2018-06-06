@@ -33,7 +33,6 @@ import android.widget.Toast;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
@@ -114,7 +113,7 @@ public class CameraFragment extends Fragment implements CvCameraViewListener2, A
         Log.i(TAG, "called onCreate");
         super.onCreate(savedInstanceState);
 
-        circularBuffer = new CircularBuffer(20);
+        circularBuffer = new CircularBuffer<>(20);
         syncBlockingQueue =  new LinkedBlockingQueue<CvCameraViewFrame>();
         context = getActivity();
 
@@ -125,44 +124,29 @@ public class CameraFragment extends Fragment implements CvCameraViewListener2, A
 
     public void initTransmitterUI(View view) {
         EditText editText = view.findViewById(R.id.etTransmitterColorValue);
-        (view.findViewById(R.id.btSetTransmitterColor)).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        (view.findViewById(R.id.btSetTransmitterColor)).setOnClickListener(v -> {
 
-                RequestQueue queue = Volley.newRequestQueue(context);
-                String url ="http://192.168.1.102:8000/calibration";
-                int[] hueValues = new int[1];
-                hueValues[0] = 180;
-                JSONObject jsonObject = new JSONObject();
-                currHueValue = Integer.parseInt(editText.getText().toString());
-                try{
-                    jsonObject = new JSONObject("{duration:15,hueValue:[" + editText.getText() + "]}");
-                }catch(Exception e) {
-                    System.out.println(e);
-                }
-                System.out.println("Folgendes:" + jsonObject.toString());
-
-                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                        (Request.Method.POST, url, jsonObject, new Response.Listener<JSONObject>() {
-
-                            @Override
-                            public void onResponse(JSONObject response) {
-                                Toast.makeText(context, "Response received: " + response.toString(), Toast.LENGTH_SHORT).show();
-                            }
-                        }, new Response.ErrorListener() {
-
-
-
-
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                Toast.makeText(context, "Request failed " + error, Toast.LENGTH_SHORT).show();
-
-                            }
-                        });
-                queue.add(jsonObjectRequest);
-
+            RequestQueue queue = Volley.newRequestQueue(context);
+            String url ="http://192.168.1.102:8000/calibration";
+            JSONObject jsonObject = new JSONObject();
+            currHueValue = Integer.parseInt(editText.getText().toString());
+            try{
+                jsonObject = new JSONObject("{duration:15,hueValue:[" + editText.getText() + "]}");
+            }catch(Exception e) {
+                System.out.println(e);
             }
+            System.out.println("Folgendes:" + jsonObject.toString());
+
+            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                    (Request.Method.POST, url, jsonObject, new Response.Listener<JSONObject>() {
+
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            Toast.makeText(context, "Response received: " + response.toString(), Toast.LENGTH_SHORT).show();
+                        }
+                    }, error -> Toast.makeText(context, "Request failed " + error, Toast.LENGTH_SHORT).show());
+            queue.add(jsonObjectRequest);
+
         });
     }
 

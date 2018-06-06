@@ -1,12 +1,8 @@
 package io.sece.vlc.rcvr;
 
-
 import org.opencv.core.Mat;
 import org.opencv.core.Rect;
 
-/**
- * Created by alex on 5/23/18.
- */
 
 public class AreaOfInterest {
     private int posX;
@@ -15,6 +11,7 @@ public class AreaOfInterest {
     private int height;
     private Mat content;
     Rect rectangle;
+
     public AreaOfInterest(int posX, int posY, int width, int height) {
         this.posX = posX;
         this.posY = posY;

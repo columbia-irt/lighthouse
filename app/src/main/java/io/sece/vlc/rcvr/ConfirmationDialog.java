@@ -22,22 +22,16 @@ public class ConfirmationDialog extends DialogFragment {
         final Fragment parent = getParentFragment();
         return new AlertDialog.Builder(getActivity())
                 .setMessage(R.string.request_permission)
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        parent.requestPermissions(new String[]{Manifest.permission.CAMERA},
-                                Receiver.REQUEST_CAMERA_PERMISSION);
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> parent.requestPermissions(new String[]{Manifest.permission.CAMERA},
+                        Receiver.REQUEST_CAMERA_PERMISSION))
+                .setNegativeButton(android.R.string.cancel, (dialog, which) -> {
+                    if (parent != null) {
+                        Activity activity = parent.getActivity();
+                        if (activity != null) {
+                            activity.finish();
+                        }
                     }
                 })
-                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Activity activity = parent.getActivity();
-                                if (activity != null) {
-                                    activity.finish();
-                                }
-                            }
-                        })
                 .create();
     }
 }

@@ -29,12 +29,9 @@ public class FSK2Modulator extends FreqModulator {
 
     @Override
     public String demodulate(Color value) {
-        if(value == u)
-        {
+        if(value == u) {
             return symbol.toBits(0);
-        }
-        else if( value == d)
-        {
+        } else if( value == d) {
             return symbol.toBits(1);
         }
         throw new IllegalArgumentException();
