@@ -430,7 +430,7 @@ public class JavaCamera2View extends CameraBridgeViewBase {
         double minCompensationRange = controlAECompensationRange.getLower();
         double maxCompensationRange = controlAECompensationRange.getUpper();
 
-        Activity activity = (Activity)MainActivity.context;
+        Activity activity = (Activity)CameraFragment.context;
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {

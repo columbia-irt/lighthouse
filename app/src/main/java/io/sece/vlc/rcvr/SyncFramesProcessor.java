@@ -79,8 +79,8 @@ public class SyncFramesProcessor implements Runnable
                 public void run() {
                     ((TextView)activity.findViewById(R.id.tvColorDetected)).setText("Current\nRGB: (" + r_curr + " ," + g_curr + " ," + b_curr + ")\nHSV: (" + (int)hsv_curr[0] + " ," + (int)hsv_curr[1] + " ," + (int)hsv_curr[2]  + ")");
                     (activity.findViewById(R.id.tvReceivedColor)).setBackgroundColor(android.graphics.Color.rgb(r_curr,g_curr,b_curr));
-                    if(MainActivity.currHueValue != -1){
-                        Color colorSent = Color.hsvToRGB(MainActivity.currHueValue, 100, 100);
+                    if(CameraFragment.currHueValue != -1){
+                        Color colorSent = Color.hsvToRGB(CameraFragment.currHueValue, 100, 100);
                         (activity.findViewById(R.id.tvTransmitterSentColor)).setBackgroundColor(android.graphics.Color.rgb(colorSent.getRed(),colorSent.getGreen(),colorSent.getBlue()));
                     }
                 }
