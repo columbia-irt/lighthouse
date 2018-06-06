@@ -13,7 +13,7 @@
         android:layout_marginRight="50dp"
         />
     <FrameLayout
-        android:id="@+id/seekbarFrame"
+        android:id="@+id/seekbarSizeFrame"
         android:layout_width="32dp"
         android:layout_height="180dp"
         android:layout_marginRight="10dp"
