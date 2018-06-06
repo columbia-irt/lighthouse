@@ -69,11 +69,15 @@ public class SyncFramesProcessor implements Runnable
                 Output on UI for
              */
         activity.runOnUiThread(() -> {
-            ((TextView)activity.findViewById(R.id.tvColorDetected)).setText("Current\nRGB: (" + r_curr + " ," + g_curr + " ," + b_curr + ")\nHSV: (" + (int)hsv_curr[0] + " ," + (int)hsv_curr[1] + " ," + (int)hsv_curr[2]  + ")");
-            (activity.findViewById(R.id.tvReceivedColor)).setBackgroundColor(android.graphics.Color.rgb(r_curr,g_curr,b_curr));
-            if(CameraFragment.currHueValue != -1){
-                Color colorSent = Color.hsvToRGB(CameraFragment.currHueValue, 100, 100);
-                (activity.findViewById(R.id.tvTransmitterSentColor)).setBackgroundColor(android.graphics.Color.rgb(colorSent.getRed(),colorSent.getGreen(),colorSent.getBlue()));
+            TextView tvColorDetected = ((TextView)activity.findViewById(R.id.tvColorDetected));
+            TextView tvColorPreview = ((TextView)activity.findViewById(R.id.tvReceivedColor));
+            if(tvColorDetected != null && tvColorPreview != null) {
+                tvColorDetected.setText("Current\nRGB: (" + r_curr + " ," + g_curr + " ," + b_curr + ")\nHSV: (" + (int) hsv_curr[0] + " ," + (int) hsv_curr[1] + " ," + (int) hsv_curr[2] + ")");
+                tvColorPreview.setBackgroundColor(android.graphics.Color.rgb(r_curr, g_curr, b_curr));
+                if (CameraFragment.currHueValue != -1) {
+                    Color colorSent = Color.hsvToRGB(CameraFragment.currHueValue, 100, 100);
+                    (activity.findViewById(R.id.tvTransmitterSentColor)).setBackgroundColor(android.graphics.Color.rgb(colorSent.getRed(), colorSent.getGreen(), colorSent.getBlue()));
+                }
             }
         });
     }

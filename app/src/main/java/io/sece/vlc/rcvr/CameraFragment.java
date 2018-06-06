@@ -45,8 +45,10 @@ public class CameraFragment extends Fragment implements CvCameraViewListener2, A
 
     private CameraBridgeViewBase cameraView = null;
 
-    Mat imgRed, imgBlue, imgGreen, imgYellow, imgPurple, imgTurquoise;
-    Mat mRgba, imgHSV;
+
+
+
+    Mat mRgba;
 
     int rHeight = 40;
     int rWidth = 40;
@@ -158,7 +160,8 @@ public class CameraFragment extends Fragment implements CvCameraViewListener2, A
         }
 
         cameraView.setCvCameraViewListener(this);
-        cameraView.setVisibility(SurfaceView.VISIBLE);
+        cameraView.setVisibility(SurfaceView.VISIBLE)
+        ;
     }
 
     public void enableRectangleSelection(View v) {
@@ -226,16 +229,6 @@ public class CameraFragment extends Fragment implements CvCameraViewListener2, A
     @Override
     public void onCameraViewStarted(int width, int height) {
         mRgba = new Mat(height, width, CvType.CV_8UC4);
-
-        imgRed = new Mat(rHeight,rWidth, mRgba.type());
-        imgBlue= new Mat(rHeight,rWidth, mRgba.type());
-        imgGreen= new Mat(rHeight,rWidth, mRgba.type());
-        imgYellow= new Mat(rHeight,rWidth, mRgba.type());
-        imgPurple= new Mat(rHeight,rWidth, mRgba.type());
-        imgTurquoise= new Mat(rHeight,rWidth, mRgba.type());
-        imgHSV = new Mat(rHeight,rWidth, CvType.CV_8UC4);
-
-//        imgRectangleContent = new Mat(rHeight,rWidth, CvType.CV_8UC4);
     }
 
     @Override
@@ -263,9 +256,7 @@ public class CameraFragment extends Fragment implements CvCameraViewListener2, A
             bqCounter++;
             addToBlockingQueue();
         }
-
-
-//      Draw the rectangle frame for led in entire matrix for preview
+//     Draw the rectangle frame for led in entire matrix for preview
         Imgproc.rectangle(mRgba, new Point(currRect.x, currRect.y), new Point(currRect.x + currRect.width, currRect.y + currRect.height), new Scalar(255, 255, 255), 1);
 
         return mRgba;
@@ -284,4 +275,6 @@ public class CameraFragment extends Fragment implements CvCameraViewListener2, A
             System.out.println(e);
         }
      }
+
+
 }

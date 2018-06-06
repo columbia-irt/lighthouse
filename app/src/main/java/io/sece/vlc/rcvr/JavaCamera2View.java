@@ -73,7 +73,7 @@ public class JavaCamera2View extends CameraBridgeViewBase {
     private CameraCaptureSession mCaptureSession;
     private CaptureRequest.Builder mPreviewRequestBuilder;
     private Handler mBackgroundHandler;
-    private CameraCharacteristics  characteristics;
+    private CameraCharacteristics characteristics;
 
     public JavaCamera2View(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -407,11 +407,7 @@ public class JavaCamera2View extends CameraBridgeViewBase {
     }
 
     public void enableExposureSettingUI() {
-        // Getting compensation characteristics
-
-        //Rational controlAECompensationStep = characteristics.get(CameraCharacteristics.CONTROL_AE_COMPENSATION_STEP);
-        //double compensationStep = controlAECompensationStep.doubleValue();
-        Range<Integer> controlAECompensationRange = characteristics.get(CameraCharacteristics.CONTROL_AE_COMPENSATION_RANGE);
+         Range<Integer> controlAECompensationRange = characteristics.get(CameraCharacteristics.CONTROL_AE_COMPENSATION_RANGE);
         assert controlAECompensationRange != null;
         System.out.println("CompensationRange: " + controlAECompensationRange.toString());
         double minCompensationRange = controlAECompensationRange.getLower();
@@ -449,4 +445,5 @@ public class JavaCamera2View extends CameraBridgeViewBase {
 
 
     }
+
 }
