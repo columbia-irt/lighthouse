@@ -75,8 +75,11 @@ public class JavaCamera2View extends CameraBridgeViewBase {
     private Handler mBackgroundHandler;
     private CameraCharacteristics characteristics;
 
+    private Frame frame;
+
     public JavaCamera2View(Context context, AttributeSet attrs) {
         super(context, attrs);
+        frame = new Frame();
     }
 
     private void startBackgroundThread() {
@@ -181,27 +184,23 @@ public class JavaCamera2View extends CameraBridgeViewBase {
             mImageReader = ImageReader.newInstance(w, h, mPreviewFormat, 2);
             mImageReader.setOnImageAvailableListener(reader -> {
                 Image image = reader.acquireLatestImage();
-                if (image == null)
+                if (image == null) return;
+
+                try {
+                    frame.setImage(image);
+                } catch (Exception e) {
+                    Log.e(LOGTAG, "Error while creating OpenCV frame", e);
+                    image.close();
                     return;
+                }
 
-                // sanity checks - 3 planes
-                Image.Plane[] planes = image.getPlanes();
-                assert (planes.length == 3);
-                assert (image.getFormat() == mPreviewFormat);
+                // Note: After calling image.close(), the frame object is no longer usable until
+                // setImage is called on it again. If any of the processing functions need to keep
+                // a copy of the image data after deliverAndDrawFrame() returns, they need to
+                // call frame.copy() to get a copy of the frame that does not depend on the image
+                // object!
 
-                // see also https://developer.android.com/reference/android/graphics/ImageFormat.html#YUV_420_888
-                // Y plane (0) non-interleaved => stride == 1; U/V plane interleaved => stride == 2
-                assert (planes[0].getPixelStride() == 1);
-                assert (planes[1].getPixelStride() == 2);
-                assert (planes[2].getPixelStride() == 2);
-
-                ByteBuffer y_plane = planes[0].getBuffer();
-                ByteBuffer uv_plane = planes[1].getBuffer();
-                Mat y_mat = new Mat(h, w, CvType.CV_8UC1, y_plane);
-                Mat uv_mat = new Mat(h / 2, w / 2, CvType.CV_8UC2, uv_plane);
-                JavaCamera2Frame tempFrame = new JavaCamera2Frame(y_mat, uv_mat, w, h);
-                deliverAndDrawFrame(tempFrame);
-                tempFrame.release();
+                deliverAndDrawFrame(frame);
                 image.close();
             }, mBackgroundHandler);
             Surface surface = mImageReader.getSurface();
@@ -363,47 +362,6 @@ public class JavaCamera2View extends CameraBridgeViewBase {
 
         enableExposureSettingUI();
         return true;
-    }
-
-    private class JavaCamera2Frame implements CvCameraViewFrame {
-        @Override
-        public Mat gray() {
-            return mYuvFrameData.submat(0, mHeight, 0, mWidth);
-        }
-
-        @Override
-        public Mat rgba() {
-            if (mPreviewFormat == ImageFormat.NV21)
-                Imgproc.cvtColor(mYuvFrameData, mRgba, Imgproc.COLOR_YUV2RGBA_NV21, 4);
-            else if (mPreviewFormat == ImageFormat.YV12)
-                Imgproc.cvtColor(mYuvFrameData, mRgba, Imgproc.COLOR_YUV2RGB_I420, 4); // COLOR_YUV2RGBA_YV12 produces inverted colors
-            else if (mPreviewFormat == ImageFormat.YUV_420_888) {
-                assert (mUVFrameData != null);
-                Imgproc.cvtColorTwoPlane(mYuvFrameData, mUVFrameData, mRgba, Imgproc.COLOR_YUV420sp2BGRA);
-            } else {
-                throw new IllegalArgumentException("Preview Format can be NV21 or YV12");
-            }
-            return mRgba;
-        }
-
-        JavaCamera2Frame(Mat Y, Mat UV, int width, int height) {
-            super();
-            mWidth = width;
-            mHeight = height;
-            mYuvFrameData = Y;
-            mUVFrameData = UV;
-            mRgba = new Mat();
-        }
-
-        void release() {
-            mRgba.release();
-        }
-
-        private Mat mYuvFrameData;
-        private Mat mUVFrameData;
-        private Mat mRgba;
-        private int mWidth;
-        private int mHeight;
     }
 
     public void enableExposureSettingUI() {

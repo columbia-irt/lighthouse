@@ -7,7 +7,7 @@ public class FSK2Modulator extends FreqModulator {
     private Symbol symbol;
 
     public FSK2Modulator() {
-        this(Color.BLACK, Color.RED);
+        this(Color.BLUE, Color.RED);
     }
 
     public FSK2Modulator(Color u, Color d) {

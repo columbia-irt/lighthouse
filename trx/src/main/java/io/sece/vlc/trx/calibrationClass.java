@@ -7,8 +7,12 @@ import io.sece.vlc.Color;
 public class calibrationClass implements Runnable
 {
     private int duration;
-    private int timeout;
     private int[] hueValue;
+    private int brightness;
+
+    public int getBrightness() {
+        return brightness;
+    }
 
     public int getDuration() {
         return duration;
@@ -20,7 +24,7 @@ public class calibrationClass implements Runnable
 
     @Override
     public String toString() {
-        return "FPS: " + duration + " - hueValue length: " + hueValue.length + " - timeout:" + timeout;
+        return "FPS: " + duration + " - hueValue length: " + hueValue.length + " - brightness: " + brightness;
     }
 
     @Override
@@ -36,7 +40,7 @@ public class calibrationClass implements Runnable
 
             for(int i = 0; i < this.getHueValue().length; i++)
             {
-                mod = new CalibrationModulator(this.getHueValue()[i], 100, 100);
+                mod = new CalibrationModulator(this.getHueValue()[i], 100, this.getBrightness());
                 t = new Transmitter<>(led, mod, (this.getDuration() * 1000));
                 String data = "1";
                 // Transmit the data stored in the buffer.

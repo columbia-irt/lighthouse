@@ -213,6 +213,7 @@ public class API {
                         if (threadDog != null && threadDog.isAlive()) {
                             threadDog.stop();
                         }
+                        led.set(Color.BLACK);
                         tID = "";
                         active = false;
                     } else {
