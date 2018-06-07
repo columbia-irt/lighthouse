@@ -38,6 +38,8 @@ import com.android.volley.toolbox.Volley;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
+import io.sece.vlc.rcvr.blocks.AreaOfInterest;
+
 
 public class CameraFragment extends Fragment implements CvCameraViewListener2, ActivityCompat.OnRequestPermissionsResultCallback {
     private static final String TAG = "CameraFragment";
@@ -151,6 +153,14 @@ public class CameraFragment extends Fragment implements CvCameraViewListener2, A
 
         });
     }
+//    public void initTransmitterUI(View view) {
+//         Uncomment to set SyncFramesProcessors Color Offset via UI
+//        EditText editText = view.findViewById(R.id.etTransmitterColorValue);
+//        (view.findViewById(R.id.btSetTransmitterColor)).setOnClickListener(v -> {
+//            SyncFramesProcessor.gray_elimination_offset = Integer.parseInt(editText.getText().toString());
+//
+//        });
+//    }
 
     public void initCamera() {
         if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA)

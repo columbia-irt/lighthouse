@@ -29,7 +29,7 @@
             android:thumbTint="#FFFFFF"
             android:colorControlActivated="#FFFFFF"
             android:progress="40"
-            android:max="80"
+            android:max="160"
             android:layout_width="180dp"
             android:layout_height="32dp"
             android:layout_gravity="center"

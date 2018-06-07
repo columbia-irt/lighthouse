@@ -26,6 +26,9 @@ public class SyncFramesProcessor implements Runnable
     private int b_curr = 0;
     private static float[] hsv_curr;
 
+    public static int gray_elimination_offset = 5;
+
+
     SyncFramesProcessor(LinkedBlockingQueue syncBlockingQueue, Activity activity) {
         this.syncBlockingQueue = syncBlockingQueue;
         this.activity = activity;
@@ -54,32 +57,43 @@ public class SyncFramesProcessor implements Runnable
         int counter_curr = 0;
         for (int i = 0; i < originalFrame.cols(); i++) {
             for (int j = 0; j < originalFrame.rows(); j++) {
-                    r_curr += originalFrame.get(i,j)[0];
-                    g_curr += originalFrame.get(i,j)[1];
-                    b_curr += originalFrame.get(i,j)[2];
+                int pixel_rgb_avg = ((int)(originalFrame.get(i, j)[0] + originalFrame.get(i, j)[1] + originalFrame.get(i, j)[2]) / 3);
+                if(!((originalFrame.get(i, j)[0] > (pixel_rgb_avg - gray_elimination_offset)) && (originalFrame.get(i, j)[0] < (pixel_rgb_avg + gray_elimination_offset)) && (originalFrame.get(i, j)[1] > (pixel_rgb_avg - gray_elimination_offset)) && (originalFrame.get(i, j)[1] < (pixel_rgb_avg + gray_elimination_offset)) && (originalFrame.get(i, j)[2] > (pixel_rgb_avg - gray_elimination_offset)) && (originalFrame.get(i, j)[2] < (pixel_rgb_avg + gray_elimination_offset)))){
+                    r_curr += originalFrame.get(i, j)[0];
+                    g_curr += originalFrame.get(i, j)[1];
+                    b_curr += originalFrame.get(i, j)[2];
                     counter_curr += 1;
-            }
-        }
-        r_curr = r_curr/ counter_curr;
-        g_curr = g_curr/ counter_curr;
-        b_curr = b_curr/ counter_curr;
-        hsv_curr = Color.RGBtoHSB(r_curr,g_curr,b_curr, null);
-
-            /*
-                Output on UI for
-             */
-        activity.runOnUiThread(() -> {
-            TextView tvColorDetected = ((TextView)activity.findViewById(R.id.tvColorDetected));
-            TextView tvColorPreview = ((TextView)activity.findViewById(R.id.tvReceivedColor));
-            if(tvColorDetected != null && tvColorPreview != null) {
-                tvColorDetected.setText("Current\nRGB: (" + r_curr + " ," + g_curr + " ," + b_curr + ")\nHSV: (" + (int) hsv_curr[0] + " ," + (int) hsv_curr[1] + " ," + (int) hsv_curr[2] + ")");
-                tvColorPreview.setBackgroundColor(android.graphics.Color.rgb(r_curr, g_curr, b_curr));
-                if (CameraFragment.currHueValue != -1) {
-                    Color colorSent = Color.hsvToRGB(CameraFragment.currHueValue, 100, 100);
-                    (activity.findViewById(R.id.tvTransmitterSentColor)).setBackgroundColor(android.graphics.Color.rgb(colorSent.getRed(), colorSent.getGreen(), colorSent.getBlue()));
                 }
             }
-        });
+        }
+        if(counter_curr != 0){
+                r_curr = r_curr/ counter_curr;
+                g_curr = g_curr/ counter_curr;
+                b_curr = b_curr/ counter_curr;
+                hsv_curr = Color.RGBtoHSB(r_curr,g_curr,b_curr, null);
+            activity.runOnUiThread(() -> {
+                TextView tvColorDetected = ((TextView)activity.findViewById(R.id.tvColorDetected));
+                TextView tvColorPreview = ((TextView)activity.findViewById(R.id.tvReceivedColor));
+                if(tvColorDetected != null && tvColorPreview != null) {
+                    tvColorDetected.setText("Current\nRGB: (" + r_curr + " ," + g_curr + " ," + b_curr + ")\nHSV: (" + (int) hsv_curr[0] + " ," + (int) hsv_curr[1] + " ," + (int) hsv_curr[2] + ")");
+                    tvColorPreview.setBackgroundColor(android.graphics.Color.rgb(r_curr, g_curr, b_curr));
+                    if (CameraFragment.currHueValue != -1) {
+                        Color colorSent = Color.hsvToRGB(CameraFragment.currHueValue, 100, 100);
+                        (activity.findViewById(R.id.tvTransmitterSentColor)).setBackgroundColor(android.graphics.Color.rgb(colorSent.getRed(), colorSent.getGreen(), colorSent.getBlue()));
+                    }
+                }
+            });
+        }else{
+            activity.runOnUiThread(() -> {
+                TextView tvColorDetected = ((TextView)activity.findViewById(R.id.tvColorDetected));
+                TextView tvColorPreview = ((TextView)activity.findViewById(R.id.tvReceivedColor));
+                if(tvColorDetected != null && tvColorPreview != null) {
+                    tvColorDetected.setText("no valid color found");
+                    tvColorPreview.setBackgroundColor(android.graphics.Color.rgb(0, 0, 0));
+                }
+            });
+        }
+
     }
 
 
