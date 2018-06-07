@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <io.sece.vlc.rcvr.JavaCamera2View
+        android:layout_centerVertical="true"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/JCV"
+    />
+
+    <SeekBar
+        android:id="@+id/seekbarSize"
+        android:progressBackgroundTint="#FFFFFF"
+        android:progressTint="#FFFFFF"
+        android:thumbTint="#FFFFFF"
+        android:colorControlActivated="#FFFFFF"
+        android:progress="40"
+        android:max="80"
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:layout_gravity="center"
+        android:layout_alignParentBottom="true"
+        />
+
+    <SeekBar
+        android:id="@+id/seekbarExposure"
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:layout_gravity="center"
+        android:layout_above="@+id/seekbarSize"
+        android:layout_marginBottom="5dp"
+        android:colorControlActivated="#FF00FF"
+        android:max="80"
+        android:progress="40"
+        android:progressBackgroundTint="#FF00FF"
+        android:progressTint="#FF00FF"
+        android:thumbTint="#FF00FF" />
+
+
+    <TextView
+        android:id="@+id/tvExposure"
+        android:textSize="15dp"
+        android:textColor="#FFFFFF"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_above="@+id/seekbarExposure"
+        android:layout_marginLeft="5dp"
+        android:layout_marginBottom="5dp"
+        android:text="Exp:\n0" />
+
+    <TextView
+        android:id="@+id/tvColorDetected"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/tvReceivedColor"
+        android:layout_marginStart="6dp"
+        android:layout_marginTop="8dp"
+        android:textColor="#FFFFFF"
+        android:text="Color" />
+    <TextView
+        android:id="@+id/tvReceivedColor"
+        android:text="Received\nColor"
+        android:layout_width="60dp"
+        android:background="#FFFFFF"
+        android:layout_height="60dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="6dp"
+        android:layout_marginTop="6dp"/>
+    <TextView
+        android:id="@+id/tvTransmitterSentColor"
+        android:text="Sent\nColor"
+        android:layout_width="60dp"
+        android:background="#000000"
+        android:layout_height="60dp"
+        android:layout_toRightOf="@+id/tvReceivedColor"
+        android:layout_marginTop="6dp"/>
+
+    <EditText
+        android:id="@+id/etTransmitterColorValue"
+        android:inputType="number"
+        android:layout_width="120dp"
+        android:text="180"
+        android:textColor="#FFFFFF"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"/>
+    <Button
+        android:id="@+id/btSetTransmitterColor"
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/etTransmitterColorValue"
+        android:layout_alignParentEnd="true"
+        android:text="Set" />
+
+
+</RelativeLayout>

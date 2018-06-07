@@ -13,14 +13,12 @@ package io.sece.vlc;
  */
 class Symbol {
     public int bits;   // Number of bits it takes to represent a symbol
-    public int max;    // The maximum symbol number returned by fromBits
-    public int states; // Number of symbol states
 
     /**
      * Create a Symbol instance with the given number of states. The number
      * of states must be a power of 2 and must be at least 2.
      */
-    public Symbol(int states) {
+    Symbol(int states) {
         if (states < 2) {
             throw new IllegalArgumentException("Number of states must be at least 2");
         }
@@ -30,8 +28,6 @@ class Symbol {
         }
 
         bits = 31 - Integer.numberOfLeadingZeros(states);
-        this.states = states;
-        max = states - 1;
     }
 
 

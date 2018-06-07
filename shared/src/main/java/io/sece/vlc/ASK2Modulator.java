@@ -21,20 +21,17 @@ public class ASK2Modulator extends AmpModulator {
     @Override
     public Integer modulate(String data, int offset) {
         switch(symbol.fromBits(data, offset)) {
-        case 0: return l1;
-        case 1: return l2;
+            case 0: return l1;
+            case 1: return l2;
         }
         throw new AssertionError();
     }
 
     @Override
     public String demodulate(Integer value) {
-        switch (value)
-        {
-            case 11:
-                return symbol.toBits(0);
-            case 12:
-                return symbol.toBits(1);
+        switch (value) {
+            case 11: return symbol.toBits(0);
+            case 12: return symbol.toBits(1);
         }
         throw new IllegalArgumentException();
     }

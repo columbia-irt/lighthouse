@@ -25,34 +25,23 @@ public class FSK4Modulator extends FreqModulator {
     @Override
     public Color modulate(String data, int offset) {
         switch(symbol.fromBits(data, offset)) {
-        case 0:
-            return n;
-        case 1:
-            return e;
-        case 2:
-            return s;
-        case 3:
-            return w;
+        case 0: return n;
+        case 1: return e;
+        case 2: return s;
+        case 3: return w;
         }
         throw new AssertionError();
     }
 
     @Override
     public String demodulate(Color value) {
-        if(value == n)
-        {
+        if (value == n) {
             return symbol.toBits(0);
-        }
-        else if( value == e)
-        {
+        } else if( value == e) {
             return symbol.toBits(1);
-        }
-        else if( value == s)
-        {
+        } else if( value == s) {
             return symbol.toBits(2);
-        }
-        else if( value == w)
-        {
+        } else if( value == w) {
             return symbol.toBits(3);
         }
         throw new IllegalArgumentException();
