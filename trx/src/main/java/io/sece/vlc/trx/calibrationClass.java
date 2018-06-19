@@ -8,7 +8,7 @@ public class calibrationClass implements Runnable
 {
     private int duration;
     private int[] hueValue;
-    private int brightness;
+    private int brightness = 100;
 
     public int getBrightness() {
         return brightness;
