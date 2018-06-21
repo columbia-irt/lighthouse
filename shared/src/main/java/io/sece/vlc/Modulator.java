@@ -25,4 +25,6 @@ public abstract class Modulator<V> {
     public abstract String demodulate(V value);
     public abstract V modulate(String data, int offset);
 
+    public abstract V getClosestElement(int value);
+
 }

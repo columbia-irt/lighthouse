@@ -34,4 +34,9 @@ public class CalibrationModulator extends FreqModulator
         // Not yet implemented
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public Color getClosestElement(int value) {
+        throw new UnsupportedOperationException();
+    }
 }

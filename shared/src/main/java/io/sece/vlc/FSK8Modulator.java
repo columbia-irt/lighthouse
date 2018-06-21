@@ -17,8 +17,8 @@ public class FSK8Modulator extends FreqModulator {
             case 1: return Color.RED;
             case 2: return Color.GREEN;
             case 3: return Color.BLUE;
-            case 4: return Color.PURPLE;
-            case 5: return Color.YELLOW;
+            case 4: return Color.YELLOW;
+            case 5: return Color.PURPLE;
             case 6: return Color.TURQUOISE;
             case 7: return Color.WHITE;
         }
@@ -35,9 +35,9 @@ public class FSK8Modulator extends FreqModulator {
             return symbol.toBits(2);
         } else if( value == Color.BLUE) {
             return symbol.toBits(3);
-        } else if( value == Color.PURPLE) {
-            return symbol.toBits(4);
         } else if( value == Color.YELLOW) {
+            return symbol.toBits(4);
+        } else if( value == Color.PURPLE) {
             return symbol.toBits(5);
         } else if( value == Color.TURQUOISE) {
             return symbol.toBits(6);
@@ -45,5 +45,49 @@ public class FSK8Modulator extends FreqModulator {
             return symbol.toBits(7);
         }
         throw new IllegalArgumentException();
+    }
+
+    @Override
+    public Color getClosestElement(int value) {
+        if(value == -1)
+        {
+            return Color.BLACK;
+        }
+        if(value == -2)
+        {
+            return Color.WHITE;
+        }
+
+        int redDistance = Math.min(Math.abs(value - (Color.RED_HUE + 360)), Math.abs(value - Color.RED_HUE));
+        int greenDistance = Math.min(Math.abs(value - (Color.GREEN_HUE + 360)), Math.abs(value - Color.GREEN_HUE));
+        int blueDistance = Math.min(Math.abs(value - (Color.BLUE_HUE + 360)), Math.abs(value - Color.BLUE_HUE));
+        int yellowDistance = Math.min(Math.abs(value - (Color.YELLOW_HUE + 360)), Math.abs(value - Color.YELLOW_HUE));
+        int purpleDistance = Math.min(Math.abs(value - (Color.PURPLE_HUE + 360)), Math.abs(value - Color.PURPLE_HUE));
+        int turquoiseDistance = Math.min(Math.abs(value - (Color.TURQUOISE_HUE + 360)), Math.abs(value - Color.TURQUOISE_HUE));
+
+        if(redDistance < greenDistance && redDistance < blueDistance && redDistance < yellowDistance && redDistance < purpleDistance && redDistance < turquoiseDistance)
+        {
+            return Color.RED;
+        }
+        else if(greenDistance < blueDistance && greenDistance < yellowDistance && greenDistance < purpleDistance && greenDistance < turquoiseDistance)
+        {
+            return Color.GREEN;
+        }
+        else if(blueDistance < yellowDistance && blueDistance < purpleDistance && blueDistance < turquoiseDistance)
+        {
+            return Color.BLUE;
+        }
+        else if(yellowDistance < purpleDistance && yellowDistance < turquoiseDistance)
+        {
+            return Color.YELLOW;
+        }
+        else if(purpleDistance < turquoiseDistance)
+        {
+            return Color.PURPLE;
+        }
+        else
+        {
+            return Color.TURQUOISE;
+        }
     }
 }

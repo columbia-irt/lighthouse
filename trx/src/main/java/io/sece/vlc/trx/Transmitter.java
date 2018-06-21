@@ -44,7 +44,7 @@ class Transmitter<T> {
     //rx isnt in the transmitter but should look like this.
     //public String demodulate(String data, int offset, Color value)
     /*
-    public String rx(T value) throws LEDException, InterruptedException
+    public String rx(T value)
     {
         return modulator.demodulate(value);
     }

@@ -35,4 +35,9 @@ public class ASK2Modulator extends AmpModulator {
         }
         throw new IllegalArgumentException();
     }
+
+    @Override
+    public Integer getClosestElement(int value) {
+        throw new UnsupportedOperationException();
+    }
 }

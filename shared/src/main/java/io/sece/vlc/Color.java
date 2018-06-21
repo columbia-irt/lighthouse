@@ -17,6 +17,15 @@ public class Color {
     public static final Color BLACK = new Color(0, 0, 0);
     public static final Color WHITE = new Color(255, 255, 255);
 
+    public static final int RED_HUE = 0;
+    public static final int YELLOW_HUE = 60;
+    public static final int GREEN_HUE = 120;
+    public static final int TURQUOISE_HUE = 180;
+    public static final int BLUE_HUE = 240;
+    public static final int PURPLE_HUE = 300;
+//    public static final int BLACK_HUE = 0;
+//    public static final int WHITE_HUE = 0;
+
     public Color(int red, int green, int blue) {
         this.red = red;
         this.green = green;

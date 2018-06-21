@@ -30,4 +30,9 @@ public class OOKModulator extends Modulator<Boolean> {
         // Not yet implemented
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public Boolean getClosestElement(int value) {
+        throw new UnsupportedOperationException();
+    }
 }

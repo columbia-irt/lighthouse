@@ -36,4 +36,19 @@ public class FSK2Modulator extends FreqModulator {
         }
         throw new IllegalArgumentException();
     }
+
+    @Override
+    public Color getClosestElement(int value) {
+        int redDistance = Math.min(Math.abs(value - (Color.RED_HUE + 360)), Math.abs(value - Color.RED_HUE));
+        int blueDistance = Math.min(Math.abs(value - (Color.BLUE_HUE + 360)), Math.abs(value - Color.BLUE_HUE));
+
+        if(redDistance < blueDistance)
+        {
+            return Color.RED;
+        }
+        else
+        {
+            return Color.BLUE;
+        }
+    }
 }

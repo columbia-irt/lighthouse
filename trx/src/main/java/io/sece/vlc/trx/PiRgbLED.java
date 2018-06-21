@@ -24,8 +24,18 @@ class PiRgbLED implements ColorLEDInterface {
     @Override
     public void set(Color color) throws LEDException
     {
-        red.set(color.red);
-        green.set(color.green);
-        blue.set(color.blue);
+        /*calibrate hue value 180
+        if(color.green == 255 && color.blue == 255)
+        {
+            red.set(color.red);
+            green.set(color.green);
+            blue.set(100);
+        }
+        else
+        {*/
+            red.set(color.red);
+            green.set(color.green);
+            blue.set(color.blue);
+        //}
     }
 }

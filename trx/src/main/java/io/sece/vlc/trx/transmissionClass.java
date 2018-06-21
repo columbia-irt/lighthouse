@@ -38,7 +38,7 @@ public class transmissionClass implements Runnable {
             PiGPIOPin r = new PiGPIOPin(22);
             PiGPIOPin g = new PiGPIOPin(27);
             PiGPIOPin b = new PiGPIOPin(17);
-            PiRgbLED   led = new PiRgbLED(r, g, b);
+            PiRgbLED led = new PiRgbLED(r, g, b);
 
             Transmitter<?> t;
             Modulator mod;
