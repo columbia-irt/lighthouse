@@ -61,8 +61,8 @@
     </FrameLayout>
 
 
-    <TextView
-        android:id="@+id/tvExposure"
+    <Button
+        android:id="@+id/btManualExposure"
         android:textSize="15dp"
         android:textColor="#FFFFFF"
         android:layout_width="wrap_content"
@@ -70,7 +70,7 @@
         android:layout_alignParentTop="true"
         android:layout_toLeftOf="@+id/seekbarSizeFrame"
         android:layout_marginRight="5dp"
-        android:text="Exp:\n0" />
+        android:text="Set ManExp" />
 
     <TextView
         android:textSize="33dp"
@@ -138,6 +138,5 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/btSetTransmitterColor"
         android:layout_alignStart="@+id/btSetTransmitterColor" />
-
 
 </RelativeLayout>

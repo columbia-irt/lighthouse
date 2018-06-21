@@ -1,4 +1,4 @@
-package io.sece.vlc.rcvr.blocks;
+package io.sece.vlc.rcvr.modules;
 
 import org.opencv.core.Mat;
 import org.opencv.core.Rect;

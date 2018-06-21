@@ -41,8 +41,8 @@
         android:thumbTint="#FF00FF" />
 
 
-    <TextView
-        android:id="@+id/tvExposure"
+    <Button
+        android:id="@+id/btManualExposure"
         android:textSize="15dp"
         android:textColor="#FFFFFF"
         android:layout_width="wrap_content"
@@ -51,7 +51,7 @@
         android:layout_above="@+id/seekbarExposure"
         android:layout_marginLeft="5dp"
         android:layout_marginBottom="5dp"
-        android:text="Exp:\n0" />
+        android:text="Set ManExp" />
 
     <TextView
         android:id="@+id/tvColorDetected"

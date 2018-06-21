@@ -38,7 +38,7 @@ import com.android.volley.toolbox.Volley;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
-import io.sece.vlc.rcvr.blocks.AreaOfInterest;
+import io.sece.vlc.rcvr.modules.AreaOfInterest;
 
 
 public class CameraFragment extends Fragment implements CvCameraViewListener2, ActivityCompat.OnRequestPermissionsResultCallback {

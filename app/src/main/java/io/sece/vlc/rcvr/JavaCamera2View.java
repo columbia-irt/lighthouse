@@ -6,7 +6,9 @@ import java.util.Collections;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.ImageFormat;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
@@ -14,23 +16,27 @@ import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureRequest;
+import android.hardware.camera2.CaptureResult;
+import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
+import android.text.InputType;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.Range;
 import android.view.Surface;
+import android.view.View;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import org.opencv.core.CvType;
-import org.opencv.core.Mat;
-import org.opencv.imgproc.Imgproc;
 
 import org.opencv.android.CameraBridgeViewBase;
 
@@ -66,9 +72,8 @@ public class JavaCamera2View extends CameraBridgeViewBase {
 
     private HandlerThread mBackgroundThread;
 
-    /*
-        Need to be accessible from MainActivity in order to do runtime camera configuration
-     */
+
+    static double currExpTime= 0;
 
     private CameraCaptureSession mCaptureSession;
     private CaptureRequest.Builder mPreviewRequestBuilder;
@@ -77,10 +82,23 @@ public class JavaCamera2View extends CameraBridgeViewBase {
 
     private Frame frame;
 
+    private CameraCaptureSession.CaptureCallback mCaptureCallback = new CameraCaptureSession.CaptureCallback() {
+        @Override
+        public void onCaptureCompleted(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, @NonNull TotalCaptureResult result) {
+            super.onCaptureCompleted(session, request, result);
+            currExpTime = result.get(CaptureResult.SENSOR_EXPOSURE_TIME);
+            System.out.println("Exposure Time: " + currExpTime);
+//            System.out.println("Frame Duration: " + result.get(CaptureResult.SENSOR_FRAME_DURATION));
+        }
+    };
+
     public JavaCamera2View(Context context, AttributeSet attrs) {
         super(context, attrs);
         frame = new Frame();
+
     }
+
+
 
     private void startBackgroundThread() {
         Log.i(LOGTAG, "startBackgroundThread");
@@ -220,15 +238,15 @@ public class JavaCamera2View extends CameraBridgeViewBase {
                             /*
                              * Setting device's auto focus off
                              */
-                            mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE,
-                                    CaptureRequest.CONTROL_AF_MODE_OFF);
+                            mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_AUTO);
 
                             /*
                              * Setting device auto exposure Routine
                              */
+//                            mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON);
                             mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
                                     CaptureRequest.CONTROL_AE_MODE_ON);
-
+                            mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AWB_MODE, CaptureRequest.CONTROL_AWB_MODE_AUTO);
 //                            Rect zoom = new Rect(0, 0,
 //                                    320,240);
 //                            mPreviewRequestBuilder.set(CaptureRequest.SCALER_CROP_REGION, zoom);
@@ -237,13 +255,17 @@ public class JavaCamera2View extends CameraBridgeViewBase {
                              * Setting device's auto white balancing routine
                              *
                              *
-                                mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AWB_MODE, CaptureRequest.CONTROL_AWB_MODE_OFF);
-                             */
+                             *
+                             * */
+
+
 
 
                             mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, new Range<>(30, 30));
 
-                            mCaptureSession.setRepeatingRequest(mPreviewRequestBuilder.build(), null, mBackgroundHandler);
+                            mCaptureSession.setRepeatingRequest(mPreviewRequestBuilder.build(), mCaptureCallback, mBackgroundHandler);
+
+
                             Log.i(LOGTAG, "CameraPreviewSession has been started");
                         } catch (Exception e) {
 //                            Log.e(TAG, "createCaptureSession failed", e);
@@ -361,13 +383,17 @@ public class JavaCamera2View extends CameraBridgeViewBase {
         }
 
         enableExposureSettingUI();
+        setManualExposureSettingUI();
         return true;
     }
 
+
     public void enableExposureSettingUI() {
-         Range<Integer> controlAECompensationRange = characteristics.get(CameraCharacteristics.CONTROL_AE_COMPENSATION_RANGE);
+
+        Range<Integer> controlAECompensationRange = characteristics.get(CameraCharacteristics.CONTROL_AE_COMPENSATION_RANGE);
         assert controlAECompensationRange != null;
         System.out.println("CompensationRange: " + controlAECompensationRange.toString());
+        System.out.println("ExposureRange: " + characteristics.get(CameraCharacteristics.SENSOR_INFO_EXPOSURE_TIME_RANGE).toString());
         double minCompensationRange = controlAECompensationRange.getLower();
         double maxCompensationRange = controlAECompensationRange.getUpper();
 
@@ -382,10 +408,13 @@ public class JavaCamera2View extends CameraBridgeViewBase {
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                     try{
                         System.out.println(progress);
+
+                        mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
+                                CaptureRequest.CONTROL_AE_MODE_ON);
                         mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AE_EXPOSURE_COMPENSATION, progress - (int)maxCompensationRange);
 
-                        mCaptureSession.setRepeatingRequest(mPreviewRequestBuilder.build(), null, mBackgroundHandler);
-                        ((TextView)activity.findViewById(R.id.tvExposure)).setText("Exp:\n" + (progress - (int)maxCompensationRange));
+                        mCaptureSession.setRepeatingRequest(mPreviewRequestBuilder.build(), mCaptureCallback, mBackgroundHandler);
+                        ((Button)activity.findViewById(R.id.btManualExposure)).setText("Exp:\n" + (progress - (int)maxCompensationRange));
                     }catch(Exception e) {
                         e.printStackTrace();
                     }
@@ -400,8 +429,46 @@ public class JavaCamera2View extends CameraBridgeViewBase {
                 }
             });
         });
-
-
     }
+
+    public void setManualExposureSettingUI(){
+        Activity activity = (Activity)CameraFragment.context;
+
+        Button btManualExposure = (Button)activity.findViewById(R.id.btManualExposure);
+        btManualExposure.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Range<Long> exposureTimeRange = characteristics.get(CameraCharacteristics.SENSOR_INFO_EXPOSURE_TIME_RANGE);
+                System.out.println("Range "+exposureTimeRange.toString());
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                builder.setTitle("Manual Exposure - Choose between " + exposureTimeRange.getLower() + " and " + exposureTimeRange.getUpper());
+                final EditText input = new EditText(activity);
+                input.setInputType(InputType.TYPE_CLASS_NUMBER);
+                builder.setView(input);
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        long curr_manual = Integer.parseInt(input.getText().toString());
+                        mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
+                                CaptureRequest.CONTROL_AE_MODE_OFF);
+                        mPreviewRequestBuilder.set(CaptureRequest.SENSOR_EXPOSURE_TIME, (curr_manual));
+                        try {
+                            mCaptureSession.setRepeatingRequest(mPreviewRequestBuilder.build(), mCaptureCallback, mBackgroundHandler);
+                        } catch (CameraAccessException e) {
+                            e.printStackTrace();
+                        }
+                        Toast.makeText(activity, "Set to: " + curr_manual, Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+                builder.show();
+
+
+            }
+        });
+    }
+
 
 }
