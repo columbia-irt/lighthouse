@@ -26,8 +26,11 @@ import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -38,6 +41,9 @@ import com.android.volley.toolbox.Volley;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
+import io.sece.vlc.FSK2Modulator;
+import io.sece.vlc.FSK4Modulator;
+import io.sece.vlc.FSK8Modulator;
 import io.sece.vlc.rcvr.modules.AreaOfInterest;
 
 
@@ -72,6 +78,8 @@ public class CameraFragment extends Fragment implements CvCameraViewListener2, A
     int delay = 300;
     long firstTimeStamp = 0;
     int bqCounter = 0;
+
+    ReceiverClass receiverClass;
 
     private void requestCameraPermission() {
         Log.d(TAG, "Requesting camera permission...");
@@ -110,6 +118,7 @@ public class CameraFragment extends Fragment implements CvCameraViewListener2, A
 
         cameraView = view.findViewById(R.id.JCV);
         initCamera();
+
     }
 
     @Override
@@ -121,9 +130,14 @@ public class CameraFragment extends Fragment implements CvCameraViewListener2, A
         syncBlockingQueue =  new LinkedBlockingQueue<CvCameraViewFrame>();
         context = getActivity();
 
-        SyncFramesProcessor syncFramesProcessor = new SyncFramesProcessor(syncBlockingQueue, getActivity());
+
+
+        receiverClass = new ReceiverClass(new FSK2Modulator());
+
+        SyncFramesProcessor syncFramesProcessor = new SyncFramesProcessor(syncBlockingQueue, getActivity(), receiverClass);
         Thread SyncFrameProcessorThread = new Thread(syncFramesProcessor);
         SyncFrameProcessorThread.start();
+
     }
 
     public void initTransmitterUI(View view) {
@@ -152,15 +166,41 @@ public class CameraFragment extends Fragment implements CvCameraViewListener2, A
             queue.add(jsonObjectRequest);
 
         });
+
+        Spinner spinner = (Spinner) getActivity().findViewById(R.id.spModulation);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
+                R.array.modulations_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String[] array = getResources().getStringArray(R.array.modulations_array);
+//                receiverClass.setModulator();
+                System.out.println(array[position]);
+                switch (array[position]){
+                    case "ASK2": break;
+                    case "ASK4": break;
+                    case "ASK8": break;
+                    case "FSK2":
+                        receiverClass.setModulator(new FSK2Modulator());
+                        break;
+                    case "FSK4":
+                        receiverClass.setModulator(new FSK4Modulator());
+                        break;
+                    case "FSK8":
+                        receiverClass.setModulator(new FSK8Modulator());
+                        break;
+                    case "OOK": break;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
-//    public void initTransmitterUI(View view) {
-//         Uncomment to set SyncFramesProcessors Color Offset via UI
-//        EditText editText = view.findViewById(R.id.etTransmitterColorValue);
-//        (view.findViewById(R.id.btSetTransmitterColor)).setOnClickListener(v -> {
-//            SyncFramesProcessor.gray_elimination_offset = Integer.parseInt(editText.getText().toString());
-//
-//        });
-//    }
 
     public void initCamera() {
         if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA)

@@ -71,6 +71,16 @@
         android:layout_toLeftOf="@+id/seekbarSizeFrame"
         android:layout_marginRight="5dp"
         android:text="Set ManExp" />
+    <Spinner
+        android:id="@+id/spModulation"
+        android:textSize="15dp"
+        android:textColor="#FFFFFF"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/colorAccent"
+        android:layout_toLeftOf="@+id/seekbarSizeFrame"
+        android:layout_marginRight="5dp" />
 
     <TextView
         android:textSize="33dp"
