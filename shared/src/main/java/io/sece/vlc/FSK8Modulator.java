@@ -27,19 +27,19 @@ public class FSK8Modulator extends FreqModulator {
 
     @Override
     public String demodulate(Color value) {
-        if (value == Color.BLACK) {
+        if( value == Color.RED) {
             return symbol.toBits(0);
-        } else if( value == Color.RED) {
-            return symbol.toBits(1);
         } else if( value == Color.GREEN) {
-            return symbol.toBits(2);
+            return symbol.toBits(1);
         } else if( value == Color.BLUE) {
-            return symbol.toBits(3);
+            return symbol.toBits(2);
         } else if( value == Color.YELLOW) {
-            return symbol.toBits(4);
+            return symbol.toBits(3);
         } else if( value == Color.PURPLE) {
-            return symbol.toBits(5);
+            return symbol.toBits(4);
         } else if( value == Color.TURQUOISE) {
+            return symbol.toBits(5);
+        } else if (value == Color.BLACK) {
             return symbol.toBits(6);
         } else if( value == Color.WHITE) {
             return symbol.toBits(7);
