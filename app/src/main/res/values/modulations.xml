@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="modulations_array">
+        <item>FSK2</item>
+        <item>FSK4</item>
+        <item>FSK8</item>
+        <item>ASK2</item>
+        <item>ASK4</item>
+        <item>ASK8</item>
+        <item>OOK</item>
+    </string-array>
+</resources>

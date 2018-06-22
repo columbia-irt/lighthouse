@@ -87,7 +87,7 @@ public class JavaCamera2View extends CameraBridgeViewBase {
         public void onCaptureCompleted(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, @NonNull TotalCaptureResult result) {
             super.onCaptureCompleted(session, request, result);
             currExpTime = result.get(CaptureResult.SENSOR_EXPOSURE_TIME);
-            System.out.println("Exposure Time: " + currExpTime);
+//            System.out.println("Exposure Time: " + currExpTime);
 //            System.out.println("Frame Duration: " + result.get(CaptureResult.SENSOR_FRAME_DURATION));
         }
     };
