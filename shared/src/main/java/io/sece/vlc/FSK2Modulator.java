@@ -7,7 +7,7 @@ public class FSK2Modulator extends FreqModulator {
     private Symbol symbol;
 
     public FSK2Modulator() {
-        this(Color.BLUE, Color.RED);
+        this(Color.RED, Color.GREEN);
     }
 
     public FSK2Modulator(Color u, Color d) {
@@ -40,15 +40,15 @@ public class FSK2Modulator extends FreqModulator {
     @Override
     public Color getClosestElement(int value) {
         int redDistance = Math.min(Math.abs(value - (Color.RED_HUE + 360)), Math.abs(value - Color.RED_HUE));
-        int blueDistance = Math.min(Math.abs(value - (Color.BLUE_HUE + 360)), Math.abs(value - Color.BLUE_HUE));
+        int greenDistance = Math.min(Math.abs(value - (Color.GREEN_HUE + 360)), Math.abs(value - Color.GREEN_HUE));
 
-        if(redDistance < blueDistance)
+        if(redDistance < greenDistance)
         {
             return Color.RED;
         }
         else
         {
-            return Color.BLUE;
+            return Color.GREEN;
         }
     }
 }

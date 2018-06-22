@@ -59,17 +59,19 @@ class Symbol {
      * in buffer out starting at index offset. Return the output buffer.
      */
     public String toBits(int symbol) {
-            StringBuilder str = new StringBuilder();
-        for(int i = 0; i < bits; i++)
+        StringBuilder str = new StringBuilder();
+        int c = 0;
+        for(int i = bits - 1; i >= 0; i--)
         {
             if(((symbol >> i) & 1L) == 1L)
             {
-                str.insert(i, '1');
+                str.insert(c, '1');
             }
             else
             {
-                str.insert(i, '0');
+                str.insert(c, '0');
             }
+            c++;
         }
         return str.toString();
     }

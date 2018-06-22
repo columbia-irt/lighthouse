@@ -13,13 +13,13 @@ public class FSK8Modulator extends FreqModulator {
     @Override
     public Color modulate(String data, int offset) {
         switch(symbol.fromBits(data, offset)) {
-            case 0: return Color.BLACK;
-            case 1: return Color.RED;
-            case 2: return Color.GREEN;
-            case 3: return Color.BLUE;
-            case 4: return Color.YELLOW;
-            case 5: return Color.PURPLE;
-            case 6: return Color.TURQUOISE;
+            case 0: return Color.RED;
+            case 1: return Color.GREEN;
+            case 2: return Color.BLUE;
+            case 3: return Color.YELLOW;
+            case 4: return Color.PURPLE;
+            case 5: return Color.TURQUOISE;
+            case 6: return Color.BLACK;
             case 7: return Color.WHITE;
         }
         throw new AssertionError();
