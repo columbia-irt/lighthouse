@@ -75,7 +75,7 @@ public class CameraFragment extends Fragment implements CvCameraViewListener2, A
     CircularBuffer<Mat> circularBuffer;
     LinkedBlockingQueue syncBlockingQueue;
 
-    int delay = 300;
+    int delay = 10;
     long firstTimeStamp = 0;
     int bqCounter = 0;
 
@@ -317,7 +317,7 @@ public class CameraFragment extends Fragment implements CvCameraViewListener2, A
             Limitation of BlockingQueue Size ?
             -> BlockingQueue put() waiting if necessary for space to become available
          */
-        System.out.println(Thread.currentThread().getId() + " " + System.currentTimeMillis()+" SyncFramesReceived " + bqCounter);
+//        System.out.println(Thread.currentThread().getId() + " " + System.currentTimeMillis()+" SyncFramesReceived " + bqCounter);
 
         try{
             syncBlockingQueue.put(circularBuffer.get());
