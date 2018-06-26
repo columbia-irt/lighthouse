@@ -9,6 +9,7 @@ public class FSK4Modulator extends FreqModulator {
     private Color w;
     private Symbol symbol;
 
+
     public FSK4Modulator() {
         this(Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW);
     }
@@ -18,7 +19,8 @@ public class FSK4Modulator extends FreqModulator {
         this.e = e;
         this.s = s;
         this.w = w;
-        symbol = new Symbol(4);
+        states = 4;
+        symbol = new Symbol(states);
         bits = symbol.bits;
     }
 

@@ -18,7 +18,8 @@ public class ASK4Modulator extends AmpModulator {
         this.l2 = l2;
         this.l3 = l3;
         this.l4 = l4;
-        symbol = new Symbol(4);
+        states = 4;
+        symbol = new Symbol(states);
         bits = symbol.bits;
     }
 

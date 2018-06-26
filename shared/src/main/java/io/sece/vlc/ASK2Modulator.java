@@ -14,7 +14,8 @@ public class ASK2Modulator extends AmpModulator {
     public ASK2Modulator(int l1, int l2) {
         this.l1 = l1;
         this.l2 = l2;
-        symbol = new Symbol(2);
+        states = 2;
+        symbol = new Symbol(states);
         bits = symbol.bits;
     }
 

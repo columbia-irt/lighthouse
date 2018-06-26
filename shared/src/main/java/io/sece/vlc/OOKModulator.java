@@ -12,7 +12,8 @@ public class OOKModulator extends Modulator<Boolean> {
     private Symbol symbol;
 
     public OOKModulator() {
-        symbol = new Symbol(2);
+        states = 2;
+        symbol = new Symbol(states);
         bits = symbol.bits;
     }
 

@@ -1,5 +1,7 @@
 package io.sece.vlc.trx;
 
+import java.util.ArrayList;
+
 import io.sece.vlc.Color;
 import io.sece.vlc.Modulator;
 
@@ -27,6 +29,8 @@ class Transmitter<T> {
             long startTime = System.currentTimeMillis();
             long delta = 0;
             int count = 1;
+
+            System.out.println(data);
             for(int i = 0; i < data.length(); i += modulator.bits)
             {
                 led.set(modulator.modulate(data, i));
@@ -41,22 +45,11 @@ class Transmitter<T> {
         }
     }
 
-    //rx isnt in the transmitter but should look like this.
-    //public String demodulate(String data, int offset, Color value)
-    /*
-    public String rx(T value)
+    public void startTx() throws LEDException, InterruptedException
     {
-        return modulator.demodulate(value);
+        int amount = 8; //Amount of symbols should be calculated through interval
+
+        this.tx(modulator.startSequence(amount));
+
     }
-
-    it should be used like this:
-
-    List<Color> colorList
-    String data = "";
-    for(int i = 0; i < colorList.lenght(); i++)
-    {
-        data += rx(colorList[i]);
-    }
-
-    */
 }

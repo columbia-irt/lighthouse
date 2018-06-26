@@ -13,7 +13,8 @@ public class CalibrationModulator extends FreqModulator
 
         this.u = hsvToRGB(hue, saturation, brightness);
         this.d = Color.BLACK;
-        symbol = new Symbol(2);
+        states = 2;
+        symbol = new Symbol(states);
         bits = symbol.bits;
         System.out.println("Red: " + u.getRed() + " Green: " + u.getGreen() + " Blue: " + u.getBlue());
         float[] test = RGBtoHSB(u.getRed(),u.getGreen(),u.getBlue(),null);

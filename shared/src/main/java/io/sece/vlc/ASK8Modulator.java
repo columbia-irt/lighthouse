@@ -26,7 +26,8 @@ public class ASK8Modulator extends AmpModulator {
         this.l6 = l6;
         this.l7 = l7;
         this.l8 = l8;
-        symbol = new Symbol(8);
+        states = 8;
+        symbol = new Symbol(states);
         bits = symbol.bits;
     }
 

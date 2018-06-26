@@ -1,6 +1,7 @@
 package io.sece.vlc;
 
 
+import java.util.ArrayList;
 
 /**
  * An abtract base class for all modulators and demodulators. The base class
@@ -17,6 +18,7 @@ package io.sece.vlc;
  */
 public abstract class Modulator<V> {
     public int bits;
+    public int states;
 
     public V modulate(String data) {
         return modulate(data, 0);
@@ -26,5 +28,15 @@ public abstract class Modulator<V> {
     public abstract V modulate(String data, int offset);
 
     public abstract V getClosestElement(int value);
+
+
+    public String startSequence(int amount) {
+        String startingSequence = "";
+        for(int i = 0; i < amount; i++)
+        {
+            startingSequence += String.format("%" + bits + "s", Integer.toBinaryString(i % states)).replace(' ', '0');
+        }
+        return startingSequence;
+    }
 
 }

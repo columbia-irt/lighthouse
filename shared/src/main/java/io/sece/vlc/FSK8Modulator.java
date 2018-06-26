@@ -6,7 +6,8 @@ public class FSK8Modulator extends FreqModulator {
     private Symbol symbol;
 
     public FSK8Modulator() {
-        symbol = new Symbol(8);
+        states = 8;
+        symbol = new Symbol(states);
         bits = symbol.bits;
     }
 

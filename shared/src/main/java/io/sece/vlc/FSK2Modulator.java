@@ -14,7 +14,8 @@ public class FSK2Modulator extends FreqModulator {
 
         this.u = u;
         this.d = d;
-        symbol = new Symbol(2);
+        states = 2;
+        symbol = new Symbol(states);
         bits = symbol.bits;
     }
 
