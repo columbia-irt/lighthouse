@@ -53,9 +53,6 @@ public class CameraFragment extends Fragment implements CvCameraViewListener2, A
 
     private CameraBridgeViewBase cameraView = null;
 
-
-
-
     Mat mRgba;
 
     int rHeight = 40;
@@ -75,7 +72,7 @@ public class CameraFragment extends Fragment implements CvCameraViewListener2, A
     CircularBuffer<Mat> circularBuffer;
     LinkedBlockingQueue syncBlockingQueue;
 
-    int delay = 10;
+    public static long timeToStartSynchronized;
     long firstTimeStamp = 0;
     int bqCounter = 0;
 
@@ -183,7 +180,7 @@ public class CameraFragment extends Fragment implements CvCameraViewListener2, A
                     case "ASK4": break;
                     case "ASK8": break;
                     case "FSK2":
-                        receiverClass.setModulator(new FSK2Modulator());
+                        receiverClass.setModulator(new FSK4Modulator());
                         break;
                     case "FSK4":
                         receiverClass.setModulator(new FSK4Modulator());
@@ -295,17 +292,32 @@ public class CameraFragment extends Fragment implements CvCameraViewListener2, A
         circularBuffer.put(mRgba.submat(currRect).clone());
 
 
-        long currDiff = (System.currentTimeMillis() - firstTimeStamp - ((bqCounter - 1) * delay));
-//        System.out.println("Curr: " + currDiff);
+        if(receiverClass.isTransmissionStarted()){
 
-        if(firstTimeStamp == 0){
+            if(timeToStartSynchronized < System.currentTimeMillis()){
+                long currDiff = (System.currentTimeMillis() - firstTimeStamp - ((bqCounter - 1) * receiverClass.getDelay()));
+//                System.out.println("Curr: " + currDiff);
+
+                if(firstTimeStamp == 0){
 //            for synchronization of following frames we need to store the first timestamp
-            firstTimeStamp = System.currentTimeMillis();
-            System.out.println("first " + firstTimeStamp);
-        }else if (currDiff >= 0) {
-            bqCounter++;
+                    firstTimeStamp = System.currentTimeMillis();
+                    System.out.println("first " + firstTimeStamp);
+                }else if (currDiff >= 0) {
+                    bqCounter++;
+                    addToBlockingQueue();
+                }
+            }
+
+        }else{
+            /*
+                to determine the best time for starting the transmission
+                we have to store all incoming frames and timestamps
+                as fast as we can
+             */
+
             addToBlockingQueue();
         }
+
 //     Draw the rectangle frame for led in entire matrix for preview
         Imgproc.rectangle(mRgba, new Point(currRect.x, currRect.y), new Point(currRect.x + currRect.width, currRect.y + currRect.height), new Scalar(255, 255, 255), 1);
 

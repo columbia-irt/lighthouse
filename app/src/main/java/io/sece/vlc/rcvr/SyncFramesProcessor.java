@@ -56,32 +56,35 @@ public class SyncFramesProcessor implements Runnable {
         Imgproc.cvtColor(pFrame.clone(), imgHSV, Imgproc.COLOR_RGB2HSV);
 //        Output Ranges: [0,180], [0,255], [0,255]
 
+//          1: Most efficient way
+//        List<Mat> channels = new ArrayList<Mat>(3);
+//        Core.split(imgHSV, channels);
+//        Mat H = channels.get(0);
+//        Mat S = channels.get(1);
+//        Mat V = channels.get(2);
+//        int h = (int)Core.mean(H).val[0] * 2;
+//        int s = (int)Core.mean(S).val[0];
+//        int v = (int)Core.mean(V).val[0];
+//
+//        activity.runOnUiThread(() -> {
+//            TextView tvColorDetected = ((TextView) activity.findViewById(R.id.tvColorDetected));
+//            try{
+//                tvColorDetected.setText("HSV: (" + h  + ", " + s + ", " + v +")");
+//            }catch(Exception e){}
+//        });
+//        try {
+//            String ret = receiverClass.rx(receiverClass.getClosestElement(h));
+//            if(ret.length() > 0){
+//                System.out.println("Detected " + ret);
+//            }
+//
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
 
-        List<Mat> channels = new ArrayList<Mat>(3);
-        Core.split(imgHSV, channels);
-        Mat H = channels.get(0);
-        Mat S = channels.get(1);
-        Mat V = channels.get(2);
-        int h = (int)Core.mean(H).val[0] * 2;
-        int s = (int)Core.mean(S).val[0];
-        int v = (int)Core.mean(V).val[0];
 
-        activity.runOnUiThread(() -> {
-            TextView tvColorDetected = ((TextView) activity.findViewById(R.id.tvColorDetected));
-            try{
-                tvColorDetected.setText("HSV: (" + h  + ", " + s + ", " + v +")");
-            }catch(Exception e){}
-        });
-        try {
-            String ret = receiverClass.rx(receiverClass.getClosestElement(h));
-            System.out.println("Detected " + ret);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        /*
-        Copy entire HSV Frame
-
+//        2: Copy entire HSV Frame
+//         -> Good working with black and white exclusion
         int counter_curr = 0;
         Mat originalFrame = new Mat();
         imgHSV.copyTo(originalFrame);
@@ -91,19 +94,45 @@ public class SyncFramesProcessor implements Runnable {
         int v_curr = 0;
         for (int i = 0; i < originalFrame.cols(); i++) {
             for (int j = 0; j < originalFrame.rows(); j++) {
-                h_curr += originalFrame.get(i, j)[0];
-                s_curr += originalFrame.get(i, j)[1];
-                v_curr += originalFrame.get(i, j)[2];
-                counter_curr += 1;
+                double s_loop = originalFrame.get(i, j)[1];
+                double v_loop= originalFrame.get(i, j)[2];
+                if (v_loop >98 && s_loop > 98){
+                    h_curr += originalFrame.get(i, j)[0];
+                    s_curr += s_loop;
+                    v_curr += v_loop;
+                    counter_curr += 1;
+                }
+
             }
         }
-        h_curr = h_curr / counter_curr;
-        s_curr = s_curr / counter_curr;
-        v_curr = v_curr / counter_curr;
-        System.out.println("HSV: (" + h_curr  + ", " + s_curr + ", " + v_curr +")");
-        */
+        if(counter_curr > 0){
+            h_curr = h_curr / counter_curr * 2;
+            s_curr = s_curr / counter_curr;
+            v_curr = v_curr / counter_curr;
+            System.out.println("HSV: (" + h_curr  + ", " + s_curr + ", " + v_curr +")");
+            try {
+                String ret = receiverClass.rx(receiverClass.getClosestElement(h_curr));
+                if(ret.length() > 0){
+                    System.out.println("Detected " + ret);
+                }
 
-//        Copy channels seperate
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            final int hue = h_curr;
+            final int sat = s_curr;
+            final int v = v_curr;
+            activity.runOnUiThread(() -> {
+                TextView tvColorDetected = ((TextView) activity.findViewById(R.id.tvColorDetected));
+                if (tvColorDetected != null) {
+                    tvColorDetected.setText(hue +", " + sat + ", " + v);
+                }
+            });
+        }
+
+
+//        3: Copy channels separate
 //
 //        Mat copied_H = new Mat();
 //        H.copyTo(copied_H);
@@ -130,12 +159,27 @@ public class SyncFramesProcessor implements Runnable {
 //        avg_hue = avg_hue/counter_curr;
 //        avg_sat=avg_sat/counter_curr;
 //        avg_v =avg_v/counter_curr;
-//        System.out.println("HSV: (" + avg_hue  + ", " + avg_sat + ", " + avg_v +")");
-//        System.out.println("Average by mean Hue: " + Core.mean(H).toString() + " " +  Core.mean(S).val[0]+ " " +  Core.mean(V).val[0]);
+////        System.out.println("HSV: (" + avg_hue  + ", " + avg_sat + ", " + avg_v +")");
+////        System.out.println("Average by mean Hue: " + Core.mean(H).toString() + " " +  Core.mean(S).val[0]+ " " +  Core.mean(V).val[0]);
+//        try {
+//            String ret = receiverClass.rx(receiverClass.getClosestElement((int)hsv_curr[0]));
+//            if(ret.length() > 0){
+//                System.out.println("Detected " + ret);
+//            }
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//        final double hue = avg_hue;
+//        activity.runOnUiThread(() -> {
+//                TextView tvColorDetected = ((TextView) activity.findViewById(R.id.tvColorDetected));
+//                if (tvColorDetected != null) {
+//                    tvColorDetected.setText("h " + hue);
+//                }
+//            });
 
 
-
-//          Previous way using RGB
+////        4:  Previous approach using RGB
+//        Mat originalFrame = pFrame.clone();
 //        int counter_curr = 0;
 //        for (int i = 0; i < originalFrame.cols(); i++) {
 //            for (int j = 0; j < originalFrame.rows(); j++) {
@@ -154,6 +198,14 @@ public class SyncFramesProcessor implements Runnable {
 //            b_curr = b_curr / counter_curr;
 //            hsv_curr = Color.RGBtoHSB(r_curr, g_curr, b_curr, null);
 //
+//            try {
+//                String ret = receiverClass.rx(receiverClass.getClosestElement((int)hsv_curr[0]));
+//                if(ret.length() > 0){
+//                    System.out.println("Detected " + ret);
+//                }
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
 //
 //
 //            activity.runOnUiThread(() -> {

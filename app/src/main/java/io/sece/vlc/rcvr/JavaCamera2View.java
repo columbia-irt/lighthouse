@@ -438,7 +438,6 @@ public class JavaCamera2View extends CameraBridgeViewBase {
         btManualExposure.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 Range<Long> exposureTimeRange = characteristics.get(CameraCharacteristics.SENSOR_INFO_EXPOSURE_TIME_RANGE);
                 System.out.println("Range "+exposureTimeRange.toString());
 
@@ -450,7 +449,7 @@ public class JavaCamera2View extends CameraBridgeViewBase {
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        long curr_manual = Integer.parseInt(input.getText().toString());
+                        long curr_manual = 10000;//Integer.parseInt(input.getText().toString());
                         mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
                                 CaptureRequest.CONTROL_AE_MODE_OFF);
                         mPreviewRequestBuilder.set(CaptureRequest.SENSOR_EXPOSURE_TIME, (curr_manual));
