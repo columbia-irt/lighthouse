@@ -180,7 +180,7 @@ public class CameraFragment extends Fragment implements CvCameraViewListener2, A
                     case "ASK4": break;
                     case "ASK8": break;
                     case "FSK2":
-                        receiverClass.setModulator(new FSK4Modulator());
+                        receiverClass.setModulator(new FSK2Modulator());
                         break;
                     case "FSK4":
                         receiverClass.setModulator(new FSK4Modulator());
@@ -285,6 +285,9 @@ public class CameraFragment extends Fragment implements CvCameraViewListener2, A
 
     @Override
     public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
+        Frame a = (Frame)inputFrame;
+        a.timestamp = System.currentTimeMillis();
+
         mRgba = inputFrame.rgba();
         AreaOfInterest areaOfInterest = new AreaOfInterest(areaX, areaY, rWidth, rHeight);
 
@@ -316,6 +319,7 @@ public class CameraFragment extends Fragment implements CvCameraViewListener2, A
              */
 
             addToBlockingQueue();
+
         }
 
 //     Draw the rectangle frame for led in entire matrix for preview

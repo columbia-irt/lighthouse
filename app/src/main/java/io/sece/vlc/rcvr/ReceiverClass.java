@@ -13,7 +13,7 @@ public class ReceiverClass<T> {
     private Modulator<T> modulator;
     private boolean transmissionStarted = false;
     private SynchronizationModule synchronizationModule;
-    private int delay = 50;
+    private int delay = 1000;
 
     public ReceiverClass(Modulator modulator){
         this.modulator = modulator;
@@ -25,7 +25,8 @@ public class ReceiverClass<T> {
         if(transmissionStarted){
             return modulator.demodulate(value);
         }else{
-            transmissionStarted = rxStartingSequence(value);
+//            transmissionStarted =
+                    rxStartingSequence(value);
             return "";
         }
     }

@@ -50,6 +50,7 @@ class Transmitter<T> {
         int amount = 8; //Amount of symbols should be calculated through interval
 
         this.tx(modulator.startSequence(amount));
+        this.tx("1000001");
 
     }
 }

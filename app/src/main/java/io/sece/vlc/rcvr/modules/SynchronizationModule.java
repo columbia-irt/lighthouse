@@ -17,6 +17,8 @@ import io.sece.vlc.rcvr.CameraFragment;
  * If there are some more incoming values which are different from the previous ones, there is
  * to add the specified delay times each symbol after the double sampled ones.
  *
+ * TODO: All timestamps have to be replaces with the ones created by ReceiverClass
+ *
  */
 
 public class SynchronizationModule {
@@ -42,7 +44,6 @@ public class SynchronizationModule {
         if(receivedStartingSequence.length() > startingSequence.length()){
             receivedStartingSequence = receivedStartingSequence.substring(receivedStartingSequence.length()- startingSequence.length(),receivedStartingSequence.length());
         }
-        System.out.println("Received Starting Sequence " + receivedStartingSequence.length() + " " + receivedStartingSequence);
 
         if(prevSymbol.equals(currSymbol)){
             symbolsCounterAfter = 1;
@@ -57,10 +58,11 @@ public class SynchronizationModule {
             symbolCounter = 1;
             timestamp = System.currentTimeMillis();
         }
+        System.out.println(System.currentTimeMillis() + " Received Starting Sequence " + receivedStartingSequence.length() + " " + receivedStartingSequence);
 
         prevSymbol = currSymbol;
         if(receivedStartingSequence.equals(startingSequence)){
-            long timeToStart = timestampCalculated + ((1000/ delay) * symbolsCounterAfter);
+            long timeToStart = timestampCalculated + ((1000/ delay) * symbolsCounterAfter) + delay;
             System.out.println("TimeToStart: " + timeToStart);
             CameraFragment.timeToStartSynchronized = timeToStart;
             return true;
