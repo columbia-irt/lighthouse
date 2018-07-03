@@ -338,7 +338,7 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
         // complete after the corresponding callback has fired.
 
         Log.d(TAG, "Requesting camera permission...");
-        requestPermissions(new String[]{Manifest.permission.CAMERA}, Receiver.REQUEST_CAMERA_PERMISSION);
+        requestPermissions(new String[]{Manifest.permission.CAMERA}, ReceiverApp.REQUEST_CAMERA_PERMISSION);
         return permission;
     }
 
@@ -346,7 +346,7 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
-        if (requestCode == Receiver.REQUEST_CAMERA_PERMISSION) {
+        if (requestCode == ReceiverApp.REQUEST_CAMERA_PERMISSION) {
             if (null == permission) {
                 Log.w(TAG, "Received unexpected permission result callback");
                 return;
