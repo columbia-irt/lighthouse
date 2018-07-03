@@ -31,13 +31,13 @@ public class CalibrationModulator extends FreqModulator
     }
 
     @Override
-    public String demodulate(Color value) {
+    public String demodulate(int value) {
         // Not yet implemented
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public Color getClosestElement(int value) {
+
+    private Color getClosestElement(int value) {
         throw new UnsupportedOperationException();
     }
 }

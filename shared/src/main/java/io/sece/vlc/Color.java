@@ -7,6 +7,7 @@ package io.sece.vlc;
  */
 public class Color {
     public int red, green, blue;
+    public int hue;
 
     public static final Color RED = new Color(255, 0, 0);
     public static final Color GREEN = new Color(0, 255, 0);
@@ -30,6 +31,15 @@ public class Color {
         this.red = red;
         this.green = green;
         this.blue = blue;
+        this.hue = Math.round(RGBtoHSB(red, green, blue, null)[0]);
+    }
+
+    public Color(int hueValue)
+    {
+        this.hue = hueValue;
+        this.red = hsvToRGB(hueValue, 100, 100).red;
+        this.green = hsvToRGB(hueValue, 100, 100).green;
+        this.blue = hsvToRGB(hueValue, 100, 100).blue;
     }
 
     public int getRed() {

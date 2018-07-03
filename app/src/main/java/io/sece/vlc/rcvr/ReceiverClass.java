@@ -21,7 +21,7 @@ public class ReceiverClass<T> {
         synchronizationModule = new SynchronizationModule(modulator.startSequence(8), delay);
     }
 
-    public String rx(T value) throws InterruptedException {
+    public String rx(int value) throws InterruptedException {
         if (transmissionStarted) {
             return modulator.demodulate(value);
         } else {
@@ -30,17 +30,13 @@ public class ReceiverClass<T> {
         }
     }
 
-    public T getClosestElement(int value) {
-        return modulator.getClosestElement(value);
-    }
-
     public void setModulator(Modulator<T> modulator) {
         this.modulator = modulator;
         System.out.println("Startingseq: " + modulator.startSequence(8));
         synchronizationModule = new SynchronizationModule(modulator.startSequence(8), delay);
     }
 
-    public boolean rxStartingSequence(T value) {
+    public boolean rxStartingSequence(int value) {
         return synchronizationModule.symbolReceived(modulator.demodulate(value));
     }
 

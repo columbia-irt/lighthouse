@@ -24,10 +24,8 @@ public abstract class Modulator<V> {
         return modulate(data, 0);
     }
 
-    public abstract String demodulate(V value);
+    public abstract String demodulate(int value);
     public abstract V modulate(String data, int offset);
-
-    public abstract V getClosestElement(int value);
 
 
     public String startSequence(int amount) {

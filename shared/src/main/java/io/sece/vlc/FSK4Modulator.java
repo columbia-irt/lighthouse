@@ -10,8 +10,14 @@ public class FSK4Modulator extends FreqModulator {
     private Symbol symbol;
 
 
-    public FSK4Modulator() {
-        this(Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW);
+    public FSK4Modulator(int offset)
+    {
+        this(Color.BLACK, new Color((((0 * 120) + offset)%360)), new Color((((1 * 120) + offset)%360)), new Color((((2 * 120) + offset)%360)));
+    }
+
+    public FSK4Modulator()
+    {
+        this(0);
     }
 
     public FSK4Modulator(Color n, Color e, Color s, Color w) {
@@ -19,6 +25,10 @@ public class FSK4Modulator extends FreqModulator {
         this.e = e;
         this.s = s;
         this.w = w;
+        System.out.println("n (rgb) : " + n.red + "," + n.green + "," + n.blue);
+        System.out.println("e (rgb) : " + e.red + "," + e.green + "," + e.blue);
+        System.out.println("s (rgb) : " + s.red + "," + s.green + "," + s.blue);
+        System.out.println("w (rgb) : " + w.red + "," + w.green + "," + w.blue);
         states = 4;
         symbol = new Symbol(states);
         bits = symbol.bits;
@@ -36,7 +46,8 @@ public class FSK4Modulator extends FreqModulator {
     }
 
     @Override
-    public String demodulate(Color value) {
+    public String demodulate(int hue) {
+        Color value = getClosestElement(hue);
         if (value == n) {
             return symbol.toBits(0);
         } else if( value == e) {
@@ -49,28 +60,44 @@ public class FSK4Modulator extends FreqModulator {
         throw new IllegalArgumentException();
     }
 
-    @Override
-    public Color getClosestElement(int value) {
-        int redDistance = Math.min(Math.abs(value - (Color.RED_HUE + 360)), Math.abs(value - Color.RED_HUE));
-        int greenDistance = Math.min(Math.abs(value - (Color.GREEN_HUE + 360)), Math.abs(value - Color.GREEN_HUE));
-        int blueDistance = Math.min(Math.abs(value - (Color.BLUE_HUE + 360)), Math.abs(value - Color.BLUE_HUE));
-        int yellowDistance = Math.min(Math.abs(value - (Color.YELLOW_HUE + 360)), Math.abs(value - Color.YELLOW_HUE));
 
-        if(redDistance < greenDistance && redDistance < blueDistance && redDistance < yellowDistance)
+    private Color getClosestElement(int value) {
+        int eDistance = Math.min(Math.abs(value - (e.hue + 360)), Math.abs(value - e.hue));
+        int sDistance = Math.min(Math.abs(value - (s.hue + 360)), Math.abs(value - s.hue));
+        int wDistance = Math.min(Math.abs(value - (w.hue + 360)), Math.abs(value - w.hue));
+        //int yellowDistance = Math.min(Math.abs(value - (Color.YELLOW_HUE + 360)), Math.abs(value - Color.YELLOW_HUE));
+
+        /*if(eDistance < sDistance && eDistance < wDistance && eDistance < yellowDistance)
         {
             return Color.RED;
         }
-        else if(greenDistance < blueDistance && greenDistance < yellowDistance)
+        else if(sDistance < wDistance && sDistance < yellowDistance)
         {
             return Color.GREEN;
         }
-        else if(blueDistance < yellowDistance)
+        else if(wDistance < yellowDistance)
         {
             return Color.BLUE;
         }
         else
         {
             return Color.YELLOW;
+        }*/
+        if(value == -1)
+        {
+            return Color.BLACK;
+        }
+        if(eDistance < sDistance && eDistance < wDistance)
+        {
+            return e;
+        }
+        else if(sDistance < wDistance)
+        {
+            return s;
+        }
+        else
+        {
+            return w;
         }
     }
 }
