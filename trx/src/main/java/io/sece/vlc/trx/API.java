@@ -163,7 +163,7 @@ public class API {
                     System.out.println(transC);
 
                     threadTrans = new Thread(transC);
-                    threadDog = new Thread(new watchDog(threadCali, transC.getTimeout()));
+                    threadDog = new Thread(new watchDog(threadTrans, transC.getTimeout()));
                     threadDog.start();
                     threadTrans.start();
 

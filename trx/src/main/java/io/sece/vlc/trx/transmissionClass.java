@@ -70,7 +70,8 @@ public class transmissionClass implements Runnable {
 
 
             // Transmit the data stored in the buffer.
-            t.tx(data);
+            //t.tx(data);
+            t.startTx();
             led.set(Color.BLACK);
 
         }
