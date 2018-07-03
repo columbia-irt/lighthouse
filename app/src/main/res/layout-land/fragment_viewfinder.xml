@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/background_dark">
+
+    <!--
+    <Spinner
+            android:id="@+id/spModulation"
+            android:textSize="15dp"
+            android:textColor="#FFFFFF"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:background="@color/colorAccent"
+            android:layout_toLeftOf="@+id/seekbarSizeFrame"
+            android:layout_marginRight="5dp" />
+    -->
+
+    <TextView
+        android:id="@+id/txColor"
+        android:layout_width="100dp"
+        android:layout_height="40dp"
+        android:shadowColor="#000000"
+        android:shadowRadius="6"
+        android:background="@android:color/holo_red_dark"
+        android:gravity="center"
+        android:text="TX"
+        android:textAlignment="center"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/rxColor"
+        android:layout_width="100dp"
+        android:layout_height="40dp"
+        android:gravity="center"
+        android:background="@android:color/holo_red_dark"
+        android:shadowColor="#000000"
+        android:shadowRadius="6"
+        android:layout_marginVertical="5dp"
+        android:text="RX"
+        android:textAlignment="center"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txColor" />
+
+    <io.sece.vlc.rcvr.Statistics
+        android:id="@+id/statistics"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textColor="#FFFFFF"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rxColor" />
+
+
+    <EditText
+        android:id="@+id/txValue"
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:text="180"
+        android:textColor="#FFFFFF"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/statistics" />
+
+
+    <Button
+        android:id="@+id/txButton"
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        android:text="Set"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txValue" />
+
+
+    <SurfaceView
+        android:id="@+id/surface"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <io.sece.vlc.rcvr.RoIPreview
+        android:id="@+id/roiPreview"
+        android:layout_width="320px"
+        android:layout_height="320px"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintStart_toStartOf="@+id/surface"
+        app:layout_constraintTop_toTopOf="@+id/surface" />
+
+    <io.sece.vlc.rcvr.GraphicOverlay
+        android:id="@+id/overlay"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="@+id/surface"
+        app:layout_constraintEnd_toEndOf="@+id/surface"
+        app:layout_constraintStart_toStartOf="@+id/surface"
+        app:layout_constraintTop_toTopOf="@+id/surface" />
+
+    <com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBarWrapper
+        android:layout_width="32dp"
+        android:layout_height="match_parent"
+        app:layout_constraintEnd_toStartOf="@+id/zoomSliderWrapper">
+        <com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar
+            android:id="@+id/exposureSlider"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:splitTrack="false"
+            android:colorControlActivated="#FF00FF"
+            android:progressBackgroundTint="#FF00FF"
+            android:progressTint="#FF00FF"
+            android:thumbTint="#FF00FF"
+            app:seekBarRotation="CW270" />
+    </com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBarWrapper>
+
+
+    <com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBarWrapper
+        android:id="@+id/zoomSliderWrapper"
+        android:layout_width="32dp"
+        android:layout_height="match_parent"
+        app:layout_constraintEnd_toEndOf="parent">
+        <com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar
+            android:id="@+id/zoomSlider"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:splitTrack="false"
+            android:colorControlActivated="#FFFFFF"
+            android:progressBackgroundTint="#FFFFFF"
+            android:progressTint="#FFFFFF"
+            android:thumbTint="#FFFFFF"
+            app:seekBarRotation="CW270" />
+    </com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBarWrapper>
+
+
+</android.support.constraint.ConstraintLayout>
