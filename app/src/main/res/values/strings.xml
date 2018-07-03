@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">VLC Receiver</string>
-    <string name="request_permission">This app needs camera permission.</string>
-    <string name="camera_error">This device does not support Camera2 API.</string>
+    <string name="camera_access_denied">This app cannot function without camera permission. Sorry!</string>
+    <string name="camera2_not_supported">This device does not support Camera2 API.</string>
+    <string name="exposure_label">EV Compensation: %1$s</string>
+    <string name="fps_indicator">FPS: %1$.1f</string>
+    <string name="working">Working...</string>
 </resources>
