@@ -13,6 +13,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 import io.sece.vlc.rcvr.Bus;
 import io.sece.vlc.rcvr.processing.block.HueDetector;
@@ -34,7 +35,7 @@ public class Processing extends HandlerThread {
     });
 
     private Frame frame = new Frame();
-    private volatile long sequence = 0;
+    private AtomicLong sequence = new AtomicLong(0);
 
     private List<ProcessingBlock> stage1;
     private List<ProcessingBlock> stage2;
@@ -94,7 +95,7 @@ public class Processing extends HandlerThread {
         frame.set(img);
         frame.set(Frame.IMAGE_TIMESTAMP, img.getTimestamp());
         frame.set(Frame.RX_TIMESTAMP, System.nanoTime());
-        frame.sequence = sequence++;
+        frame.sequence = sequence.getAndIncrement();
 
         Frame f = frame;
         for (ProcessingBlock block : stage1) {
@@ -128,7 +129,7 @@ public class Processing extends HandlerThread {
 
         if (null != frame) {
             frame.set(Frame.PROCESSING_END, System.nanoTime());
-            frame.set(Frame.CURRENT_SEQUENCE, sequence - 1);
+            frame.set(Frame.CURRENT_SEQUENCE, sequence.get() - 1);
             Bus.send(new Result(frame));
         }
     }
