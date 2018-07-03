@@ -1,37 +1,41 @@
 package io.sece.vlc.rcvr;
 
-import android.Manifest;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
+
+import java.util.concurrent.CompletableFuture;
 
 
-/**
- * Shows an OK/Cancel confirmation dialog about camera permissions.
- */
 public class ConfirmationDialog extends DialogFragment {
+    private static final String ARG_MESSAGE = "message";
+    private static final String ARG_CANCELABLE = "cancelable";
+
+    public CompletableFuture<Boolean> completed;
+
+    public static ConfirmationDialog newInstance(String message, boolean cancelable) {
+        ConfirmationDialog d = new ConfirmationDialog();
+        d.completed = new CompletableFuture<>();
+
+        Bundle args = new Bundle();
+        args.putString(ARG_MESSAGE, message);
+        args.putBoolean(ARG_CANCELABLE, cancelable);
+        d.setArguments(args);
+        return d;
+    }
 
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        final Fragment parent = getParentFragment();
-        return new AlertDialog.Builder(getActivity())
-                .setMessage(R.string.request_permission)
-                .setPositiveButton(android.R.string.ok, (dialog, which) -> parent.requestPermissions(new String[]{Manifest.permission.CAMERA},
-                        Receiver.REQUEST_CAMERA_PERMISSION))
-                .setNegativeButton(android.R.string.cancel, (dialog, which) -> {
-                    if (parent != null) {
-                        Activity activity = parent.getActivity();
-                        if (activity != null) {
-                            activity.finish();
-                        }
-                    }
-                })
-                .create();
+        AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
+        Bundle args = getArguments();
+
+        b.setMessage(args.getString(ARG_MESSAGE));
+        b.setPositiveButton(android.R.string.ok, (dialog, which) -> completed.complete(true));
+        if (args.getBoolean(ARG_CANCELABLE))
+            b.setNegativeButton(android.R.string.cancel, (dialog, which) -> completed.complete(false));
+        return b.create();
     }
 }
