@@ -15,6 +15,20 @@ public class HueDetector implements ProcessingBlock {
     private float s_threshold;
     private float v_threshold;
 
+    private final ThreadLocal<Mat> rgbBuf = new ThreadLocal<Mat>() {
+        @Override protected Mat initialValue() {
+            return new Mat();
+        }
+    };
+
+    private final ThreadLocal<Mat> hsvBuf = new ThreadLocal<Mat>() {
+        @Override protected Mat initialValue() {
+            return new Mat();
+        }
+    };
+
+    private final ThreadLocal<float[]> floatBuf = new ThreadLocal<>();
+
 
     public HueDetector() {
         this(DEFAULT_S_THRESHOLD, DEFAULT_V_THRESHOLD);
@@ -32,13 +46,21 @@ public class HueDetector implements ProcessingBlock {
     // TODO: Pre-allocate some of the buffers and keep them in thread-local storage as optimization
 
     public Frame apply(Frame frame) {
-        Mat rgb = new Mat();
-        Mat hsv = new Mat();
+        Mat rgb = rgbBuf.get();
+        Mat hsv = hsvBuf.get();
+
         frame.rgba().convertTo(rgb, CvType.CV_32FC3, 1.0 / 255d);
         Imgproc.cvtColor(rgb, hsv, Imgproc.COLOR_RGB2HSV_FULL);
 
         int ch = hsv.channels();
-        float[] buf = new float[hsv.rows() * hsv.cols() * ch];
+        int len = hsv.rows() * hsv.cols() * ch;
+
+        float[] buf = floatBuf.get();
+        if (null == buf || buf.length != len) {
+            buf = new float[len];
+            floatBuf.set(buf);
+        }
+
         hsv.get(0, 0, buf);
 
         double x = 0.0;
