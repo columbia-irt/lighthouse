@@ -5,13 +5,10 @@ import android.util.Log;
 
 import org.opencv.android.OpenCVLoader;
 
-import io.sece.vlc.Modulator;
-
 
 public class Receiver extends Application {
     public static final String TAG = "Receiver";
     public static final int REQUEST_CAMERA_PERMISSION = 1;
-
 
     static {
         if (OpenCVLoader.initDebug()) {
@@ -20,6 +17,4 @@ public class Receiver extends Application {
             throw new UnsatisfiedLinkError("Cannot load OpenCV native libraries");
         }
     }
-
-
 }
