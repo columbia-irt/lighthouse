@@ -1,13 +1,12 @@
-package io.sece.vlc.rcvr.modules;
+package io.sece.vlc.rcvr;
 
 
-import io.sece.vlc.rcvr.CameraFragment;
 
 /**
  * Created by alex on 6/26/18.
- *
+ * <p>
  * The Synchronization Procedure is run at the fastest possible FPS Rate.
- *
+ * <p>
  * This module is in charge to check if the incoming symbols
  * fit to the given starting sequence.
  * Furthermore it automatically calculates the timestamp for
@@ -18,7 +17,6 @@ import io.sece.vlc.rcvr.CameraFragment;
  * to add the specified delay times each symbol after the double sampled ones.
  *
  * TODO: All timestamps have to be replaces with the ones created by ReceiverClass
- *
  */
 
 public class SynchronizationModule {
@@ -27,7 +25,7 @@ public class SynchronizationModule {
     private String prevSymbol = "-1";
 
     private int symbolCounter = 1;
-    private int symbolsCounterAfter= 1;
+    private int symbolsCounterAfter = 1;
 
     private long timestamp;
     private long timestampCalculated;
@@ -35,23 +33,23 @@ public class SynchronizationModule {
     private String startingSequence;
     public static String receivedStartingSequence = "";
 
-    public SynchronizationModule(String startingSequence, int delay){
+    public SynchronizationModule(String startingSequence, int delay) {
         this.startingSequence = startingSequence;
         this.delay = delay;
     }
 
-    public boolean symbolReceived(String currSymbol){
-        if(receivedStartingSequence.length() > startingSequence.length()){
-            receivedStartingSequence = receivedStartingSequence.substring(receivedStartingSequence.length()- startingSequence.length(),receivedStartingSequence.length());
+    public boolean symbolReceived(String currSymbol) {
+        if (receivedStartingSequence.length() > startingSequence.length()) {
+            receivedStartingSequence = receivedStartingSequence.substring(receivedStartingSequence.length() - startingSequence.length(), receivedStartingSequence.length());
         }
 
-        if(prevSymbol.equals(currSymbol)){
+        if (prevSymbol.equals(currSymbol)) {
             symbolsCounterAfter = 1;
             symbolCounter++;
             timestamp += System.currentTimeMillis();
-        }else{
+        } else {
             receivedStartingSequence += currSymbol;
-            if(symbolCounter > 1){
+            if (symbolCounter > 1) {
                 timestampCalculated = timestamp / symbolCounter;
             }
             symbolsCounterAfter++;
@@ -61,10 +59,10 @@ public class SynchronizationModule {
         System.out.println(System.currentTimeMillis() + " Received Starting Sequence " + receivedStartingSequence.length() + " " + receivedStartingSequence);
 
         prevSymbol = currSymbol;
-        if(receivedStartingSequence.equals(startingSequence)){
+        if (receivedStartingSequence.equals(startingSequence)) {
             long timeToStart = timestampCalculated + ((1000/ delay) * symbolsCounterAfter) + delay;
             System.out.println("TimeToStart: " + timeToStart);
-            CameraFragment.timeToStartSynchronized = timeToStart;
+            ViewfinderFragment.timeToStartSynchronized = timeToStart;
             return true;
         }
         return false;
