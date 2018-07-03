@@ -1,17 +1,9 @@
 package io.sece.vlc.trx;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
+
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+
 import java.util.concurrent.ExecutorService;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -24,13 +16,8 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
 import io.sece.pigpio.PiGPIOPin;
-import io.sece.vlc.CalibrationModulator;
+
 import io.sece.vlc.Color;
-import io.sece.vlc.FSK2Modulator;
-import io.sece.vlc.FSK4Modulator;
-import io.sece.vlc.FSK8Modulator;
-import io.sece.vlc.Modulator;
-import io.sece.vlc.OOKModulator;
 
 
 public class API {

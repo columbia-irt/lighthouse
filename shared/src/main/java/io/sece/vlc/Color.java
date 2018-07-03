@@ -24,8 +24,6 @@ public class Color {
     public static final int TURQUOISE_HUE = 180;
     public static final int BLUE_HUE = 240;
     public static final int PURPLE_HUE = 300;
-//    public static final int BLACK_HUE = 0;
-//    public static final int WHITE_HUE = 0;
 
     public Color(int red, int green, int blue) {
         this.red = red;

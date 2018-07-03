@@ -1,8 +1,6 @@
 package io.sece.vlc;
 
 
-import java.util.ArrayList;
-
 /**
  * An abtract base class for all modulators and demodulators. The base class
  * declares API to modulate a bit set into a LED signal and to demodulate a

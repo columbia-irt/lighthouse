@@ -1,6 +1,5 @@
 package io.sece.vlc.trx;
 
-import io.sece.pigpio.PiGPIOException;
 import io.sece.pigpio.PiGPIOPin;
 import io.sece.vlc.Color;
 

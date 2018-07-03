@@ -1,8 +1,5 @@
 package io.sece.vlc.trx;
 
-import java.util.ArrayList;
-
-import io.sece.vlc.Color;
 import io.sece.vlc.Modulator;
 
 /**
