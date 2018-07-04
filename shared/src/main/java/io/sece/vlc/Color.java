@@ -193,7 +193,7 @@ public class Color implements EuclideanSpace {
 
     @Override
     public String toString() {
-        return String.format(Locale.US,"#%0Xd%0Xd%0Xd", red, green, blue);
+        return String.format(Locale.US,"#%02X%02X%02X", red, green, blue);
     }
 
 
