@@ -2,13 +2,13 @@ package io.sece.vlc;
 
 import static io.sece.vlc.Color.RGBtoHSB;
 
-public class CalibrationModulator extends FreqModulator
+public class CalibrationModem extends FreqModem
 {
     private Color u;
     private Color d;
     private Symbol symbol;
 
-    public CalibrationModulator(int hue, int saturation, int brightness) {
+    public CalibrationModem(int hue, int saturation, int brightness) {
 
         this.u = new Color(new int[]{hue, saturation, brightness});
         this.d = Color.BLACK;

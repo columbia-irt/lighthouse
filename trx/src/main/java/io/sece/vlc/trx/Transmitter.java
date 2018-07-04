@@ -1,7 +1,7 @@
 package io.sece.vlc.trx;
 
 import io.sece.vlc.EuclideanSpace;
-import io.sece.vlc.Modulator;
+import io.sece.vlc.Modem;
 
 /**
  * This class represents a LED transmitter which connects a LED with a
@@ -10,28 +10,28 @@ import io.sece.vlc.Modulator;
  */
 class Transmitter<T extends EuclideanSpace> {
     private LEDInterface<T> led;
-    private Modulator<T> modulator;
+    private Modem<T> modem;
     private int interval;
 
-    public Transmitter(LEDInterface<T> led, Modulator<T> modulator, int interval)
+    public Transmitter(LEDInterface<T> led, Modem<T> modem, int interval)
     {
         this.led = led;
-        this.modulator = modulator;
+        this.modem = modem;
         this.interval = interval;
     }
 
     public void tx(String data) throws LEDException, InterruptedException
     {
-        if(data.length() % modulator.bits == 0)
+        if(data.length() % modem.bits == 0)
         {
             long startTime = System.currentTimeMillis();
             long delta = 0;
             int count = 1;
 
             System.out.println(data);
-            for(int i = 0; i < data.length(); i += modulator.bits)
+            for(int i = 0; i < data.length(); i += modem.bits)
             {
-                led.set(modulator.modulate(data, i));
+                led.set(modem.modulate(data, i));
                 Sleeper.sleepNanos((interval - delta) * 1000000);
                 delta = System.currentTimeMillis() - (startTime + (interval * count));
                 count ++;
@@ -47,7 +47,7 @@ class Transmitter<T extends EuclideanSpace> {
     {
         int amount = 8; //Amount of symbols should be calculated through interval
 
-        this.tx(modulator.startSequence(amount));
+        this.tx(modem.startSequence(amount));
         this.tx("1000001");
 
     }

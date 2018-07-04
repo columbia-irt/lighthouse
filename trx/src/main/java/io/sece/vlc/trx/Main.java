@@ -4,12 +4,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 
 import io.sece.pigpio.PiGPIO;
-import io.sece.pigpio.PiGPIOPin;
-import io.sece.vlc.Color;
-import io.sece.vlc.FSK2Modulator;
-import io.sece.vlc.FSK4Modulator;
-import io.sece.vlc.FSK8Modulator;
-import io.sece.vlc.Modulator;
 
 
 public class Main {

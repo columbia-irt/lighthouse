@@ -8,12 +8,12 @@ package io.sece.vlc;
  * accepts and generates boolean values so that it can be connected directly
  * to LED interfaces that only accept binary values.
  */
-public class OOKModulator extends Modulator<Amplitude> {
+public class OOKModem extends Modem<Amplitude> {
     private Symbol symbol;
     private Amplitude off = new Amplitude(0);
     private Amplitude on = new Amplitude(1);
 
-    public OOKModulator() {
+    public OOKModem() {
         states = 2;
         symbol = new Symbol(states);
         bits = symbol.bits;

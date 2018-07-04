@@ -14,7 +14,7 @@ package io.sece.vlc;
  * Each modulator also exports an attribute bits which determines how many
  * bits at a time the modulator consumers or generates.
  */
-public abstract class Modulator<V extends EuclideanSpace> {
+public abstract class Modem<V extends EuclideanSpace> {
     public int bits;
     public int states;
 
@@ -57,5 +57,4 @@ public abstract class Modulator<V extends EuclideanSpace> {
         }
         return rv;
     }
-
 }

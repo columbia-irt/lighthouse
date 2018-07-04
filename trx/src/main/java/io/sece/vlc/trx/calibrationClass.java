@@ -1,7 +1,7 @@
 package io.sece.vlc.trx;
 
 import io.sece.pigpio.PiGPIOPin;
-import io.sece.vlc.CalibrationModulator;
+import io.sece.vlc.CalibrationModem;
 import io.sece.vlc.Color;
 
 public class calibrationClass implements Runnable
@@ -35,12 +35,12 @@ public class calibrationClass implements Runnable
             PiGPIOPin g = new PiGPIOPin(27);
             PiGPIOPin b = new PiGPIOPin(17);
             PiRgbLED   led = new PiRgbLED(r, g, b);
-            CalibrationModulator mod;
+            CalibrationModem mod;
             Transmitter<?> t;
 
             for(int i = 0; i < this.getHueValue().length; i++)
             {
-                mod = new CalibrationModulator(this.getHueValue()[i], 100, this.getBrightness());
+                mod = new CalibrationModem(this.getHueValue()[i], 100, this.getBrightness());
                 t = new Transmitter<>(led, mod, (this.getDuration() * 1000));
                 String data = "1";
                 // Transmit the data stored in the buffer.

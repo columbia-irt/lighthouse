@@ -1,13 +1,12 @@
 package io.sece.vlc.trx;
 
 import io.sece.pigpio.PiGPIOPin;
-import io.sece.vlc.CalibrationModulator;
 import io.sece.vlc.Color;
-import io.sece.vlc.FSK2Modulator;
-import io.sece.vlc.FSK4Modulator;
-import io.sece.vlc.FSK8Modulator;
-import io.sece.vlc.Modulator;
-import io.sece.vlc.OOKModulator;
+import io.sece.vlc.FSK2Modem;
+import io.sece.vlc.FSK4Modem;
+import io.sece.vlc.FSK8Modem;
+import io.sece.vlc.Modem;
+import io.sece.vlc.OOKModem;
 
 public class transmissionClass implements Runnable {
     private int FPS;
@@ -41,23 +40,23 @@ public class transmissionClass implements Runnable {
             PiRgbLED led = new PiRgbLED(r, g, b);
 
             Transmitter<?> t;
-            Modulator mod;
+            Modem mod;
 
             System.out.println(this.getModulator());
             switch (this.getModulator())
             {
                 case "fsk2":
-                    mod = new FSK2Modulator();
+                    mod = new FSK2Modem();
                     break;
                 case "fsk4":
-                    mod = new FSK4Modulator();
+                    mod = new FSK4Modem();
                     break;
                 case "fsk8":
-                    mod = new FSK8Modulator();
+                    mod = new FSK8Modem();
                     break;
                 default:
                     System.out.println("default");
-                    mod = new OOKModulator();
+                    mod = new OOKModem();
                     break;
             }
             // Create an transmitter implementation which connects a particular

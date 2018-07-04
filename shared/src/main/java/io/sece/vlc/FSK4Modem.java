@@ -2,21 +2,21 @@ package io.sece.vlc;
 
 
 
-public class FSK4Modulator extends FreqModulator {
+public class FSK4Modem extends FreqModem {
     private Color n, e, s, w;
     private Symbol symbol;
 
 
-    public FSK4Modulator(int offset) {
+    public FSK4Modem(int offset) {
         this(Color.BLACK, new Color((((0 * 120) + offset)%360)), new Color((((1 * 120) + offset)%360)), new Color((((2 * 120) + offset)%360)));
     }
 
-    public FSK4Modulator()
+    public FSK4Modem()
     {
         this(0);
     }
 
-    public FSK4Modulator(Color n, Color e, Color s, Color w) {
+    public FSK4Modem(Color n, Color e, Color s, Color w) {
         this.n = n;
         this.e = e;
         this.s = s;

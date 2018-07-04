@@ -3,7 +3,7 @@ package io.sece.vlc.rcvr;
 import com.google.common.eventbus.Subscribe;
 
 import io.sece.vlc.EuclideanSpace;
-import io.sece.vlc.Modulator;
+import io.sece.vlc.Modem;
 import io.sece.vlc.rcvr.processing.Frame;
 import io.sece.vlc.rcvr.processing.Processing;
 
@@ -14,35 +14,35 @@ import io.sece.vlc.rcvr.processing.Processing;
  */
 
 public class ReceiverClass<T extends EuclideanSpace> {
-    private Modulator<T> modulator;
+    private Modem<T> modem;
     private boolean transmissionStarted = false;
     private SynchronizationModule synchronizationModule;
     private int delay = 50;
 
 
-    public ReceiverClass(Modulator modulator) {
-        this.modulator = modulator;
-        System.out.println("Startingseq: " + modulator.startSequence(8));
-        synchronizationModule = new SynchronizationModule(modulator.startSequence(8), delay);
+    public ReceiverClass(Modem modem) {
+        this.modem = modem;
+        System.out.println("Startingseq: " + modem.startSequence(8));
+        synchronizationModule = new SynchronizationModule(modem.startSequence(8), delay);
     }
 
     public String rx(T value) throws InterruptedException {
         if (transmissionStarted) {
-            return modulator.demodulate(value);
+            return modem.demodulate(value);
         } else {
             transmissionStarted = rxStartingSequence(value);
             return "";
         }
     }
 
-    public void setModulator(Modulator<T> modulator) {
-        this.modulator = modulator;
-        System.out.println("Startingseq: " + modulator.startSequence(8));
-        synchronizationModule = new SynchronizationModule(modulator.startSequence(8), delay);
+    public void setModem(Modem<T> modem) {
+        this.modem = modem;
+        System.out.println("Startingseq: " + modem.startSequence(8));
+        synchronizationModule = new SynchronizationModule(modem.startSequence(8), delay);
     }
 
     public boolean rxStartingSequence(T value) {
-        return synchronizationModule.symbolReceived(modulator.demodulate(value));
+        return synchronizationModule.symbolReceived(modem.demodulate(value));
     }
 
     public boolean isTransmissionStarted() {

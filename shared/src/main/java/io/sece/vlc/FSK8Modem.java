@@ -2,11 +2,11 @@ package io.sece.vlc;
 
 
 
-public class FSK8Modulator extends FreqModulator {
+public class FSK8Modem extends FreqModem {
     private Symbol symbol;
     private Color n, e, s, w, ne, se, sw, nw;
 
-    public FSK8Modulator(Color n, Color ne, Color e, Color se, Color s, Color sw, Color w, Color nw) {
+    public FSK8Modem(Color n, Color ne, Color e, Color se, Color s, Color sw, Color w, Color nw) {
         this.n = n;
         this.ne = ne;
         this.e = e;
@@ -30,12 +30,12 @@ public class FSK8Modulator extends FreqModulator {
     }
 
 
-    public FSK8Modulator(int offset)
+    public FSK8Modem(int offset)
     {
         this(new Color((((0 * 45) + offset)%360)), new Color((((1 * 45) + offset)%360)), new Color((((2 * 45) + offset)%360)), new Color((((3 * 45) + offset)%360)), new Color((((4 * 45) + offset)%360)),new Color((((5 * 45) + offset)%360)) ,new Color((((6 * 45) + offset)%360)) ,new Color((((7 * 45) + offset)%360)));
     }
 
-    public FSK8Modulator()
+    public FSK8Modem()
     {
         this(0);
     }

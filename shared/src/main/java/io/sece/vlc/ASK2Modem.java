@@ -2,15 +2,15 @@ package io.sece.vlc;
 
 
 
-public class ASK2Modulator extends AmpModulator {
+public class ASK2Modem extends AmpModem {
     private Amplitude l1, l2;
     private Symbol symbol;
 
-    public ASK2Modulator() {
+    public ASK2Modem() {
         this(0, 255);
     }
 
-    public ASK2Modulator(int l1, int l2) {
+    public ASK2Modem(int l1, int l2) {
         this.l1 = new Amplitude(l1);
         this.l2 = new Amplitude(l2);
         states = 2;

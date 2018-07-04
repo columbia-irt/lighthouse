@@ -47,7 +47,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 import io.sece.vlc.Color;
-import io.sece.vlc.FSK4Modulator;
+import io.sece.vlc.FSK4Modem;
 import io.sece.vlc.rcvr.processing.Frame;
 import io.sece.vlc.rcvr.processing.Processing;
 import io.sece.vlc.rcvr.camera.CameraException;
@@ -84,7 +84,7 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
     //private ReceiverClass receiverClass;
     public static long timeToStartSynchronized;
 
-    private FSK4Modulator modulator = new FSK4Modulator();
+    private FSK4Modem modem = new FSK4Modem();
 
     public static class RoIEvent extends Bus.Event {
         public RectF boundingBox;
@@ -591,7 +591,7 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
     @Subscribe
     public void onProcessingResult(Processing.Result ev) {
         Color c = new Color((int)(long)ev.frame.get(Frame.HUE), (int)(long)ev.frame.get(Frame.BRIGHTNESS));
-        c = modulator.detect(c);
+        c = modem.detect(c);
         rxColor.setBackgroundColor(android.graphics.Color.rgb(c.red, c.green, c.blue));
     }
 
