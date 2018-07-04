@@ -10,5 +10,5 @@ package io.sece.vlc;
  * Not all LEDs support amplitude modulation. For example, a LED that only
  * supports on-off states cannot amplitude-modulated.
  */
-public abstract class AmpModulator extends Modulator<Integer> {
+public abstract class AmpModulator extends Modulator<Amplitude> {
 }

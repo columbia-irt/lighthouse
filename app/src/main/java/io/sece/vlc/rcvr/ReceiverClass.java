@@ -1,6 +1,11 @@
 package io.sece.vlc.rcvr;
 
+import com.google.common.eventbus.Subscribe;
+
+import io.sece.vlc.EuclideanSpace;
 import io.sece.vlc.Modulator;
+import io.sece.vlc.rcvr.processing.Frame;
+import io.sece.vlc.rcvr.processing.Processing;
 
 /**
  * Created by alex on 6/22/18.
@@ -8,7 +13,7 @@ import io.sece.vlc.Modulator;
  * This class contains the basic setup of the Receiver including Modulation, FPS, Transmissionstarting
  */
 
-public class ReceiverClass<T> {
+public class ReceiverClass<T extends EuclideanSpace> {
     private Modulator<T> modulator;
     private boolean transmissionStarted = false;
     private SynchronizationModule synchronizationModule;
@@ -46,5 +51,12 @@ public class ReceiverClass<T> {
 
     public int getDelay() {
         return delay;
+    }
+
+
+    @Subscribe
+    public void rx(Processing.Result ev) {
+        long h = ev.frame.get(Frame.HUE);
+        long b = ev.frame.get(Frame.BRIGHTNESS);
     }
 }

@@ -14,7 +14,7 @@ package io.sece.vlc;
  * Each modulator also exports an attribute bits which determines how many
  * bits at a time the modulator consumers or generates.
  */
-public abstract class Modulator<V> {
+public abstract class Modulator<V extends EuclideanSpace> {
     public int bits;
     public int states;
 
@@ -22,8 +22,9 @@ public abstract class Modulator<V> {
         return modulate(data, 0);
     }
 
-    public abstract String demodulate(V input);
     public abstract V modulate(String data, int offset);
+    public abstract String demodulate(V input);
+    public abstract V detect(V input);
 
 
     public String startSequence(int amount) {
@@ -35,16 +36,15 @@ public abstract class Modulator<V> {
         return startingSequence;
     }
 
-
-    protected static Color nearestNeighbor(Color value, Color... symbols) {
+    protected V nearestNeighbor(V value, V... symbols) {
         double d, min = Double.MAX_VALUE;
-        Color rv = null;
+        V rv = null;
 
         if (symbols.length == 0)
-            throw new IllegalArgumentException("A list of colors required");
+            throw new IllegalArgumentException("Missing list of symbols");
 
-        for (Color s : symbols) {
-            d = value.distance(s);
+        for (V s : symbols) {
+            d = Math.abs(value.euclideanDistance(s));
             if (d < min) {
                 min = d;
                 rv = s;
@@ -52,4 +52,5 @@ public abstract class Modulator<V> {
         }
         return rv;
     }
+
 }

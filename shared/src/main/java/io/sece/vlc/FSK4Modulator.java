@@ -45,15 +45,18 @@ public class FSK4Modulator extends FreqModulator {
         throw new AssertionError();
     }
 
+    @Override
+    public Color detect(Color input) {
+        return nearestNeighbor(input, n, e, s, w);
+    }
 
     @Override
-    public String demodulate(Color value) {
-        value = nearestNeighbor(value, n, e, s, w);
-
-        if (value.equals(n)) return symbol.toBits(0);
-        if (value.equals(e)) return symbol.toBits(1);
-        if (value.equals(s)) return symbol.toBits(2);
-        if (value.equals(w)) return symbol.toBits(3);
+    public String demodulate(Color input) {
+        input = detect(input);
+        if (input.equals(n)) return symbol.toBits(0);
+        if (input.equals(e)) return symbol.toBits(1);
+        if (input.equals(s)) return symbol.toBits(2);
+        if (input.equals(w)) return symbol.toBits(3);
         throw new IllegalArgumentException();
     }
 }

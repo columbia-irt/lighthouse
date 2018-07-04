@@ -11,7 +11,6 @@ public class FSK2Modulator extends FreqModulator {
     }
 
     public FSK2Modulator(Color u, Color d) {
-
         this.u = u;
         this.d = d;
         states = 2;
@@ -29,9 +28,14 @@ public class FSK2Modulator extends FreqModulator {
     }
 
     @Override
-    public String demodulate(Color value) {
-        value = nearestNeighbor(value, u, d);
-        if (value.equals(u)) return symbol.toBits(0);
+    public Color detect(Color input) {
+        return nearestNeighbor(input, u, d);
+    }
+
+    @Override
+    public String demodulate(Color input) {
+        input = detect(input);
+        if (input.equals(u)) return symbol.toBits(0);
         else return symbol.toBits(1);
     }
 }

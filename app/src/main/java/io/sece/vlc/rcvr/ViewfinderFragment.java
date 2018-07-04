@@ -18,7 +18,6 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.graphics.ColorUtils;
 import android.util.Log;
 import android.util.Range;
 import android.util.Rational;
@@ -48,6 +47,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 import io.sece.vlc.Color;
+import io.sece.vlc.FSK4Modulator;
 import io.sece.vlc.rcvr.processing.Frame;
 import io.sece.vlc.rcvr.processing.Processing;
 import io.sece.vlc.rcvr.camera.CameraException;
@@ -83,6 +83,8 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
 
     //private ReceiverClass receiverClass;
     public static long timeToStartSynchronized;
+
+    private FSK4Modulator modulator = new FSK4Modulator();
 
     public static class RoIEvent extends Bus.Event {
         public RectF boundingBox;
@@ -588,22 +590,9 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
 
     @Subscribe
     public void onProcessingResult(Processing.Result ev) {
-        long hue = ev.frame.get(Frame.HUE);
-        long brightness = ev.frame.get(Frame.BRIGHTNESS);
-
-        String dcdText;
-        if (brightness > 0) {
-            dcdText = String.format(Locale.US, "RX hue: %d", hue);
-        } else {
-            dcdText = "RX hue: -";
-        }
-
-        rxColor.setText(dcdText);
-        float[] hsl = new float[3];
-        hsl[0] = hue;
-        hsl[1] = 1f;
-        hsl[2] = brightness > 0 ? 0.5f : 0;
-        rxColor.setBackgroundColor(ColorUtils.HSLToColor(hsl));
+        Color c = new Color((int)(long)ev.frame.get(Frame.HUE), (int)(long)ev.frame.get(Frame.BRIGHTNESS));
+        c = modulator.detect(c);
+        rxColor.setBackgroundColor(android.graphics.Color.rgb(c.red, c.green, c.blue));
     }
 
 

@@ -8,8 +8,10 @@ package io.sece.vlc;
  * accepts and generates boolean values so that it can be connected directly
  * to LED interfaces that only accept binary values.
  */
-public class OOKModulator extends Modulator<Boolean> {
+public class OOKModulator extends Modulator<Amplitude> {
     private Symbol symbol;
+    private Amplitude off = new Amplitude(0);
+    private Amplitude on = new Amplitude(1);
 
     public OOKModulator() {
         states = 2;
@@ -18,15 +20,20 @@ public class OOKModulator extends Modulator<Boolean> {
     }
 
     @Override
-    public Boolean modulate(String data, int offset) {
+    public Amplitude modulate(String data, int offset) {
         switch(symbol.fromBits(data, offset)) {
-        case 0: return false;
-        case 1: return true;
+        case 0: return off;
+        case 1: return on;
         }
         throw new AssertionError();
     }
 
-    public String demodulate(Boolean value) {
+    @Override
+    public Amplitude detect(Amplitude input) {
+        return nearestNeighbor(input, on, off);
+    }
+
+    public String demodulate(Amplitude input) {
         // Not yet implemented
         throw new UnsupportedOperationException();
     }

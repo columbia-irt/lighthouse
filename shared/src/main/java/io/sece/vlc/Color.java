@@ -4,7 +4,7 @@ package io.sece.vlc;
 import java.util.Locale;
 import java.util.Objects;
 
-public class Color {
+public class Color implements EuclideanSpace {
     public static final int MAX_RGB = 255;
     public static final int MAX_HUE = 360;
     public static final int MAX_SATURATION = 100;
@@ -197,12 +197,14 @@ public class Color {
     }
 
 
-    public static double euclidianDistance(Color a, Color b) {
+    public static double euclideanDistance(Color a, Color b) {
         return Math.sqrt(Math.pow(a.red - b.red, 2) + Math.pow(a.green - b.green, 2) + Math.pow(a.blue - b.blue, 2));
     }
 
 
-    public double distance(Color c) {
-        return euclidianDistance(this, c);
+    public double euclideanDistance(Object o) {
+        if (!(o instanceof Color))
+            throw new IllegalArgumentException("Invalid type");
+        return euclideanDistance(this, (Color)o);
     }
 }
