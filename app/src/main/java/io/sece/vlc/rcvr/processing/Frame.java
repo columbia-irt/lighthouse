@@ -31,7 +31,8 @@ public class Frame implements CameraBridgeViewBase.CvCameraViewFrame {
     public static final String RX_TIMESTAMP = "RX_TIMESTAMP";
     public static final String PROCESSING_START = "PROCESSING_START";
     public static final String PROCESSING_END = "PROCESSING_END";
-    public static final String DETECTED_HUE = "DETECTED_HUE";
+    public static final String HUE = "HUE";
+    public static final String BRIGHTNESS = "BRIGHTNESS";
     public static final String CURRENT_SEQUENCE = "CURRENT_SEQUENCE";
 
     public int width;

@@ -4,13 +4,13 @@ import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
 
+import io.sece.vlc.Color;
 import io.sece.vlc.rcvr.processing.Frame;
 import io.sece.vlc.rcvr.processing.ProcessingBlock;
 
 public class HueDetector implements ProcessingBlock {
     private static final float DEFAULT_S_THRESHOLD = 0.5f;
     private static final float DEFAULT_V_THRESHOLD = 0.5f;
-    public static final long NO_HUE_DETECTED = Long.MAX_VALUE;
 
     private float s_threshold;
     private float v_threshold;
@@ -78,15 +78,17 @@ public class HueDetector implements ProcessingBlock {
             }
         }
 
-        long avg;
+        long avgHue = 0;
+        long brightness = 0;
+
         if (n > 0) {
-            avg = Math.round(Math.toDegrees(Math.atan2(y / n, x / n)));
-            if (avg < 0) avg += 360;
-        } else {
-            avg = NO_HUE_DETECTED;
+            avgHue = Math.round(Math.toDegrees(Math.atan2(y / n, x / n)));
+            if (avgHue < 0) avgHue += Color.MAX_HUE;
+            brightness = Color.MAX_BRIGHTNESS;
         }
 
-        frame.set(Frame.DETECTED_HUE, avg);
+        frame.set(Frame.HUE, avgHue);
+        frame.set(Frame.BRIGHTNESS, brightness);
         return frame;
     }
 }

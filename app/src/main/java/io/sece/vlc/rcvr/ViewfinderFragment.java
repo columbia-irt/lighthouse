@@ -588,10 +588,11 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
 
     @Subscribe
     public void onProcessingResult(Processing.Result ev) {
-        long hue = ev.frame.get(Frame.DETECTED_HUE);
+        long hue = ev.frame.get(Frame.HUE);
+        long brightness = ev.frame.get(Frame.BRIGHTNESS);
 
         String dcdText;
-        if (hue != Long.MAX_VALUE) {
+        if (brightness > 0) {
             dcdText = String.format(Locale.US, "RX hue: %d", hue);
         } else {
             dcdText = "RX hue: -";
@@ -601,7 +602,7 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
         float[] hsl = new float[3];
         hsl[0] = hue;
         hsl[1] = 1f;
-        hsl[2] = 0.5f;
+        hsl[2] = brightness > 0 ? 0.5f : 0;
         rxColor.setBackgroundColor(ColorUtils.HSLToColor(hsl));
     }
 
