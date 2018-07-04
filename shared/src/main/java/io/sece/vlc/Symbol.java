@@ -53,26 +53,18 @@ class Symbol {
     }
 
 
+    public String toBits(int symbol) {
+        return toBits(new StringBuilder(), 0, symbol).toString();
+    }
+
 
     /**
      * Convert the given modulation symbol value into bits and store the bits
      * in buffer out starting at index offset. Return the output buffer.
      */
-    public String toBits(int symbol) {
-        StringBuilder str = new StringBuilder();
-        int c = 0;
+    public StringBuilder toBits(StringBuilder buf, int offset, int symbol) {
         for(int i = bits - 1; i >= 0; i--)
-        {
-            if(((symbol >> i) & 1L) == 1L)
-            {
-                str.insert(c, '1');
-            }
-            else
-            {
-                str.insert(c, '0');
-            }
-            c++;
-        }
-        return str.toString();
+            buf.insert(offset++, ((symbol >> i) & 1L) == 1L ? '1' : '0');
+        return buf;
     }
 }
