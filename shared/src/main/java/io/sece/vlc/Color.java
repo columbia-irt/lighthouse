@@ -1,21 +1,26 @@
 package io.sece.vlc;
 
 
+import java.util.Locale;
+import java.util.Objects;
+
 public class Color {
-    public static final Color RED = new Color(255, 0, 0);
-    public static final Color GREEN = new Color(0, 255, 0);
-    public static final Color BLUE = new Color(0, 0, 255);
-
-    public static final Color YELLOW = new Color(255, 255, 0);
-    public static final Color CYAN = new Color(0, 255, 255);
-    public static final Color MAGENTA = new Color(255, 0, 255);
-
-    public static final Color BLACK = new Color(0, 0, 0);
-    public static final Color WHITE = new Color(255, 255, 255);
-
+    public static final int MAX_RGB = 255;
     public static final int MAX_HUE = 360;
     public static final int MAX_SATURATION = 100;
     public static final int MAX_BRIGHTNESS = 100;
+
+    public static final Color RED = new Color(MAX_RGB, 0, 0);
+    public static final Color GREEN = new Color(0, MAX_RGB, 0);
+    public static final Color BLUE = new Color(0, 0, MAX_RGB);
+
+    public static final Color YELLOW = new Color(MAX_RGB, MAX_RGB, 0);
+    public static final Color CYAN = new Color(0, MAX_RGB, MAX_RGB);
+    public static final Color MAGENTA = new Color(MAX_RGB, 0, MAX_RGB);
+
+    public static final Color BLACK = new Color(0, 0, 0);
+    public static final Color WHITE = new Color(MAX_RGB, MAX_RGB, MAX_RGB);
+
 
     public final int red, green, blue;
     public final int hue, saturation, brightness;
@@ -27,7 +32,12 @@ public class Color {
 
 
     public Color(int hue) {
-        this(new int[] {hue, MAX_SATURATION, MAX_BRIGHTNESS});
+        this(hue, MAX_BRIGHTNESS);
+    }
+
+
+    public Color(int hue, int brightness) {
+        this(new int[] {hue, MAX_SATURATION, brightness});
     }
 
 
@@ -67,7 +77,7 @@ public class Color {
         float b = brightness / (float)MAX_BRIGHTNESS;
 
         if (s == 0) {
-            rgb[0] = rgb[1] = rgb[2] = (int) (b * 255.0f + 0.5f);
+            rgb[0] = rgb[1] = rgb[2] = (int) (b * (float)MAX_RGB + 0.5f);
         } else {
             float hh = (h - (float)Math.floor(h)) * 6.0f;
             float f = hh - (float)java.lang.Math.floor(hh);
@@ -76,34 +86,39 @@ public class Color {
             float t = b * (1.0f - (s * (1.0f - f)));
             switch ((int) hh) {
                 case 0:
-                    rgb[0] = (int) (b * 255.0f + 0.5f);
-                    rgb[1] = (int) (t * 255.0f + 0.5f);
-                    rgb[2] = (int) (p * 255.0f + 0.5f);
+                    rgb[0] = (int) (b * (float)MAX_RGB + 0.5f);
+                    rgb[1] = (int) (t * (float)MAX_RGB + 0.5f);
+                    rgb[2] = (int) (p * (float)MAX_RGB + 0.5f);
                     break;
+
                 case 1:
-                    rgb[0] = (int) (q * 255.0f + 0.5f);
-                    rgb[1] = (int) (b * 255.0f + 0.5f);
-                    rgb[2] = (int) (p * 255.0f + 0.5f);
+                    rgb[0] = (int) (q * (float)MAX_RGB + 0.5f);
+                    rgb[1] = (int) (b * (float)MAX_RGB + 0.5f);
+                    rgb[2] = (int) (p * (float)MAX_RGB + 0.5f);
                     break;
+
                 case 2:
-                    rgb[0] = (int) (p * 255.0f + 0.5f);
-                    rgb[1] = (int) (b * 255.0f + 0.5f);
-                    rgb[2] = (int) (t * 255.0f + 0.5f);
+                    rgb[0] = (int) (p * (float)MAX_RGB + 0.5f);
+                    rgb[1] = (int) (b * (float)MAX_RGB + 0.5f);
+                    rgb[2] = (int) (t * (float)MAX_RGB + 0.5f);
                     break;
+
                 case 3:
-                    rgb[0] = (int) (p * 255.0f + 0.5f);
-                    rgb[1] = (int) (q * 255.0f + 0.5f);
-                    rgb[2] = (int) (b * 255.0f + 0.5f);
+                    rgb[0] = (int) (p * (float)MAX_RGB + 0.5f);
+                    rgb[1] = (int) (q * (float)MAX_RGB + 0.5f);
+                    rgb[2] = (int) (b * (float)MAX_RGB + 0.5f);
                     break;
+
                 case 4:
-                    rgb[0] = (int) (t * 255.0f + 0.5f);
-                    rgb[1] = (int) (p * 255.0f + 0.5f);
-                    rgb[2] = (int) (b * 255.0f + 0.5f);
+                    rgb[0] = (int) (t * (float)MAX_RGB + 0.5f);
+                    rgb[1] = (int) (p * (float)MAX_RGB + 0.5f);
+                    rgb[2] = (int) (b * (float)MAX_RGB + 0.5f);
                     break;
+
                 case 5:
-                    rgb[0] = (int) (b * 255.0f + 0.5f);
-                    rgb[1] = (int) (p * 255.0f + 0.5f);
-                    rgb[2] = (int) (q * 255.0f + 0.5f);
+                    rgb[0] = (int) (b * (float)MAX_RGB + 0.5f);
+                    rgb[1] = (int) (p * (float)MAX_RGB + 0.5f);
+                    rgb[2] = (int) (q * (float)MAX_RGB + 0.5f);
                     break;
             }
         }
@@ -129,7 +144,7 @@ public class Color {
             max = blue;
         else if (blue < min)
             min = blue;
-        b = (float)max / 255f;
+        b = (float)max / (float)MAX_RGB;
 
         if (max == 0)
             s = 0;
@@ -154,5 +169,40 @@ public class Color {
         hsb[1] = Math.round(s * (float)MAX_SATURATION);
         hsb[2] = Math.round(b * (float)MAX_BRIGHTNESS);
         return hsb;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this)
+            return true;
+
+        if (!(o instanceof Color))
+            return false;
+
+        Color c = (Color)o;
+        return red == c.red && green == c.green && blue == c.blue;
+    }
+
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(red, green, blue);
+    }
+
+
+    @Override
+    public String toString() {
+        return String.format(Locale.US,"#%0Xd%0Xd%0Xd", red, green, blue);
+    }
+
+
+    public static double euclidianDistance(Color a, Color b) {
+        return Math.sqrt(Math.pow(a.red - b.red, 2) + Math.pow(a.green - b.green, 2) + Math.pow(a.blue - b.blue, 2));
+    }
+
+
+    public double distance(Color c) {
+        return euclidianDistance(this, c);
     }
 }
