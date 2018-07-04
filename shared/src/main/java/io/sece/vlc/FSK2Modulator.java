@@ -29,27 +29,9 @@ public class FSK2Modulator extends FreqModulator {
     }
 
     @Override
-    public String demodulate(int hue) {
-        Color value = getClosestElement(hue);
-        if(value == u) {
-            return symbol.toBits(0);
-        } else if( value == d) {
-            return symbol.toBits(1);
-        }
-        throw new IllegalArgumentException();
-    }
-
-    private Color getClosestElement(int value) {
-        int redDistance = Math.min(Math.abs(value - (Color.RED.hue + 360)), Math.abs(value - Color.RED.hue));
-        int greenDistance = Math.min(Math.abs(value - (Color.GREEN.hue + 360)), Math.abs(value - Color.GREEN.hue));
-
-        if(redDistance < greenDistance)
-        {
-            return Color.RED;
-        }
-        else
-        {
-            return Color.GREEN;
-        }
+    public String demodulate(Color value) {
+        value = nearestNeighbor(value, u, d);
+        if (value.equals(u)) return symbol.toBits(0);
+        else return symbol.toBits(1);
     }
 }

@@ -29,11 +29,7 @@ public class ASK2Modulator extends AmpModulator {
     }
 
     @Override
-    public String demodulate(int value) {
-        switch (value) {
-            case 11: return symbol.toBits(0);
-            case 12: return symbol.toBits(1);
-        }
+    public String demodulate(Integer value) {
         throw new IllegalArgumentException();
     }
 

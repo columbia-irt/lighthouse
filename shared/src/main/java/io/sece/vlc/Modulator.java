@@ -2,7 +2,7 @@ package io.sece.vlc;
 
 
 /**
- * An abtract base class for all modulators and demodulators. The base class
+ * An abstract base class for all modulators and demodulators. The base class
  * declares API to modulate a bit set into a LED signal and to demodulate a
  * LED signal into a bit set. The type of LED signal is configurable and is
  * meant to be set by implementations inheriting from this class.
@@ -22,7 +22,7 @@ public abstract class Modulator<V> {
         return modulate(data, 0);
     }
 
-    public abstract String demodulate(int value);
+    public abstract String demodulate(V input);
     public abstract V modulate(String data, int offset);
 
 
@@ -35,4 +35,21 @@ public abstract class Modulator<V> {
         return startingSequence;
     }
 
+
+    protected static Color nearestNeighbor(Color value, Color... symbols) {
+        double d, min = Double.MAX_VALUE;
+        Color rv = null;
+
+        if (symbols.length == 0)
+            throw new IllegalArgumentException("A list of colors required");
+
+        for (Color s : symbols) {
+            d = value.distance(s);
+            if (d < min) {
+                min = d;
+                rv = s;
+            }
+        }
+        return rv;
+    }
 }

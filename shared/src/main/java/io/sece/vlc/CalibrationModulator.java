@@ -30,7 +30,7 @@ public class CalibrationModulator extends FreqModulator
     }
 
     @Override
-    public String demodulate(int value) {
+    public String demodulate(Color value) {
         // Not yet implemented
         throw new UnsupportedOperationException();
     }

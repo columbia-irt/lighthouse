@@ -21,7 +21,7 @@ public class ReceiverClass<T> {
         synchronizationModule = new SynchronizationModule(modulator.startSequence(8), delay);
     }
 
-    public String rx(int value) throws InterruptedException {
+    public String rx(T value) throws InterruptedException {
         if (transmissionStarted) {
             return modulator.demodulate(value);
         } else {
@@ -36,7 +36,7 @@ public class ReceiverClass<T> {
         synchronizationModule = new SynchronizationModule(modulator.startSequence(8), delay);
     }
 
-    public boolean rxStartingSequence(int value) {
+    public boolean rxStartingSequence(T value) {
         return synchronizationModule.symbolReceived(modulator.demodulate(value));
     }
 

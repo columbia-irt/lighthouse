@@ -45,59 +45,15 @@ public class FSK4Modulator extends FreqModulator {
         throw new AssertionError();
     }
 
+
     @Override
-    public String demodulate(int hue) {
-        Color value = getClosestElement(hue);
-        if (value == n) {
-            return symbol.toBits(0);
-        } else if( value == e) {
-            return symbol.toBits(1);
-        } else if( value == s) {
-            return symbol.toBits(2);
-        } else if( value == w) {
-            return symbol.toBits(3);
-        }
+    public String demodulate(Color value) {
+        value = nearestNeighbor(value, n, e, s, w);
+
+        if (value.equals(n)) return symbol.toBits(0);
+        if (value.equals(e)) return symbol.toBits(1);
+        if (value.equals(s)) return symbol.toBits(2);
+        if (value.equals(w)) return symbol.toBits(3);
         throw new IllegalArgumentException();
-    }
-
-
-    private Color getClosestElement(int value) {
-        int eDistance = Math.min(Math.abs(value - (e.hue + 360)), Math.abs(value - e.hue));
-        int sDistance = Math.min(Math.abs(value - (s.hue + 360)), Math.abs(value - s.hue));
-        int wDistance = Math.min(Math.abs(value - (w.hue + 360)), Math.abs(value - w.hue));
-        //int yellowDistance = Math.min(Math.abs(value - (Color.YELLOW_HUE + 360)), Math.abs(value - Color.YELLOW_HUE));
-
-        /*if(eDistance < sDistance && eDistance < wDistance && eDistance < yellowDistance)
-        {
-            return Color.RED;
-        }
-        else if(sDistance < wDistance && sDistance < yellowDistance)
-        {
-            return Color.GREEN;
-        }
-        else if(wDistance < yellowDistance)
-        {
-            return Color.BLUE;
-        }
-        else
-        {
-            return Color.YELLOW;
-        }*/
-        if(value == -1)
-        {
-            return Color.BLACK;
-        }
-        if(eDistance < sDistance && eDistance < wDistance)
-        {
-            return e;
-        }
-        else if(sDistance < wDistance)
-        {
-            return s;
-        }
-        else
-        {
-            return w;
-        }
     }
 }

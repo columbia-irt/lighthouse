@@ -26,13 +26,8 @@ public class OOKModulator extends Modulator<Boolean> {
         throw new AssertionError();
     }
 
-    public String demodulate(int value) {
+    public String demodulate(Boolean value) {
         // Not yet implemented
-        throw new UnsupportedOperationException();
-    }
-
-
-    private Boolean getClosestElement(int value) {
         throw new UnsupportedOperationException();
     }
 }
