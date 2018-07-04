@@ -1,6 +1,5 @@
 package io.sece.vlc;
 
-import static io.sece.vlc.Color.hsvToRGB;
 import static io.sece.vlc.Color.RGBtoHSB;
 
 public class CalibrationModulator extends FreqModulator
@@ -9,15 +8,15 @@ public class CalibrationModulator extends FreqModulator
     private Color d;
     private Symbol symbol;
 
-    public CalibrationModulator(float hue, float saturation, float brightness) {
+    public CalibrationModulator(int hue, int saturation, int brightness) {
 
-        this.u = hsvToRGB(hue, saturation, brightness);
+        this.u = new Color(new int[]{hue, saturation, brightness});
         this.d = Color.BLACK;
         states = 2;
         symbol = new Symbol(states);
         bits = symbol.bits;
-        System.out.println("Red: " + u.getRed() + " Green: " + u.getGreen() + " Blue: " + u.getBlue());
-        float[] test = RGBtoHSB(u.getRed(),u.getGreen(),u.getBlue(),null);
+        System.out.println("Red: " + u.red + " Green: " + u.green + " Blue: " + u.blue);
+        int[] test = RGBtoHSB(null, u.red, u.green, u.blue);
         System.out.println("Hue: " + test[0] + " Saturation: " + test[1] + " Brightness: " + test[2]);
     }
 

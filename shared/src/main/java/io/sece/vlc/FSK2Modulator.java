@@ -40,8 +40,8 @@ public class FSK2Modulator extends FreqModulator {
     }
 
     private Color getClosestElement(int value) {
-        int redDistance = Math.min(Math.abs(value - (Color.RED_HUE + 360)), Math.abs(value - Color.RED_HUE));
-        int greenDistance = Math.min(Math.abs(value - (Color.GREEN_HUE + 360)), Math.abs(value - Color.GREEN_HUE));
+        int redDistance = Math.min(Math.abs(value - (Color.RED.hue + 360)), Math.abs(value - Color.RED.hue));
+        int greenDistance = Math.min(Math.abs(value - (Color.GREEN.hue + 360)), Math.abs(value - Color.GREEN.hue));
 
         if(redDistance < greenDistance)
         {

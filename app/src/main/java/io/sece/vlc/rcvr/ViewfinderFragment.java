@@ -472,7 +472,7 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
             });
             // FIXME: The following should turned into thenAccept when done with debugging
             f.whenComplete((obj, ex) -> {
-                Color c = Color.hsvToRGB(hue, 100, 100);
+                Color c = new Color(hue);
                 indicator.setBackgroundColor(android.graphics.Color.rgb(c.red, c.green, c.blue));
                 indicator.setText(String.format(Locale.US, "TX: %d", hue));
             });

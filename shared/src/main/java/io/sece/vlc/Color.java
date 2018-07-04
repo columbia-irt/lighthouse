@@ -1,165 +1,158 @@
 package io.sece.vlc;
 
 
-/**
- * This class represents a color composed of three primary channels: red,
- * green, and blue. It also provides named constants for well-known colors.
- */
 public class Color {
-    public int red, green, blue;
-    public int hue;
-
     public static final Color RED = new Color(255, 0, 0);
     public static final Color GREEN = new Color(0, 255, 0);
     public static final Color BLUE = new Color(0, 0, 255);
-    public static final Color PURPLE = new Color(255, 0, 190);
-    public static final Color YELLOW = new Color(255, 185, 0);
-    public static final Color TURQUOISE = new Color(0, 255, 150);
+
+    public static final Color YELLOW = new Color(255, 255, 0);
+    public static final Color CYAN = new Color(0, 255, 255);
+    public static final Color MAGENTA = new Color(255, 0, 255);
+
     public static final Color BLACK = new Color(0, 0, 0);
     public static final Color WHITE = new Color(255, 255, 255);
 
-    public static final int RED_HUE = 0;
-    public static final int YELLOW_HUE = 60;
-    public static final int GREEN_HUE = 120;
-    public static final int TURQUOISE_HUE = 180;
-    public static final int BLUE_HUE = 240;
-    public static final int PURPLE_HUE = 300;
+    public static final int MAX_HUE = 360;
+    public static final int MAX_SATURATION = 100;
+    public static final int MAX_BRIGHTNESS = 100;
+
+    public final int red, green, blue;
+    public final int hue, saturation, brightness;
+
 
     public Color(int red, int green, int blue) {
+        this(red, green, blue, null);
+    }
+
+
+    public Color(int hue) {
+        this(new int[] {hue, MAX_SATURATION, MAX_BRIGHTNESS});
+    }
+
+
+    protected Color(int red, int green, int blue, int[] hsv) {
         this.red = red;
         this.green = green;
         this.blue = blue;
-        this.hue = Math.round(RGBtoHSB(red, green, blue, null)[0]);
-    }
 
-    public Color(int hueValue)
-    {
-        this.hue = hueValue;
-        this.red = hsvToRGB(hueValue, 100, 100).red;
-        this.green = hsvToRGB(hueValue, 100, 100).green;
-        this.blue = hsvToRGB(hueValue, 100, 100).blue;
-    }
+        if (hsv == null)
+            hsv = RGBtoHSB(null, red, green, blue);
 
-    public int getRed() {
-        return red;
-    }
-
-    public int getGreen() {
-        return green;
-    }
-
-    public int getBlue() {
-        return blue;
+        this.hue = hsv[0];
+        this.saturation = hsv[1];
+        this.brightness = hsv[2];
     }
 
 
-    private static int HSBtoRGB(float var0, float var1, float var2) {
-        int var3 = 0;
-        int var4 = 0;
-        int var5 = 0;
-        if (var1 == 0.0F) {
-            var3 = var4 = var5 = (int) (var2 * 255.0F + 0.5F);
+    public Color(int[] hsv) {
+        int[] rgb = HSBtoRGB(null, hsv[0], hsv[1], hsv[2]);
+
+        this.red = rgb[0];
+        this.green = rgb[1];
+        this.blue = rgb[2];
+
+        this.hue = hsv[0];
+        this.saturation = hsv[1];
+        this.brightness = hsv[2];
+    }
+
+
+    public static int[] HSBtoRGB(int[] rgb, int hue, int saturation, int brightness) {
+        if (rgb == null)
+            rgb = new int[3];
+
+        float h = hue / (float)MAX_HUE;
+        float s = saturation / (float)MAX_SATURATION;
+        float b = brightness / (float)MAX_BRIGHTNESS;
+
+        if (s == 0) {
+            rgb[0] = rgb[1] = rgb[2] = (int) (b * 255.0f + 0.5f);
         } else {
-            float var6 = (var0 - (float) Math.floor((double) var0)) * 6.0F;
-            float var7 = var6 - (float) Math.floor((double) var6);
-            float var8 = var2 * (1.0F - var1);
-            float var9 = var2 * (1.0F - var1 * var7);
-            float var10 = var2 * (1.0F - var1 * (1.0F - var7));
-            switch ((int) var6) {
+            float hh = (h - (float)Math.floor(h)) * 6.0f;
+            float f = hh - (float)java.lang.Math.floor(hh);
+            float p = b * (1.0f - s);
+            float q = b * (1.0f - s * f);
+            float t = b * (1.0f - (s * (1.0f - f)));
+            switch ((int) hh) {
                 case 0:
-                    var3 = (int) (var2 * 255.0F + 0.5F);
-                    var4 = (int) (var10 * 255.0F + 0.5F);
-                    var5 = (int) (var8 * 255.0F + 0.5F);
+                    rgb[0] = (int) (b * 255.0f + 0.5f);
+                    rgb[1] = (int) (t * 255.0f + 0.5f);
+                    rgb[2] = (int) (p * 255.0f + 0.5f);
                     break;
                 case 1:
-                    var3 = (int) (var9 * 255.0F + 0.5F);
-                    var4 = (int) (var2 * 255.0F + 0.5F);
-                    var5 = (int) (var8 * 255.0F + 0.5F);
+                    rgb[0] = (int) (q * 255.0f + 0.5f);
+                    rgb[1] = (int) (b * 255.0f + 0.5f);
+                    rgb[2] = (int) (p * 255.0f + 0.5f);
                     break;
                 case 2:
-                    var3 = (int) (var8 * 255.0F + 0.5F);
-                    var4 = (int) (var2 * 255.0F + 0.5F);
-                    var5 = (int) (var10 * 255.0F + 0.5F);
+                    rgb[0] = (int) (p * 255.0f + 0.5f);
+                    rgb[1] = (int) (b * 255.0f + 0.5f);
+                    rgb[2] = (int) (t * 255.0f + 0.5f);
                     break;
                 case 3:
-                    var3 = (int) (var8 * 255.0F + 0.5F);
-                    var4 = (int) (var9 * 255.0F + 0.5F);
-                    var5 = (int) (var2 * 255.0F + 0.5F);
+                    rgb[0] = (int) (p * 255.0f + 0.5f);
+                    rgb[1] = (int) (q * 255.0f + 0.5f);
+                    rgb[2] = (int) (b * 255.0f + 0.5f);
                     break;
                 case 4:
-                    var3 = (int) (var10 * 255.0F + 0.5F);
-                    var4 = (int) (var8 * 255.0F + 0.5F);
-                    var5 = (int) (var2 * 255.0F + 0.5F);
+                    rgb[0] = (int) (t * 255.0f + 0.5f);
+                    rgb[1] = (int) (p * 255.0f + 0.5f);
+                    rgb[2] = (int) (b * 255.0f + 0.5f);
                     break;
                 case 5:
-                    var3 = (int) (var2 * 255.0F + 0.5F);
-                    var4 = (int) (var8 * 255.0F + 0.5F);
-                    var5 = (int) (var9 * 255.0F + 0.5F);
+                    rgb[0] = (int) (b * 255.0f + 0.5f);
+                    rgb[1] = (int) (p * 255.0f + 0.5f);
+                    rgb[2] = (int) (q * 255.0f + 0.5f);
+                    break;
             }
         }
-
-        return -16777216 | var3 << 16 | var4 << 8 | var5 << 0;
+        return rgb;
     }
 
-    public static Color hsvToRGB(float hue, float saturation, float brightness) {
-        float hueT = hue / 360;
-        float saturationT = saturation / 100;
-        float brightnessT = brightness / 100;
-        int rgb = HSBtoRGB(hueT, saturationT, brightnessT);
-        int red = (rgb >> 16) & 0xFF;
-        int green = (rgb >> 8) & 0xFF;
-        int blue = rgb & 0xFF;
 
-        return new Color(red, green, blue);
-    }
+    public static int[] RGBtoHSB(int hsb[], int red, int green, int blue) {
+        if (hsb == null)
+            hsb = new int[3];
 
-    public static float[] RGBtoHSB(int var0, int var1, int var2, float[] var3) {
-        if (var3 == null) {
-            var3 = new float[3];
-        }
+        float h, s, b;
+        int min, max;
 
-        int var7 = var0 > var1 ? var0 : var1;
-        if (var2 > var7) {
-            var7 = var2;
-        }
-
-        int var8 = var0 < var1 ? var0 : var1;
-        if (var2 < var8) {
-            var8 = var2;
-        }
-
-        float var6 = (float) var7 / 255.0F;
-        float var5;
-        if (var7 != 0) {
-            var5 = (float) (var7 - var8) / (float) var7;
+        if (red < green) {
+            min = red;
+            max = green;
         } else {
-            var5 = 0.0F;
+            min = green;
+            max = red;
+        }
+        if (blue > max)
+            max = blue;
+        else if (blue < min)
+            min = blue;
+        b = (float)max / 255f;
+
+        if (max == 0)
+            s = 0;
+        else
+            s = ((float) (max - min)) / ((float) max);
+
+        if (s == 0)
+            h = 0;
+        else {
+            float delta = (max - min) * 6;
+            if (red == max)
+                h = (float) (green - blue) / delta;
+            else if (green == max)
+                h = 1f / 3 + (blue - red) / delta;
+            else
+                h = 2f / 3 + (red - green) / delta;
+            if (h < 0)
+                h++;
         }
 
-        float var4;
-        if (var5 == 0.0F) {
-            var4 = 0.0F;
-        } else {
-            float var9 = (float) (var7 - var0) / (float) (var7 - var8);
-            float var10 = (float) (var7 - var1) / (float) (var7 - var8);
-            float var11 = (float) (var7 - var2) / (float) (var7 - var8);
-            if (var0 == var7) {
-                var4 = var11 - var10;
-            } else if (var1 == var7) {
-                var4 = 2.0F + var9 - var11;
-            } else {
-                var4 = 4.0F + var10 - var9;
-            }
-
-            var4 /= 6.0F;
-            if (var4 < 0.0F) {
-                ++var4;
-            }
-        }
-
-        var3[0] = ((int) (var4 * 360) * 100) / 100;
-        var3[1] = ((int) (var5 * 100) * 100) / 100;
-        var3[2] = ((int) (var6 * 100) * 100) / 100;
-        return var3;
+        hsb[0] = Math.round(h * (float)MAX_HUE);
+        hsb[1] = Math.round(s * (float)MAX_SATURATION);
+        hsb[2] = Math.round(b * (float)MAX_BRIGHTNESS);
+        return hsb;
     }
 }
