@@ -4,14 +4,7 @@ package io.sece.vlc;
 
 public class FSK8Modulator extends FreqModulator {
     private Symbol symbol;
-    private Color n;
-    private Color ne;
-    private Color e;
-    private Color se;
-    private Color s;
-    private Color sw;
-    private Color w;
-    private Color nw;
+    private Color n, e, s, w, ne, se, sw, nw;
 
     public FSK8Modulator(Color n, Color ne, Color e, Color se, Color s, Color sw, Color w, Color nw) {
         this.n = n;
@@ -23,14 +16,14 @@ public class FSK8Modulator extends FreqModulator {
         this.w = w;
         this.nw = nw;
 
-        System.out.println("n (rgb) : " + n.red + "," + n.green + "," + n.blue);
-        System.out.println("ne (rgb) : " + ne.red + "," + ne.green + "," + ne.blue);
-        System.out.println("e (rgb) : " + e.red + "," + e.green + "," + e.blue);
-        System.out.println("se (rgb) : " + se.red + "," + se.green + "," + se.blue);
-        System.out.println("s (rgb) : " + s.red + "," + s.green + "," + s.blue);
-        System.out.println("sw (rgb) : " + sw.red + "," + sw.green + "," + sw.blue);
-        System.out.println("w (rgb) : " + w.red + "," + w.green + "," + w.blue);
-        System.out.println("ne (rgb) : " + ne.red + "," + ne.green + "," + ne.blue);
+        System.out.println("n (rgb) : " + n);
+        System.out.println("ne (rgb) : " + ne);
+        System.out.println("e (rgb) : " + e);
+        System.out.println("se (rgb) : " + se);
+        System.out.println("s (rgb) : " + s);
+        System.out.println("sw (rgb) : " + sw);
+        System.out.println("w (rgb) : " + w);
+        System.out.println("ne (rgb) : " + ne);
         states = 8;
         symbol = new Symbol(states);
         bits = symbol.bits;
@@ -52,12 +45,13 @@ public class FSK8Modulator extends FreqModulator {
     public Color modulate(String data, int offset) {
         switch(symbol.fromBits(data, offset)) {
             case 0: return n;
-            case 1: return ne;
             case 2: return e;
-            case 3: return se;
             case 4: return s;
-            case 5: return sw;
             case 6: return w;
+
+            case 1: return ne;
+            case 3: return se;
+            case 5: return sw;
             case 7: return nw;
         }
         throw new AssertionError();
@@ -71,19 +65,23 @@ public class FSK8Modulator extends FreqModulator {
 
 
     @Override
-    public String demodulate(Color input) {
+    public StringBuilder demodulate(StringBuilder buf, int offset, Color input) {
+        int sym;
+
         input = detect(input);
 
-        if (input.equals(n)) return symbol.toBits(0);
-        if (input.equals(e)) return symbol.toBits(2);
-        if (input.equals(s)) return symbol.toBits(4);
-        if (input.equals(w)) return symbol.toBits(6);
+        if      (input.equals(n)) sym = 0;
+        else if (input.equals(e)) sym = 2;
+        else if (input.equals(s)) sym = 4;
+        else if (input.equals(w)) sym = 6;
 
-        if (input.equals(ne)) return symbol.toBits(1);
-        if (input.equals(se)) return symbol.toBits(3);
-        if (input.equals(sw)) return symbol.toBits(5);
-        if (input.equals(nw)) return symbol.toBits(7);
+        else if (input.equals(ne)) sym = 1;
+        else if (input.equals(se)) sym = 3;
+        else if (input.equals(sw)) sym = 5;
+        else if (input.equals(nw)) sym = 7;
+        else
+            throw new IllegalArgumentException();
 
-        throw new IllegalArgumentException();
+        return symbol.toBits(buf, offset, sym);
     }
 }

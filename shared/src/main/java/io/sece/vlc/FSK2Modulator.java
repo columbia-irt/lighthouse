@@ -33,9 +33,13 @@ public class FSK2Modulator extends FreqModulator {
     }
 
     @Override
-    public String demodulate(Color input) {
+    public StringBuilder demodulate(StringBuilder buf, int offset, Color input) {
+        int sym;
+
         input = detect(input);
-        if (input.equals(u)) return symbol.toBits(0);
-        else return symbol.toBits(1);
+        if (input.equals(u)) sym = 0;
+        else sym = 1;
+
+        return symbol.toBits(buf, offset, sym);
     }
 }

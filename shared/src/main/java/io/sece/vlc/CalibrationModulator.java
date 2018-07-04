@@ -35,7 +35,7 @@ public class CalibrationModulator extends FreqModulator
     }
 
     @Override
-    public String demodulate(Color input) {
+    public StringBuilder demodulate(StringBuilder buf, int offset, Color input) {
         // Not yet implemented
         throw new UnsupportedOperationException();
     }

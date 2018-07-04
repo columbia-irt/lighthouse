@@ -37,7 +37,7 @@ public class ASK4Modulator extends AmpModulator {
     }
 
     @Override
-    public String demodulate(Amplitude input) {
+    public StringBuilder demodulate(StringBuilder buf, int offset, Amplitude input) {
         throw new UnsupportedOperationException();
     }
 }

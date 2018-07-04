@@ -3,15 +3,11 @@ package io.sece.vlc;
 
 
 public class FSK4Modulator extends FreqModulator {
-    private Color n;
-    private Color e;
-    private Color s;
-    private Color w;
+    private Color n, e, s, w;
     private Symbol symbol;
 
 
-    public FSK4Modulator(int offset)
-    {
+    public FSK4Modulator(int offset) {
         this(Color.BLACK, new Color((((0 * 120) + offset)%360)), new Color((((1 * 120) + offset)%360)), new Color((((2 * 120) + offset)%360)));
     }
 
@@ -25,10 +21,10 @@ public class FSK4Modulator extends FreqModulator {
         this.e = e;
         this.s = s;
         this.w = w;
-        System.out.println("n (rgb) : " + n.red + "," + n.green + "," + n.blue);
-        System.out.println("e (rgb) : " + e.red + "," + e.green + "," + e.blue);
-        System.out.println("s (rgb) : " + s.red + "," + s.green + "," + s.blue);
-        System.out.println("w (rgb) : " + w.red + "," + w.green + "," + w.blue);
+        System.out.println("n (rgb) : " + n);
+        System.out.println("e (rgb) : " + e);
+        System.out.println("s (rgb) : " + s);
+        System.out.println("w (rgb) : " + w);
         states = 4;
         symbol = new Symbol(states);
         bits = symbol.bits;
@@ -51,12 +47,17 @@ public class FSK4Modulator extends FreqModulator {
     }
 
     @Override
-    public String demodulate(Color input) {
+    public StringBuilder demodulate(StringBuilder buf, int offset, Color input) {
+        int sym;
+
         input = detect(input);
-        if (input.equals(n)) return symbol.toBits(0);
-        if (input.equals(e)) return symbol.toBits(1);
-        if (input.equals(s)) return symbol.toBits(2);
-        if (input.equals(w)) return symbol.toBits(3);
-        throw new IllegalArgumentException();
+        if      (input.equals(n)) sym = 0;
+        else if (input.equals(e)) sym = 1;
+        else if (input.equals(s)) sym = 2;
+        else if (input.equals(w)) sym = 3;
+        else
+            throw new IllegalArgumentException();
+
+        return symbol.toBits(buf, offset, sym);
     }
 }

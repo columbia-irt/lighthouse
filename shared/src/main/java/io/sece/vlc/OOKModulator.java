@@ -33,7 +33,7 @@ public class OOKModulator extends Modulator<Amplitude> {
         return nearestNeighbor(input, on, off);
     }
 
-    public String demodulate(Amplitude input) {
+    public StringBuilder demodulate(StringBuilder buf, int offset, Amplitude input) {
         // Not yet implemented
         throw new UnsupportedOperationException();
     }

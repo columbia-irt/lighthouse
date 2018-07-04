@@ -23,8 +23,13 @@ public abstract class Modulator<V extends EuclideanSpace> {
     }
 
     public abstract V modulate(String data, int offset);
-    public abstract String demodulate(V input);
+    public abstract StringBuilder demodulate(StringBuilder buf, int offset, V input);
     public abstract V detect(V input);
+
+
+    public String demodulate(V input) {
+        return demodulate(new StringBuilder(), 0, input).toString();
+    }
 
 
     public String startSequence(int amount) {
