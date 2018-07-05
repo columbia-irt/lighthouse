@@ -41,7 +41,7 @@ public class ASK8Modem extends AmpModem {
 
     @Override
     public Amplitude detect(Amplitude input) {
-        return nearestNeighbor(input, l1, l2, l3, l4, l5, l6, l7, l8);
+        return input.nearestNeighbor(l1, l2, l3, l4, l5, l6, l7, l8);
     }
 
     @Override

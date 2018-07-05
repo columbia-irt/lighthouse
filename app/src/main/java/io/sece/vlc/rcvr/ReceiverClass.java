@@ -2,7 +2,7 @@ package io.sece.vlc.rcvr;
 
 import com.google.common.eventbus.Subscribe;
 
-import io.sece.vlc.EuclideanSpace;
+import io.sece.vlc.Coordinate;
 import io.sece.vlc.Modem;
 import io.sece.vlc.rcvr.processing.Frame;
 import io.sece.vlc.rcvr.processing.Processing;
@@ -13,7 +13,7 @@ import io.sece.vlc.rcvr.processing.Processing;
  * This class contains the basic setup of the Receiver including Modulation, FPS, Transmissionstarting
  */
 
-public class ReceiverClass<T extends EuclideanSpace> {
+public class ReceiverClass<T extends Coordinate> {
     private Modem<T> modem;
     private boolean transmissionStarted = false;
     private SynchronizationModule synchronizationModule;

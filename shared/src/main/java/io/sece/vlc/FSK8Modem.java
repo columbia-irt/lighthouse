@@ -60,7 +60,7 @@ public class FSK8Modem extends FreqModem {
 
     @Override
     public Color detect(Color input) {
-        return nearestNeighbor(input, n, e, s, w, ne, se, sw, nw);
+        return input.nearestNeighbor(n, e, s, w, ne, se, sw, nw);
     }
 
 

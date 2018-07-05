@@ -14,7 +14,7 @@ package io.sece.vlc;
  * Each modulator also exports an attribute bits which determines how many
  * bits at a time the modulator consumers or generates.
  */
-public abstract class Modem<V extends EuclideanSpace> {
+public abstract class Modem<V extends Coordinate> {
     public int bits;
     public int states;
 
@@ -39,22 +39,5 @@ public abstract class Modem<V extends EuclideanSpace> {
             startingSequence += String.format("%" + bits + "s", Integer.toBinaryString(i % states)).replace(' ', '0');
         }
         return startingSequence;
-    }
-
-    protected V nearestNeighbor(V value, V... symbols) {
-        double d, min = Double.MAX_VALUE;
-        V rv = null;
-
-        if (symbols.length == 0)
-            throw new IllegalArgumentException("Missing list of symbols");
-
-        for (V s : symbols) {
-            d = Math.abs(value.euclideanDistance(s));
-            if (d < min) {
-                min = d;
-                rv = s;
-            }
-        }
-        return rv;
     }
 }

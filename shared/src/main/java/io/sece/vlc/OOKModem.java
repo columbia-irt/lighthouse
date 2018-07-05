@@ -30,7 +30,7 @@ public class OOKModem extends Modem<Amplitude> {
 
     @Override
     public Amplitude detect(Amplitude input) {
-        return nearestNeighbor(input, on, off);
+        return input.nearestNeighbor(on, off);
     }
 
     public StringBuilder demodulate(StringBuilder buf, int offset, Amplitude input) {
