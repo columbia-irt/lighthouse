@@ -1,7 +1,9 @@
-package io.sece.vlc.trx;
+package io.sece.vlc.trx.led;
 
 import io.sece.pigpio.PiGPIOException;
 import io.sece.pigpio.PiGPIOPin;
+import io.sece.vlc.trx.DiscreteLEDInterface;
+import io.sece.vlc.trx.LEDException;
 
 
 /**
@@ -11,7 +13,7 @@ import io.sece.pigpio.PiGPIOPin;
  *
  * This class is mostly for development and debugging purposes.
  */
-class PiBasicLED implements DiscreteLEDInterface {
+public class PiBasicLED implements DiscreteLEDInterface {
     private PiGPIOPin pin;
 
     public PiBasicLED(PiGPIOPin pin)

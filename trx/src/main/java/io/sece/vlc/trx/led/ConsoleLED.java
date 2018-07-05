@@ -1,12 +1,13 @@
-package io.sece.vlc.trx;
+package io.sece.vlc.trx.led;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import io.sece.vlc.Color;
+import io.sece.vlc.trx.ColorLEDInterface;
 
 
-class ConsoleLED implements ColorLEDInterface {
+public class ConsoleLED implements ColorLEDInterface {
     private static final String PREFIX  = "\033[";
     private static final String HOME    = "0;0H";
     private static final String CLEAR   = "2J";

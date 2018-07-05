@@ -2,6 +2,7 @@ package io.sece.vlc.trx;
 
 import io.sece.vlc.CalibrationModem;
 import io.sece.vlc.Color;
+import io.sece.vlc.trx.led.PiRgbLED;
 
 public class CalibrationTransmitter implements Runnable
 {

@@ -1,6 +1,8 @@
 package io.sece.vlc.trx;
 
 
+import io.sece.vlc.trx.led.PiRgbLED;
+
 public class WatchDog implements Runnable {
 
     private Thread thread;

@@ -1,7 +1,9 @@
-package io.sece.vlc.trx;
+package io.sece.vlc.trx.led;
 
 import io.sece.pigpio.PiGPIOException;
 import io.sece.pigpio.PiGPIOPin;
+import io.sece.vlc.trx.ContinuousLEDInterface;
+import io.sece.vlc.trx.LEDException;
 
 
 /**
@@ -10,7 +12,7 @@ import io.sece.pigpio.PiGPIOPin;
  * any GPIO pin, this driver implements the continuous variant of the
  * interface.
  */
-class PiPwmLED implements ContinuousLEDInterface {
+public class PiPwmLED implements ContinuousLEDInterface {
     private PiGPIOPin pin;
 
     public PiPwmLED(PiGPIOPin pin)

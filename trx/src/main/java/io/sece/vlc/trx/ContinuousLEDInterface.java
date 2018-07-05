@@ -10,5 +10,5 @@ package io.sece.vlc.trx;
  * This interface extends the abstract LED interface in order to set the value
  * type to Integer.
  */
-interface ContinuousLEDInterface extends LEDInterface<Integer> {
+public interface ContinuousLEDInterface extends LEDInterface<Integer> {
 }

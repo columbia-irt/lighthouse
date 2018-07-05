@@ -19,6 +19,7 @@ import io.sece.pigpio.PiGPIOException;
 import io.sece.pigpio.PiGPIOPin;
 
 import io.sece.vlc.Color;
+import io.sece.vlc.trx.led.PiRgbLED;
 
 
 public class API {
