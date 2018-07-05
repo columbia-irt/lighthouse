@@ -1,6 +1,6 @@
 package io.sece.vlc.trx;
 
-import io.sece.vlc.EuclideanSpace;
+import io.sece.vlc.Coordinate;
 import io.sece.vlc.Modem;
 
 /**
@@ -8,7 +8,7 @@ import io.sece.vlc.Modem;
  * modulator and provides a method to transmit a packet of bits.
  *
  */
-class Transmitter<T extends EuclideanSpace> {
+class Transmitter<T extends Coordinate> {
     private LEDInterface<T> led;
     private Modem<T> modem;
     private int interval;

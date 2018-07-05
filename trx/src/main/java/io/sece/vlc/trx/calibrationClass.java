@@ -9,6 +9,8 @@ public class calibrationClass implements Runnable
     private int duration;
     private int[] hueValue;
     private int brightness = 100;
+    private PiRgbLED led;
+
 
     public int getBrightness() {
         return brightness;
@@ -22,6 +24,10 @@ public class calibrationClass implements Runnable
         return hueValue;
     }
 
+    public void setLed(PiRgbLED led) {
+        this.led = led;
+    }
+
     @Override
     public String toString() {
         return "FPS: " + duration + " - hueValue length: " + hueValue.length + " - brightness: " + brightness;
@@ -31,10 +37,6 @@ public class calibrationClass implements Runnable
     public void run()
     {
         try {
-            PiGPIOPin r = new PiGPIOPin(22);
-            PiGPIOPin g = new PiGPIOPin(27);
-            PiGPIOPin b = new PiGPIOPin(17);
-            PiRgbLED   led = new PiRgbLED(r, g, b);
             CalibrationModem mod;
             Transmitter<?> t;
 
