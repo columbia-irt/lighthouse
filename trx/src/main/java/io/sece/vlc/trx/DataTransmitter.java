@@ -1,6 +1,5 @@
 package io.sece.vlc.trx;
 
-import io.sece.pigpio.PiGPIOPin;
 import io.sece.vlc.Color;
 import io.sece.vlc.FSK2Modem;
 import io.sece.vlc.FSK4Modem;
@@ -8,7 +7,7 @@ import io.sece.vlc.FSK8Modem;
 import io.sece.vlc.Modem;
 import io.sece.vlc.OOKModem;
 
-public class transmissionClass implements Runnable {
+public class DataTransmitter implements Runnable {
     private int FPS;
     private int timeout;
     private String modulator;
