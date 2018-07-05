@@ -12,6 +12,7 @@ public class transmissionClass implements Runnable {
     private int FPS;
     private int timeout;
     private String modulator;
+    private PiRgbLED led;
 
     public int getFPS() {
         return FPS;
@@ -25,20 +26,21 @@ public class transmissionClass implements Runnable {
         return timeout;
     }
 
+    public void setLed(PiRgbLED led) {
+        this.led = led;
+    }
+
     @Override
     public String toString() {
         return "FPS: " + FPS + " - timeout:" + timeout + " - modulator: " + modulator;
     }
 
+
+
     @Override
     public void run()
     {
         try {
-            PiGPIOPin r = new PiGPIOPin(22);
-            PiGPIOPin g = new PiGPIOPin(27);
-            PiGPIOPin b = new PiGPIOPin(17);
-            PiRgbLED led = new PiRgbLED(r, g, b);
-
             Transmitter<?> t;
             Modem mod;
 

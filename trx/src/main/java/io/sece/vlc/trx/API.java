@@ -15,6 +15,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
+import io.sece.pigpio.PiGPIOException;
 import io.sece.pigpio.PiGPIOPin;
 
 import io.sece.vlc.Color;
@@ -28,6 +29,7 @@ public class API {
     private static Thread threadCali;
     private static Thread threadTrans;
     private static Thread threadDog = new Thread();
+    private static LEDInterface led;
 
 
     public API(int port) throws IOException {
@@ -40,6 +42,19 @@ public class API {
         server.createContext("/transmit", new transmissionHandler());
         server.createContext("/off", new offHandler());
         server.setExecutor(null);
+
+        try
+        {
+            PiGPIOPin r = new PiGPIOPin(22);
+            PiGPIOPin g = new PiGPIOPin(27);
+            PiGPIOPin b = new PiGPIOPin(17);
+            led = new PiRgbLED(r, g, b);
+        }
+        catch (PiGPIOException e)
+        {
+            System.out.println(e.getMessage());
+        }
+
     }
 
     public void start(ExecutorService executor) {
@@ -97,10 +112,11 @@ public class API {
                 try (Reader isr =  new InputStreamReader(he.getRequestBody(),"utf-8")) {
                     Gson gson = new GsonBuilder().create();
                     calibrationClass calC = gson.fromJson(isr, calibrationClass.class);
+                    calC.setLed((PiRgbLED)led);
                     System.out.println(calC);
 
                     threadCali = new Thread(calC);
-                    threadDog = new Thread(new watchDog(threadCali, calC.getDuration()*(calC.getHueValue().length)));
+                    threadDog = new Thread(new watchDog(threadCali, calC.getDuration()*(calC.getHueValue().length),(PiRgbLED)led));
                     threadDog.start();
                     threadCali.start();
                     os.write(response);
@@ -147,10 +163,11 @@ public class API {
                 try (Reader isr =  new InputStreamReader(he.getRequestBody(),"utf-8")) {
                     Gson gson = new GsonBuilder().create();
                     transmissionClass transC = gson.fromJson(isr, transmissionClass.class);
+                    transC.setLed((PiRgbLED)led);
                     System.out.println(transC);
 
                     threadTrans = new Thread(transC);
-                    threadDog = new Thread(new watchDog(threadTrans, transC.getTimeout()));
+                    threadDog = new Thread(new watchDog(threadTrans, transC.getTimeout(),(PiRgbLED)led));
                     threadDog.start();
                     threadTrans.start();
 
@@ -181,10 +198,6 @@ public class API {
             try (Reader isr =  new InputStreamReader(he.getRequestBody(),"utf-8")) {
                 Gson gson = new GsonBuilder().create();
                 transID = gson.fromJson(isr, transmissionID.class);
-                PiGPIOPin r = new PiGPIOPin(22);
-                PiGPIOPin g = new PiGPIOPin(27);
-                PiGPIOPin b = new PiGPIOPin(17);
-                PiRgbLED led = new PiRgbLED(r, g, b);
                 if (!active) {
                     jsonString = "Not active";
                 } else {
