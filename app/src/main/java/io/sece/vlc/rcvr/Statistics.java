@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 import io.sece.vlc.rcvr.processing.Frame;
 import io.sece.vlc.rcvr.processing.block.RateMonitor;
 import io.sece.vlc.rcvr.processing.Processing;
+import io.sece.vlc.rcvr.processing.block.TransmitMonitor;
 import io.sece.vlc.rcvr.utils.MovingAverage;
 
 
@@ -22,6 +23,8 @@ public class Statistics extends AppCompatTextView {
     private MovingAverage processingDelay = new MovingAverage(100, TimeUnit.MILLISECONDS);
     private MovingAverage processingTime = new MovingAverage(100, TimeUnit.MILLISECONDS);
     private MovingAverage queueLength = new MovingAverage(100, TimeUnit.MILLISECONDS);
+    private boolean transmitInProgress = false;
+    private double transmitFPS = 0;
 
 
     public Statistics(Context context) {
@@ -40,8 +43,8 @@ public class Statistics extends AppCompatTextView {
 
     private void updateStatistics() {
         setText(String.format(Locale.US,
-                "Camera frame rate: %.1f fps\nProcessing delay: %.0f ms\nProcessing time: %.0f ms\nProcessing queue: %.0f\nProcessing frame rate: %.1f fps",
-                cameraFrameRate, processingDelay.value, processingTime.value, queueLength.value, workerFrameRate));
+                "Camera frame rate: %.1f fps\nProcessing delay: %.0f ms\nProcessing time: %.0f ms\nProcessing queue: %.0f\nProcessing frame rate: %.1f fps\nStatus: %b (%.0f)",
+                cameraFrameRate, processingDelay.value, processingTime.value, queueLength.value, workerFrameRate, transmitInProgress, transmitFPS));
     }
 
 
@@ -84,6 +87,13 @@ public class Statistics extends AppCompatTextView {
 
         queueLength.update(ev.frame.get(Frame.CURRENT_SEQUENCE) - ev.frame.sequence);
 
+        updateStatistics();
+    }
+
+    @Subscribe
+    private void onResult(TransmitMonitor.Event ev) {
+        transmitFPS = ev.fps;
+        transmitInProgress = ev.transmissionInProgress;
         updateStatistics();
     }
 }

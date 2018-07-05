@@ -15,10 +15,14 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
+import io.sece.vlc.Modem;
 import io.sece.vlc.rcvr.Bus;
+import io.sece.vlc.rcvr.ViewfinderModel;
+import io.sece.vlc.rcvr.processing.block.FrameSampler;
 import io.sece.vlc.rcvr.processing.block.HueDetector;
 import io.sece.vlc.rcvr.processing.block.RateMonitor;
 import io.sece.vlc.rcvr.processing.block.RoIExtractor;
+import io.sece.vlc.rcvr.processing.block.TransmitMonitor;
 
 
 public class Processing extends HandlerThread {
@@ -40,6 +44,7 @@ public class Processing extends HandlerThread {
     private List<ProcessingBlock> stage1;
     private List<ProcessingBlock> stage2;
 
+    private Modem modem;
 
     public static class Result extends Bus.Event {
         public Frame frame;
@@ -50,18 +55,19 @@ public class Processing extends HandlerThread {
     }
 
 
-    public Processing(RectF roi) {
+    public Processing(RectF roi, Modem modem) {
         super("Processing");
 
         stage1 = Arrays.asList(
                 new RateMonitor("camera"),
-                //ew FrameSampler(250, TimeUnit.MILLISECONDS),
                 new RoIExtractor(roi)
         );
 
         stage2 = Arrays.asList(
                 new RateMonitor("worker"),
-                new HueDetector()
+                new HueDetector(),
+                new FrameSampler(((1000 / ViewfinderModel.synced_fps)), TimeUnit.MILLISECONDS),
+                new TransmitMonitor(ViewfinderModel.synced_fps, modem, 3)
         );
     }
 

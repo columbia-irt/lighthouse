@@ -260,7 +260,7 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
 
         // Once the target frame size is known, create the image reader object
         CompletableFuture f1 = haveSource.thenApply(v -> {
-            processing = new Processing(overlay.normalizeBoundingBox(roi.boundingBox()));
+            processing = new Processing(overlay.normalizeBoundingBox(roi.boundingBox()), modem);
             processing.start();
             imageReader = createImageReader(processing, S.frameResolution);
             S.setSurfaces(Arrays.asList(surface.getHolder().getSurface(), imageReader.getSurface()));

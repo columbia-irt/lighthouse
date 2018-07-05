@@ -2,6 +2,9 @@ package io.sece.vlc.rcvr.processing.block;
 
 import java.util.concurrent.TimeUnit;
 
+import io.sece.vlc.Color;
+import io.sece.vlc.Modem;
+import io.sece.vlc.rcvr.ViewfinderModel;
 import io.sece.vlc.rcvr.processing.Frame;
 import io.sece.vlc.rcvr.processing.ProcessingBlock;
 
@@ -11,6 +14,8 @@ public class FrameSampler implements ProcessingBlock {
 
     private long interval;  // Sampling interval in nano seconds
     private long lastAcceptedFrame = 0;
+
+
 
 
     public FrameSampler(long interval, TimeUnit unit) {
@@ -25,4 +30,6 @@ public class FrameSampler implements ProcessingBlock {
         lastAcceptedFrame = stamp;
         return frame;
     }
+
+
 }

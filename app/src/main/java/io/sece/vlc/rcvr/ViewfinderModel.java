@@ -17,5 +17,6 @@ public class ViewfinderModel extends ViewModel {
     public Point roiCenter = DEFAULT_ROI_CENTER;
     public int roiRadius = DEFAULT_ROI_RADIUS;
 
+    public  static final int synced_fps = 15;
     public CameraSessionParams cameraParams = new CameraSessionParams();
 }
