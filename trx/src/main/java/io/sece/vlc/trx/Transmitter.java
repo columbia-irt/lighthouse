@@ -13,6 +13,8 @@ class Transmitter<T extends Coordinate> {
     private Modem<T> modem;
     private int interval;
 
+
+
     public Transmitter(LEDInterface<T> led, Modem<T> modem, int interval)
     {
         this.led = led;

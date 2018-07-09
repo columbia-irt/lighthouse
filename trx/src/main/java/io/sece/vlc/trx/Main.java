@@ -4,6 +4,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 
 import io.sece.pigpio.PiGPIO;
+import io.sece.vlc.RaptorCodeEncoder;
 
 
 public class Main {
@@ -45,5 +46,8 @@ public class Main {
             System.out.println(e.getMessage());
         }*/
         System.out.println("LED transmitter is running");
+
+        RaptorCodeEncoder rcp = new RaptorCodeEncoder();
+        rcp.test();
     }
 }
