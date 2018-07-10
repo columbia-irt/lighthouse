@@ -9,7 +9,7 @@ package io.sece.vlc;
  *
  * Each modulate/demodulate function is implemented in two variants: with and
  * without an offset. The offset parameters allows reading/storing the bits at
- * a non-zero index in an existing BitSet buffer.
+ * a non-zero index in an existing BitSet buffer.start
  *
  * Each modulator also exports an attribute bits which determines how many
  * bits at a time the modulator consumers or generates.

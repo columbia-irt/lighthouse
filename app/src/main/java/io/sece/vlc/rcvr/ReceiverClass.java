@@ -2,9 +2,13 @@ package io.sece.vlc.rcvr;
 
 import com.google.common.eventbus.Subscribe;
 
+import java.util.ArrayList;
+
+import io.sece.vlc.Color;
 import io.sece.vlc.Coordinate;
 import io.sece.vlc.Modem;
 import io.sece.vlc.rcvr.processing.Frame;
+import io.sece.vlc.rcvr.processing.FramingBlock;
 import io.sece.vlc.rcvr.processing.Processing;
 
 /**
@@ -14,40 +18,19 @@ import io.sece.vlc.rcvr.processing.Processing;
  */
 
 public class ReceiverClass<T extends Coordinate> {
-    private Modem<T> modem;
-    private boolean transmissionStarted = false;
+    private Modem<Color> modem;
     private SynchronizationModule synchronizationModule;
     private int delay = 50;
+    private FramingBlock framingBlock;
+
 
 
     public ReceiverClass(Modem modem) {
         this.modem = modem;
-        System.out.println("Startingseq: " + modem.startSequence(8));
-        synchronizationModule = new SynchronizationModule(modem.startSequence(8), delay);
+        framingBlock = new FramingBlock(modem.startSequence(4), modem.bits, 800);
+        Bus.subscribe(this);
     }
 
-    public String rx(T value) throws InterruptedException {
-        if (transmissionStarted) {
-            return modem.demodulate(value);
-        } else {
-            transmissionStarted = rxStartingSequence(value);
-            return "";
-        }
-    }
-
-    public void setModem(Modem<T> modem) {
-        this.modem = modem;
-        System.out.println("Startingseq: " + modem.startSequence(8));
-        synchronizationModule = new SynchronizationModule(modem.startSequence(8), delay);
-    }
-
-    public boolean rxStartingSequence(T value) {
-        return synchronizationModule.symbolReceived(modem.demodulate(value));
-    }
-
-    public boolean isTransmissionStarted() {
-        return transmissionStarted;
-    }
 
     public int getDelay() {
         return delay;
@@ -55,8 +38,20 @@ public class ReceiverClass<T extends Coordinate> {
 
 
     @Subscribe
-    public void rx(Processing.Result ev) {
+    private void rx(Processing.Result ev) {
         long h = ev.frame.get(Frame.HUE);
         long b = ev.frame.get(Frame.BRIGHTNESS);
+
+        String currSymbol  =  modem.demodulate(modem.detect(new Color(((int)h), ((int)b))));
+//        System.out.println(currSymbol + " " + ev.frame.get(Frame.IMAGE_TIMESTAMP));
+        String[] currFrameData = framingBlock.apply(currSymbol);
+        if(currFrameData != null){
+            for(String temp: currFrameData){
+                System.out.println(temp);
+            }
+            System.out.println("Received FrameArray " + currFrameData.toString() + currFrameData.length);
+        }
     }
+
+
 }
