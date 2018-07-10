@@ -382,7 +382,6 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
         gestureControl = new GestureControl(overlay);
         surfaceView = view.findViewById(R.id.surface);
         rxColor = view.findViewById(R.id.rxColor);
-        initTrxControl(view.findViewById(R.id.txValue), view.findViewById(R.id.txButton), view.findViewById(R.id.txColor));
     }
 
 
@@ -390,6 +389,8 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
     public void onResume() {
         super.onResume();
         Bus.subscribe(this);
+
+        initTrxControl(getView().findViewById(R.id.txValue), getView().findViewById(R.id.txButton), getView().findViewById(R.id.txColor));
 
         onSurfaceReady(surfaceView, surface -> {
             if (state != NO_SESSION) return;
