@@ -1,16 +1,14 @@
 package io.sece.vlc.trx;
 
 
-import io.sece.vlc.trx.led.PiRgbLED;
-
 public class WatchDog implements Runnable {
 
     private Thread thread;
     private int timeout;
-    private PiRgbLED led;
+    private ColorLEDInterface led;
 
 
-    public WatchDog(Thread thread, int timeout, PiRgbLED led)
+    public WatchDog(Thread thread, int timeout, ColorLEDInterface led)
     {
         this.thread = thread;
         this.timeout = timeout;

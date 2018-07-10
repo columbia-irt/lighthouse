@@ -1,6 +1,9 @@
 package io.sece.vlc.trx;
 
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
 /**
  * An interface for LEDs whose intensity can be controlled on a scale of more
  * than two values. Typically, a LED connected via a PWM-controllable GPIO pin

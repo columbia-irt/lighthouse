@@ -1,18 +1,18 @@
 package io.sece.vlc.trx;
 
-import io.sece.vlc.Color;
+import java.util.Random;
+
 import io.sece.vlc.FSK2Modem;
 import io.sece.vlc.FSK4Modem;
 import io.sece.vlc.FSK8Modem;
 import io.sece.vlc.Modem;
 import io.sece.vlc.OOKModem;
-import io.sece.vlc.trx.led.PiRgbLED;
 
 public class DataTransmitter implements Runnable {
     private int FPS;
     private int timeout;
     private String modulator;
-    private PiRgbLED led;
+    private ColorLEDInterface led;
 
     public int getFPS() {
         return FPS;
@@ -26,7 +26,7 @@ public class DataTransmitter implements Runnable {
         return timeout;
     }
 
-    public void setLed(PiRgbLED led) {
+    public void setLed(ColorLEDInterface led) {
         this.led = led;
     }
 
@@ -69,10 +69,27 @@ public class DataTransmitter implements Runnable {
 
             String data = mod.startSequence(4) + "11110000" + mod.startSequence(4) + "11110000";
 
+            Random rand = new Random();
+
 
             // Transmit the data stored in the buffer.
             while(true) {
-                t.tx(data);
+                try
+                {
+                    t.tx(data);
+                }
+                catch (LEDException|InterruptedException e)
+                {
+                    throw new RuntimeException(e);
+                }
+                try
+                {
+                    Thread.sleep((rand.nextInt(2500) + 500) * 1000);
+                }
+                catch (InterruptedException e)
+                {
+                    throw new RuntimeException(e);
+                }
             }
             //t.startTx();
             //led.set(Color.BLACK);
@@ -81,10 +98,6 @@ public class DataTransmitter implements Runnable {
         catch (IllegalArgumentException e)
         {
             throw new IllegalArgumentException();
-        }
-        catch (Exception e)
-        {
-            System.out.println(e.getMessage());
         }
     }
 }

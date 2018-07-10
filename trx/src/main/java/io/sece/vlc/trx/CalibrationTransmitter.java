@@ -2,14 +2,14 @@ package io.sece.vlc.trx;
 
 import io.sece.vlc.CalibrationModem;
 import io.sece.vlc.Color;
-import io.sece.vlc.trx.led.PiRgbLED;
+
 
 public class CalibrationTransmitter implements Runnable
 {
     private int duration;
     private int[] hueValue;
     private int brightness = 100;
-    private PiRgbLED led;
+    private ColorLEDInterface led;
 
 
     public int getBrightness() {
@@ -24,7 +24,7 @@ public class CalibrationTransmitter implements Runnable
         return hueValue;
     }
 
-    public void setLed(PiRgbLED led) {
+    public void setLed(ColorLEDInterface led) {
         this.led = led;
     }
 
@@ -36,7 +36,6 @@ public class CalibrationTransmitter implements Runnable
     @Override
     public void run()
     {
-        try {
             CalibrationModem mod;
             Transmitter<?> t;
 
@@ -46,7 +45,18 @@ public class CalibrationTransmitter implements Runnable
                 t = new Transmitter<>(led, mod, (this.getDuration() * 1000));
                 String data = "1";
                 // Transmit the data stored in the buffer.
-                t.tx(data);
+                try
+                {
+                    t.tx(data);
+                }
+                catch (LEDException e)
+                {
+                    throw new RuntimeException(e);
+                }
+                catch (InterruptedException e)
+                {
+                    throw new RuntimeException(e);
+                }
             }
 
             // Create an transmitter implementation which connects a particular
@@ -54,12 +64,14 @@ public class CalibrationTransmitter implements Runnable
             // enforce strict type checking and it should not be possible to
             // connect LEDs with incompatible modulators. That should generate a compile-time error.
 
-            led.set(Color.BLACK);
-        }
-        catch (Exception e)
-        {
-            System.out.println(e.getMessage());
-        }
+            try
+            {
+                led.set(Color.BLACK);
+            }
+            catch (LEDException e)
+            {
+                throw new RuntimeException(e);
+            }
     }
 
 }
