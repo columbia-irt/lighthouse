@@ -30,7 +30,7 @@ public class PiRgbLED implements ColorLEDInterface {
 
         this.red = new PiPwmLED(new PiGPIOPin(Integer.parseInt(args[0])));
         this.green = new PiPwmLED(new PiGPIOPin(Integer.parseInt(args[1])));
-        this.blue = new PiPwmLED(new PiGPIOPin(Integer.parseInt(args[1])));
+        this.blue = new PiPwmLED(new PiGPIOPin(Integer.parseInt(args[2])));
     }
 
     @Override

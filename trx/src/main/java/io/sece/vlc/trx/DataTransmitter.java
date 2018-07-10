@@ -67,7 +67,7 @@ public class DataTransmitter implements Runnable {
             // connect LEDs with incompatible modulators. That should generate a compile-time error.
             t = new Transmitter<>(led, mod, (1000/this.getFPS()));
 
-            String data = mod.startSequence(4) + "11110000" + mod.startSequence(4) + "11110000";
+            String data = mod.startSequence(2) + "11110000111100001111";
 
             Random rand = new Random();
 
@@ -76,6 +76,7 @@ public class DataTransmitter implements Runnable {
             while(true) {
                 try
                 {
+                    System.out.println(data);
                     t.tx(data);
                 }
                 catch (LEDException|InterruptedException e)
@@ -84,7 +85,7 @@ public class DataTransmitter implements Runnable {
                 }
                 try
                 {
-                    Thread.sleep((rand.nextInt(2500) + 500) * 1000);
+                    Thread.sleep((rand.nextInt(2500) + 500));
                 }
                 catch (InterruptedException e)
                 {
