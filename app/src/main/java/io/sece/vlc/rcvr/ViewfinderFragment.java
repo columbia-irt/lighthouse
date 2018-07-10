@@ -19,7 +19,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
-import android.util.Range;
 import android.util.Rational;
 import android.util.Size;
 import android.view.LayoutInflater;
@@ -81,7 +80,7 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
     private TransmitterAPI trx;
     private Processing processing;
 
-    //private ReceiverClass receiverClass;
+    //private Receiver receiver;
     public static long timeToStartSynchronized;
 
     private FSK4Modem modem = new FSK4Modem();
@@ -153,18 +152,12 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
                 Log.d(TAG, "Found camera ID: " + id);
                 camera = new CameraHelper(getContext(), id);
 
-                if (!camera.backFacing()) {
+                if (!camera.backFacing) {
                     Log.d(TAG, "Skipping a camera that is not back facing");
                     continue;
                 }
 
-                Log.d(TAG, "Sensor orientation: " + camera.orientation());
-                Log.d(TAG, "Active sensor size: " + camera.getSensorSize().getWidth() + "x" + camera.getSensorSize().getHeight());
-                Log.d(TAG, "Max digital zoom: " + camera.maxZoom());
-                Log.d(TAG, "Supported FPS ranges: " + camera.describeFPSRanges());
-                Log.d(TAG, "Supported formats: " + camera.describeFormats());
-                int maxFPS = camera.maxFPS();
-                Log.d(TAG, "Max FPS: " + maxFPS);
+                Log.d(TAG, camera.toString());
 
                 Size resolution;
                 try {
@@ -179,7 +172,7 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
                 session.frameResolution = resolution;
 
                 // FIXME: Get rid of the following hack
-                session.fps = maxFPS > 60 ? 60: maxFPS;
+                session.fps = camera.maxFPS() > 60 ? 60: camera.maxFPS();
                 return;
             }
         } catch (CameraAccessException e) {
@@ -305,8 +298,10 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
         CompletableFuture f3 = f2.whenComplete((cs, ex) -> {
             if (null == ex) return;
             // Make sure to clean up the opened camera device on exception.
-            S.cameraDevice.close();
-            S.cameraDevice = null;
+            if (S.cameraDevice != null) {
+                S.cameraDevice.close();
+                S.cameraDevice = null;
+            }
         });
 
         return CompletableFuture.allOf(f1, f21, f22, f3).thenApply(v -> S);
@@ -370,7 +365,7 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
         super.onCreate(savedInstanceState);
         model = ViewModelProviders.of(this).get(ViewfinderModel.class);
 
-        //receiverClass = new ReceiverClass(new FSK2Modulator());
+        //receiver = new Receiver(new FSK2Modulator());
     }
 
 
@@ -409,6 +404,7 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
             session.exceptionally(ex -> {
                 state = NO_SESSION;
                 session = null;
+                Log.e(TAG, "Error while creating camera session", ex);
                 ConfirmationDialog d = ConfirmationDialog.newInstance(ex.getCause().getMessage(), false);
                 d.show(getChildFragmentManager(), FRAGMENT_DIALOG);
                 d.completed.whenComplete((v, t) -> {
@@ -543,19 +539,14 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
 
 
     private class ExposureControl {
-        private Rational aeStep;
         private Slider slider;
 
         ExposureControl(CameraSession session, SeekBar widget) {
-
-            aeStep = session.camera.getAeStep();
-            Range<Integer> aeRange = session.camera.getAeRange();
-
             Log.d(TAG, String.format("Camera AE compensation range %d-%d, step: %d/%d",
-                    aeRange.getLower(), aeRange.getUpper(),
-                    aeStep.getNumerator(), aeStep.getDenominator()));
+                    session.camera.aeRange.getLower(), session.camera.aeRange.getUpper(),
+                    session.camera.aeStep.getNumerator(), session.camera.aeStep.getDenominator()));
 
-            slider = new Slider(aeRange.getLower(), aeRange.getUpper(), session.params.aeCompensation(), widget);
+            slider = new Slider(session.camera.aeRange.getLower(), session.camera.aeRange.getUpper(), session.params.aeCompensation(), widget);
 
             slider.onChange(v -> {
                 session.params.aeCompensation(v);
@@ -570,15 +561,9 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
         private Slider slider;
 
         ZoomControl(CameraSession session, SeekBar widget) {
-            float maxZoom;
-            try {
-                maxZoom = session.camera.maxZoom();
-                Log.d(TAG, String.format("Camera max zoom: %f", maxZoom));
-            } catch (CameraException e) {
-                throw new RuntimeException(e);
-            }
+            Log.d(TAG, String.format("Camera max zoom: %f", session.camera.maxDigitalZoom));
 
-            slider = new Slider(SCALE_FACTOR, (int)maxZoom * SCALE_FACTOR, (int)session.params.zoom() * SCALE_FACTOR, widget);
+            slider = new Slider(SCALE_FACTOR, (int)session.camera.maxDigitalZoom * SCALE_FACTOR, (int)session.params.zoom() * SCALE_FACTOR, widget);
 
             slider.onChange(v -> {
                 session.params.zoom((float)v / (float)SCALE_FACTOR);

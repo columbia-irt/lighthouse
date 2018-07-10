@@ -1,9 +1,10 @@
 package io.sece.vlc.trx;
 
-public class transmissionID {
+
+public class TransmissionID {
     private int tID;
 
-    public transmissionID()
+    public TransmissionID()
     {
         tID = -1;
     }

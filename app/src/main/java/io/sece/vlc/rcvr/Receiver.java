@@ -13,14 +13,14 @@ import io.sece.vlc.rcvr.processing.Processing;
  * This class contains the basic setup of the Receiver including Modulation, FPS, Transmissionstarting
  */
 
-public class ReceiverClass<T extends Coordinate> {
+public class Receiver<T extends Coordinate> {
     private Modem<T> modem;
     private boolean transmissionStarted = false;
     private SynchronizationModule synchronizationModule;
     private int delay = 50;
 
 
-    public ReceiverClass(Modem modem) {
+    public Receiver(Modem modem) {
         this.modem = modem;
         System.out.println("Startingseq: " + modem.startSequence(8));
         synchronizationModule = new SynchronizationModule(modem.startSequence(8), delay);

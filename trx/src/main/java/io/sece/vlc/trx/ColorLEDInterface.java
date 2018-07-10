@@ -20,5 +20,5 @@ import io.sece.vlc.Color;
  * class implementing the interface, since neutral colors are rarely obtained
  * by setting the same intensity value on all channels.
  */
-interface ColorLEDInterface extends LEDInterface<Color> {
+public interface ColorLEDInterface extends LEDInterface<Color> {
 }
