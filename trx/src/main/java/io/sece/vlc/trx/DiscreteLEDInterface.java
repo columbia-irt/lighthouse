@@ -14,5 +14,5 @@ package io.sece.vlc.trx;
  * This interface extends the abstract LEDInterface in order to set the value
  * type to Boolean.
  */
-interface DiscreteLEDInterface extends LEDInterface<Boolean> {
+public interface DiscreteLEDInterface extends LEDInterface<Boolean> {
 }

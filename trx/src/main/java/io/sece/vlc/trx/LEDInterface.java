@@ -6,6 +6,6 @@ package io.sece.vlc.trx;
  * parameters of the emitted light. The method set (which must be parametrized
  * by the driver) provides an interface to set those parameters.
  */
-interface LEDInterface<T> {
+public interface LEDInterface<T> {
     void set(T value) throws LEDException;
 }

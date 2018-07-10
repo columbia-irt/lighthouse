@@ -16,7 +16,7 @@ package io.sece.vlc.rcvr;
  * If there are some more incoming values which are different from the previous ones, there is
  * to add the specified delay times each symbol after the double sampled ones.
  *
- * TODO: All timestamps have to be replaces with the ones created by ReceiverClass
+ * TODO: All timestamps have to be replaces with the ones created by Receiver
  */
 
 public class SynchronizationModule {

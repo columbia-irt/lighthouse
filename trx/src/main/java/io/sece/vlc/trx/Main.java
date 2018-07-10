@@ -4,6 +4,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 
 import io.sece.pigpio.PiGPIO;
+import io.sece.vlc.RaptorCodeEncoder;
 
 
 public class Main {
@@ -13,15 +14,6 @@ public class Main {
 
         System.out.println("Starting LED transmitter");
         ExecutorService threadPool = Executors.newCachedThreadPool();
-
-        System.out.println("Initializing pigpio library");
-        PiGPIO.gpioInitialise();
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-        @Override
-        public void run() {
-                System.out.println("Shutting down pigpio library");
-                PiGPIO.gpioTerminate();
-        }});
 
         API api = new API(8000);
         api.start(threadPool);
@@ -45,5 +37,8 @@ public class Main {
             System.out.println(e.getMessage());
         }*/
         System.out.println("LED transmitter is running");
+
+        RaptorCodeEncoder rcp = new RaptorCodeEncoder();
+        rcp.test();
     }
 }

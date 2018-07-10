@@ -17,15 +17,16 @@ import io.sece.vlc.rcvr.processing.Processing;
  * This class contains the basic setup of the Receiver including Modulation, FPS, Transmissionstarting
  */
 
-public class ReceiverClass<T extends Coordinate> {
-    private Modem<Color> modem;
+public class Receiver<T extends Coordinate> {
+    private Modem<T> modem;
+    private boolean transmissionStarted = false;
     private SynchronizationModule synchronizationModule;
     private int delay = 50;
     private FramingBlock framingBlock;
 
 
 
-    public ReceiverClass(Modem modem) {
+    public Receiver(Modem modem) {
         this.modem = modem;
         framingBlock = new FramingBlock(modem.startSequence(4), modem.bits, 800);
         Bus.subscribe(this);
@@ -42,7 +43,7 @@ public class ReceiverClass<T extends Coordinate> {
         long h = ev.frame.get(Frame.HUE);
         long b = ev.frame.get(Frame.BRIGHTNESS);
 
-        String currSymbol  =  modem.demodulate(modem.detect(new Color(((int)h), ((int)b))));
+        String currSymbol  =  modem.demodulate(new Color((int)h, (int)b));
 //        System.out.println(currSymbol + " " + ev.frame.get(Frame.IMAGE_TIMESTAMP));
         String[] currFrameData = framingBlock.apply(currSymbol);
         if(currFrameData != null){

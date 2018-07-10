@@ -1,10 +1,10 @@
 package io.sece.vlc.trx;
 
-import io.sece.pigpio.PiGPIOPin;
 import io.sece.vlc.CalibrationModem;
 import io.sece.vlc.Color;
+import io.sece.vlc.trx.led.PiRgbLED;
 
-public class calibrationClass implements Runnable
+public class CalibrationTransmitter implements Runnable
 {
     private int duration;
     private int[] hueValue;

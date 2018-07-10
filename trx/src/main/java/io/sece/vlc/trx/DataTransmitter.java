@@ -1,14 +1,14 @@
 package io.sece.vlc.trx;
 
-import io.sece.pigpio.PiGPIOPin;
 import io.sece.vlc.Color;
 import io.sece.vlc.FSK2Modem;
 import io.sece.vlc.FSK4Modem;
 import io.sece.vlc.FSK8Modem;
 import io.sece.vlc.Modem;
 import io.sece.vlc.OOKModem;
+import io.sece.vlc.trx.led.PiRgbLED;
 
-public class transmissionClass implements Runnable {
+public class DataTransmitter implements Runnable {
     private int FPS;
     private int timeout;
     private String modulator;
@@ -67,13 +67,15 @@ public class transmissionClass implements Runnable {
             // connect LEDs with incompatible modulators. That should generate a compile-time error.
             t = new Transmitter<>(led, mod, (1000/this.getFPS()));
 
-            String data = "11000110";
+            String data = mod.startSequence(4) + "11110000";
 
 
             // Transmit the data stored in the buffer.
-            t.tx(data);
+            while(true) {
+                t.tx(data);
+            }
             //t.startTx();
-            led.set(Color.BLACK);
+            //led.set(Color.BLACK);
 
         }
         catch (IllegalArgumentException e)

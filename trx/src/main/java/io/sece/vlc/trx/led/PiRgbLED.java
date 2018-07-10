@@ -1,14 +1,16 @@
-package io.sece.vlc.trx;
+package io.sece.vlc.trx.led;
 
 import io.sece.pigpio.PiGPIOPin;
 import io.sece.vlc.Color;
+import io.sece.vlc.trx.ColorLEDInterface;
+import io.sece.vlc.trx.LEDException;
 
 
 /**
  * A driver for a tri-color (RGB) LED connected to three different GPIO pins
  * on a Raspberry PI and PWM-controlled by the PiGPIO library.
  */
-class PiRgbLED implements ColorLEDInterface {
+public class PiRgbLED implements ColorLEDInterface {
     private PiPwmLED red;
     private PiPwmLED green;
     private PiPwmLED blue;
