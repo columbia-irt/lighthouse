@@ -1,5 +1,8 @@
 package io.sece.vlc.trx;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
 import io.sece.vlc.Color;
 
 
@@ -21,4 +24,23 @@ import io.sece.vlc.Color;
  * by setting the same intensity value on all channels.
  */
 public interface ColorLEDInterface extends LEDInterface<Color> {
+
+    static ColorLEDInterface byName(String name) throws LEDException {
+        try {
+            Class<? extends ColorLEDInterface> cls = Class.forName("io.sece.vlc.trx.led." + name).asSubclass(ColorLEDInterface.class);
+            return cls.newInstance();
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+            throw new LEDException("Error while creating LED driver for " + name, e);
+        }
+    }
+
+    static ColorLEDInterface byName(String name, String arguments) throws LEDException {
+        try {
+            Class<? extends ColorLEDInterface> cls = Class.forName("io.sece.vlc.trx.led." + name).asSubclass(ColorLEDInterface.class);
+            Constructor<? extends ColorLEDInterface> ctor = cls.getConstructor(String.class);
+            return ctor.newInstance(arguments);
+        } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
+            throw new LEDException("Error while creating LED driver for " + name, e);
+        }
+    }
 }

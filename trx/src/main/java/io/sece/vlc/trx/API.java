@@ -15,11 +15,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
-import io.sece.pigpio.PiGPIOException;
-import io.sece.pigpio.PiGPIOPin;
-
 import io.sece.vlc.Color;
-import io.sece.vlc.trx.led.PiRgbLED;
 
 
 public class API {
@@ -30,7 +26,6 @@ public class API {
     private static Thread threadCali;
     private static Thread threadTrans;
     private static Thread threadDog = new Thread();
-    private static LEDInterface led;
 
 
     public API(int port) throws IOException {
@@ -43,19 +38,6 @@ public class API {
         server.createContext("/transmit", new transmissionHandler());
         server.createContext("/off", new offHandler());
         server.setExecutor(null);
-
-        try
-        {
-            PiGPIOPin r = new PiGPIOPin(22);
-            PiGPIOPin g = new PiGPIOPin(27);
-            PiGPIOPin b = new PiGPIOPin(17);
-            led = new PiRgbLED(r, g, b);
-        }
-        catch (PiGPIOException e)
-        {
-            System.out.println(e.getMessage());
-        }
-
     }
 
     public void start(ExecutorService executor) {
@@ -113,11 +95,11 @@ public class API {
                 try (Reader isr =  new InputStreamReader(he.getRequestBody(),"utf-8")) {
                     Gson gson = new GsonBuilder().create();
                     CalibrationTransmitter calTrx = gson.fromJson(isr, CalibrationTransmitter.class);
-                    calTrx.setLed((PiRgbLED)led);
+                    calTrx.setLed(Main.led);
                     System.out.println(calTrx);
 
                     threadCali = new Thread(calTrx);
-                    threadDog = new Thread(new WatchDog(threadCali, calTrx.getDuration()*(calTrx.getHueValue().length),(PiRgbLED)led));
+                    threadDog = new Thread(new WatchDog(threadCali, calTrx.getDuration()*(calTrx.getHueValue().length), Main.led));
                     threadDog.start();
                     threadCali.start();
                     os.write(response);
@@ -164,11 +146,11 @@ public class API {
                 try (Reader isr =  new InputStreamReader(he.getRequestBody(),"utf-8")) {
                     Gson gson = new GsonBuilder().create();
                     DataTransmitter transTrx = gson.fromJson(isr, DataTransmitter.class);
-                    transTrx.setLed((PiRgbLED)led);
+                    transTrx.setLed(Main.led);
                     System.out.println(transTrx);
 
                     threadTrans = new Thread(transTrx);
-                    threadDog = new Thread(new WatchDog(threadTrans, transTrx.getTimeout(),(PiRgbLED)led));
+                    threadDog = new Thread(new WatchDog(threadTrans, transTrx.getTimeout(), Main.led));
                     threadDog.start();
                     threadTrans.start();
 
@@ -214,7 +196,7 @@ public class API {
                         if (threadDog != null && threadDog.isAlive()) {
                             threadDog.stop();
                         }
-                        led.set(Color.BLACK);
+                        Main.led.set(Color.BLACK);
                         tID = "";
                         active = false;
                     } else {

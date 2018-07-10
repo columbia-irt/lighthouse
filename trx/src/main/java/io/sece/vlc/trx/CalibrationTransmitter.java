@@ -2,14 +2,14 @@ package io.sece.vlc.trx;
 
 import io.sece.vlc.CalibrationModem;
 import io.sece.vlc.Color;
-import io.sece.vlc.trx.led.PiRgbLED;
+
 
 public class CalibrationTransmitter implements Runnable
 {
     private int duration;
     private int[] hueValue;
     private int brightness = 100;
-    private PiRgbLED led;
+    private ColorLEDInterface led;
 
 
     public int getBrightness() {
@@ -24,7 +24,7 @@ public class CalibrationTransmitter implements Runnable
         return hueValue;
     }
 
-    public void setLed(PiRgbLED led) {
+    public void setLed(ColorLEDInterface led) {
         this.led = led;
     }
 

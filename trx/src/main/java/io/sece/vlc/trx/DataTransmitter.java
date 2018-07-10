@@ -1,18 +1,16 @@
 package io.sece.vlc.trx;
 
-import io.sece.vlc.Color;
 import io.sece.vlc.FSK2Modem;
 import io.sece.vlc.FSK4Modem;
 import io.sece.vlc.FSK8Modem;
 import io.sece.vlc.Modem;
 import io.sece.vlc.OOKModem;
-import io.sece.vlc.trx.led.PiRgbLED;
 
 public class DataTransmitter implements Runnable {
     private int FPS;
     private int timeout;
     private String modulator;
-    private PiRgbLED led;
+    private ColorLEDInterface led;
 
     public int getFPS() {
         return FPS;
@@ -26,7 +24,7 @@ public class DataTransmitter implements Runnable {
         return timeout;
     }
 
-    public void setLed(PiRgbLED led) {
+    public void setLed(ColorLEDInterface led) {
         this.led = led;
     }
 
