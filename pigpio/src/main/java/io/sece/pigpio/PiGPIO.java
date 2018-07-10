@@ -379,5 +379,19 @@ public class PiGPIO {
 
     static {
         System.loadLibrary("pigpio-java");
+
+        System.out.println("Initializing pigpio library");
+        try {
+            PiGPIO.gpioInitialise();
+            Runtime.getRuntime().addShutdownHook(new Thread() {
+                @Override
+                public void run() {
+                    System.out.println("Shutting down pigpio library");
+                    PiGPIO.gpioTerminate();
+                }
+            });
+        } catch (PiGPIOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

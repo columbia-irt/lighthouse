@@ -15,15 +15,6 @@ public class Main {
         System.out.println("Starting LED transmitter");
         ExecutorService threadPool = Executors.newCachedThreadPool();
 
-        System.out.println("Initializing pigpio library");
-        PiGPIO.gpioInitialise();
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-        @Override
-        public void run() {
-                System.out.println("Shutting down pigpio library");
-                PiGPIO.gpioTerminate();
-        }});
-
         API api = new API(8000);
         api.start(threadPool);
 

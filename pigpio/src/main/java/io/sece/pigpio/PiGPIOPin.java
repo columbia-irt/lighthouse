@@ -1,8 +1,5 @@
 package io.sece.pigpio;
 
-import io.sece.pigpio.PiGPIO;
-import io.sece.pigpio.PiGPIOException;
-
 
 public class PiGPIOPin
 {
