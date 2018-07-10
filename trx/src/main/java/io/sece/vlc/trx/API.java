@@ -178,36 +178,39 @@ public class API {
 
 
 
-            try (Reader isr =  new InputStreamReader(he.getRequestBody(),"utf-8")) {
-                Gson gson = new GsonBuilder().create();
-                transID = gson.fromJson(isr, TransmissionID.class);
-                if (!active) {
-                    jsonString = "Not active";
-                } else {
-                    if (tID.equals(String.valueOf(transID.getID())))//tID muss be transmitted by client
-                    {
-                        jsonString = "you turned it off";
-                        if (threadCali != null && threadCali.isAlive()) {
-                            threadCali.stop();
-                        }
-                        if (threadTrans != null && threadTrans.isAlive()) {
-                            threadTrans.stop();
-                        }
-                        if (threadDog != null && threadDog.isAlive()) {
-                            threadDog.stop();
-                        }
-                        Main.led.set(Color.BLACK);
-                        tID = "";
-                        active = false;
-                    } else {
-                        jsonString = "you are not allowed to turn the device off!";
+            Reader isr =  new InputStreamReader(he.getRequestBody(),"utf-8");
+            Gson gson = new GsonBuilder().create();
+            transID = gson.fromJson(isr, TransmissionID.class);
+            if (!active) {
+                jsonString = "Not active";
+            } else {
+                if (tID.equals(String.valueOf(transID.getID())))//tID muss be transmitted by client
+                {
+                    jsonString = "you turned it off";
+                    if (threadCali != null && threadCali.isAlive()) {
+                        threadCali.stop();
                     }
+                    if (threadTrans != null && threadTrans.isAlive()) {
+                        threadTrans.stop();
+                    }
+                    if (threadDog != null && threadDog.isAlive()) {
+                        threadDog.stop();
+                    }
+                    try
+                    {
+                        Main.led.set(Color.BLACK);
+                    }
+                    catch (LEDException e)
+                    {
+                        throw new RuntimeException(e);
+                    }
+                    tID = "";
+                    active = false;
+                } else {
+                    jsonString = "you are not allowed to turn the device off!";
                 }
             }
-            catch(Exception e)
-                {
-                    System.out.println(e.getMessage());
-                }
+
 
             response = jsonString.getBytes();
 

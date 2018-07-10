@@ -1,5 +1,7 @@
 package io.sece.vlc.trx;
 
+import java.util.Random;
+
 import io.sece.vlc.FSK2Modem;
 import io.sece.vlc.FSK4Modem;
 import io.sece.vlc.FSK8Modem;
@@ -67,10 +69,27 @@ public class DataTransmitter implements Runnable {
 
             String data = mod.startSequence(4) + "11110000" + mod.startSequence(4) + "11110000";
 
+            Random rand = new Random();
+
 
             // Transmit the data stored in the buffer.
             while(true) {
-                t.tx(data);
+                try
+                {
+                    t.tx(data);
+                }
+                catch (LEDException|InterruptedException e)
+                {
+                    throw new RuntimeException(e);
+                }
+                try
+                {
+                    Thread.sleep((rand.nextInt(2500) + 500) * 1000);
+                }
+                catch (InterruptedException e)
+                {
+                    throw new RuntimeException(e);
+                }
             }
             //t.startTx();
             //led.set(Color.BLACK);
@@ -79,10 +98,6 @@ public class DataTransmitter implements Runnable {
         catch (IllegalArgumentException e)
         {
             throw new IllegalArgumentException();
-        }
-        catch (Exception e)
-        {
-            System.out.println(e.getMessage());
         }
     }
 }
