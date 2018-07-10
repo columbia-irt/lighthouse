@@ -409,6 +409,7 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
             session.exceptionally(ex -> {
                 state = NO_SESSION;
                 session = null;
+                Log.e(TAG, "Error while creating camera session", ex);
                 ConfirmationDialog d = ConfirmationDialog.newInstance(ex.getCause().getMessage(), false);
                 d.show(getChildFragmentManager(), FRAGMENT_DIALOG);
                 d.completed.whenComplete((v, t) -> {
