@@ -18,7 +18,7 @@ import io.sece.vlc.rcvr.processing.Processing;
  */
 
 public class Receiver<T extends Coordinate> {
-    private Modem<T> modem;
+    private Modem<Color> modem;
     private boolean transmissionStarted = false;
     private SynchronizationModule synchronizationModule;
     private int delay = 50;
