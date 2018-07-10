@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 import io.sece.vlc.Color;
 import io.sece.vlc.Coordinate;
+import io.sece.vlc.DataFrame;
 import io.sece.vlc.Modem;
 import io.sece.vlc.rcvr.processing.Frame;
 import io.sece.vlc.rcvr.processing.FramingBlock;
@@ -45,12 +46,10 @@ public class Receiver<T extends Coordinate> {
 
         String currSymbol  =  modem.demodulate(new Color((int)h, (int)b));
 //        System.out.println(currSymbol + " " + ev.frame.get(Frame.IMAGE_TIMESTAMP));
-        String[] currFrameData = framingBlock.apply(currSymbol);
-        if(currFrameData != null){
-            for(String temp: currFrameData){
-                System.out.println(temp);
-            }
-            System.out.println("Received FrameArray " + currFrameData.toString() + currFrameData.length);
+        DataFrame dataFrame = (framingBlock.apply(currSymbol));
+        if(dataFrame != null){
+
+            System.out.println("Received Frame " + dataFrame.data());
         }
     }
 
