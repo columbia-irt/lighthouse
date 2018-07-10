@@ -67,6 +67,12 @@ build-trx-java:
 run: build-trx $(alldep)
 	sudo java -Dled.driver=PiRgbLED -Dled.params="22,27,17" -Djava.library.path=$(native_dir) -cp pigpio/build/libs/pigpio.jar:shared/build/libs/shared.jar:trx/build/libs/trx.jar:/home/pi/gson-2.8.4.jar:/home/pi/openrq-3.3.2.jar $(trx_pkg).Main
 
+
+.PHONY: run-console
+run-console: $(alldep)
+	$(gradle) --configure-on-demand :trx:run
+
+
 .PHONY: clean-trx
 clean-trx: $(alldep)
 	$(gradle) --configure-on-demand :trx:clean :pigpio:clean :unix:clean :shared:clean

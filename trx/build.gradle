@@ -9,7 +9,7 @@ mainClassName = 'io.sece.vlc.trx.Main'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-applicationDefaultJvmArgs = ["-Djava.library.path=${rootDir}/build/native"]
+applicationDefaultJvmArgs = ["-Dled.driver=ConsoleLED"]
 
 jar {
   manifest {
