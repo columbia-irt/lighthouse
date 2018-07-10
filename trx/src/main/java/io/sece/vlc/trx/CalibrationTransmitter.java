@@ -36,7 +36,6 @@ public class CalibrationTransmitter implements Runnable
     @Override
     public void run()
     {
-        try {
             CalibrationModem mod;
             Transmitter<?> t;
 
@@ -46,7 +45,18 @@ public class CalibrationTransmitter implements Runnable
                 t = new Transmitter<>(led, mod, (this.getDuration() * 1000));
                 String data = "1";
                 // Transmit the data stored in the buffer.
-                t.tx(data);
+                try
+                {
+                    t.tx(data);
+                }
+                catch (LEDException e)
+                {
+                    throw new RuntimeException(e);
+                }
+                catch (InterruptedException e)
+                {
+                    throw new RuntimeException(e);
+                }
             }
 
             // Create an transmitter implementation which connects a particular
@@ -54,12 +64,14 @@ public class CalibrationTransmitter implements Runnable
             // enforce strict type checking and it should not be possible to
             // connect LEDs with incompatible modulators. That should generate a compile-time error.
 
-            led.set(Color.BLACK);
-        }
-        catch (Exception e)
-        {
-            System.out.println(e.getMessage());
-        }
+            try
+            {
+                led.set(Color.BLACK);
+            }
+            catch (LEDException e)
+            {
+                throw new RuntimeException(e);
+            }
     }
 
 }

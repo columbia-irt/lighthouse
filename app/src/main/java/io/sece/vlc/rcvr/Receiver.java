@@ -28,7 +28,7 @@ public class Receiver<T extends Coordinate> {
 
     public Receiver(Modem modem) {
         this.modem = modem;
-        framingBlock = new FramingBlock(modem.startSequence(4), modem.bits, 800);
+        framingBlock = new FramingBlock(modem.startSequence(2), modem.bits, 800);
         Bus.subscribe(this);
     }
 

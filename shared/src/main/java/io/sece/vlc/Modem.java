@@ -34,7 +34,7 @@ public abstract class Modem<V extends Coordinate> {
 
     public String startSequence(int amount) {
         String startingSequence = "";
-        for(int i = 0; i < amount; i++)
+        for(int i = amount; i > 0; i--)
         {
             startingSequence += String.format("%" + bits + "s", Integer.toBinaryString(i % states)).replace(' ', '0');
         }

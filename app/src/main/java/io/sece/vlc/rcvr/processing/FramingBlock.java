@@ -34,9 +34,10 @@ public class FramingBlock {
             this.startingSequence.add(startingSequence.substring(i -offset, i));
         }
 
-        dataAmount = 6; //(int)((interval / (1000 / ViewfinderModel.synced_fps)));
+        dataAmount =  12 - this.startingSequence.size() - tailCheckingBits; // 24 Bits to transfer
+        //(int)((interval / (1000 / ViewfinderModel.synced_fps)));
         receivedBits = new String[dataAmount + tailCheckingBits];
-        System.out.println("hier " + this.startingSequence.toString() + " dataAmount " + dataAmount);
+        System.out.println("startingsequence " + this.startingSequence.toString()  + " dataAmount " + dataAmount);
     }
 
 
@@ -69,21 +70,6 @@ public class FramingBlock {
         return receivingState == (startingSequence.size());
     }
 
-//    private boolean checkFrameData(){
-////        parity check
-//        int sum = 0;
-//        int parityBit = -1;
-//        for(int i= 0; i < receivedBits.length; i++){
-//            System.out.println(receivedBits[i]);
-//            if(i == receivedBits.length -1){
-//
-//                System.out.println(receivedBits.toString() + "paritybit: " + receivedBits[i]);
-//                parityBit = Integer.parseInt(receivedBits[i]);
-//            }else{
-//                sum += Integer.parseInt(receivedBits[i]);
-//            }
-//        }
-//        return sum % 2 == parityBit;
-//    }
+
 
 }
