@@ -48,6 +48,21 @@ public class TransmitterAPI {
     }
 
 
+    public CompletableFuture<JSONObject> transmit(int fps, int duration, String modulator) {
+        JSONObject data = new JSONObject();
+        try {
+            data.put("FPS", fps);
+            data.put("timeout", duration);
+            data.put("modulator", modulator);
+        } catch (JSONException e) {
+            CompletableFuture<JSONObject> rv = new CompletableFuture<>();
+            rv.completeExceptionally(e);
+            return rv;
+        }
+        return jsonRequest(Request.Method.POST, "transmit", data);
+    }
+
+
     public CompletableFuture<JSONObject> calibrate(List<Integer> hues, int duration) {
         JSONObject data = new JSONObject();
         try {
