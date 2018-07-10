@@ -80,7 +80,7 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
     private TransmitterAPI trx;
     private Processing processing;
 
-    //private Receiver receiver;
+    private Receiver receiver;
     public static long timeToStartSynchronized;
 
     private FSK4Modem modem = new FSK4Modem();
@@ -365,7 +365,7 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
         super.onCreate(savedInstanceState);
         model = ViewModelProviders.of(this).get(ViewfinderModel.class);
 
-        //receiver = new Receiver(new FSK2Modulator());
+        receiver = new Receiver(new FSK4Modem());
     }
 
 

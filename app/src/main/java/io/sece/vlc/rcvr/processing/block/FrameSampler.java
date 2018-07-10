@@ -15,9 +15,6 @@ public class FrameSampler implements ProcessingBlock {
     private long interval;  // Sampling interval in nano seconds
     private long lastAcceptedFrame = 0;
 
-
-
-
     public FrameSampler(long interval, TimeUnit unit) {
         this.interval = unit.toNanos(interval);
     }
