@@ -45,7 +45,7 @@ public class Frame implements CameraBridgeViewBase.CvCameraViewFrame {
     private Mat uv;     // Refers to the Image buffer for data
 
     private Mat _gray; // Refers to y Mat for data
-    private Mat _rgba; // Always allocates its own buffer to store data
+    private Mat _rgba; // Always allocates its own buffer to storeRX data
     private boolean refreshRGBA = true;
 
 

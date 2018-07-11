@@ -2,14 +2,11 @@ package io.sece.vlc.rcvr;
 
 import com.google.common.eventbus.Subscribe;
 
-import java.util.ArrayList;
-
 import io.sece.vlc.Color;
 import io.sece.vlc.Coordinate;
-import io.sece.vlc.DataFrame;
+import io.sece.vlc.FramingBlock;
 import io.sece.vlc.Modem;
 import io.sece.vlc.rcvr.processing.Frame;
-import io.sece.vlc.rcvr.processing.FramingBlock;
 import io.sece.vlc.rcvr.processing.Processing;
 
 /**
@@ -29,7 +26,7 @@ public class Receiver<T extends Coordinate> {
 
     public Receiver(Modem modem) {
         this.modem = modem;
-        framingBlock = new FramingBlock(modem.startSequence(2), modem.bits, 800);
+        framingBlock = new FramingBlock();
         Bus.subscribe(this);
     }
 
@@ -46,10 +43,10 @@ public class Receiver<T extends Coordinate> {
 
         String currSymbol  =  modem.demodulate(new Color((int)h, (int)b));
 //        System.out.println(currSymbol + " " + ev.frame.get(Frame.IMAGE_TIMESTAMP));
-        DataFrame dataFrame = (framingBlock.apply(currSymbol));
-        if(dataFrame != null){
+        String data = (framingBlock.applyRX(currSymbol));
+        if(data != null){
 
-            System.out.println("Received Frame " + dataFrame.data());
+            System.out.println("Received Frame " + data);
         }
     }
 

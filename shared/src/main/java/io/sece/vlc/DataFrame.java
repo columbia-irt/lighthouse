@@ -43,11 +43,12 @@ public class DataFrame {
 
     public String data()
     {
-        if(data.length() > expectedBitsAmount){
-            data = data.substring(0, expectedBitsAmount);
+        String tempData = StuffingBlock.removeStuffingBits(data);
+        if(tempData.length() > expectedBitsAmount){
+            tempData = tempData.substring(0, expectedBitsAmount);
         }
         System.out.println(data);
-        return StuffingBlock.removeStuffingBits(data);
+        return tempData;
 
 //        if(this.checksum.equals(calcChecksum())) {
 //            return data;

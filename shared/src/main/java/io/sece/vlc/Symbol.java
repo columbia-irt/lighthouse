@@ -59,7 +59,7 @@ class Symbol {
 
 
     /**
-     * Convert the given modulation symbol value into bits and store the bits
+     * Convert the given modulation symbol value into bits and storeRX the bits
      * in buffer out starting at index offset. Return the output buffer.
      */
     public StringBuilder toBits(StringBuilder buf, int offset, int symbol) {
