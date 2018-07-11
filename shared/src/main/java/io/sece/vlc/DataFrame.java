@@ -5,7 +5,7 @@ import java.util.zip.CRC32;
 
 public class DataFrame {
 
-    private String marker = "101100";
+    private String marker = "1001";
     private String data;
     private String checksum;
     private int expectedBitsAmount;
@@ -46,8 +46,9 @@ public class DataFrame {
         if(data.length() > expectedBitsAmount){
             data = data.substring(0, expectedBitsAmount);
         }
-        removeStuffingBits(data);
-        return data;
+        System.out.println(data);
+        return StuffingBlock.removeStuffingBits(data);
+
 //        if(this.checksum.equals(calcChecksum())) {
 //            return data;
 //        }
@@ -59,46 +60,7 @@ public class DataFrame {
 
 
 
-    private void removeStuffingBits(String input){
-        int equalCounter = 0;
-        for(int i=0; i < input.length(); i++){
-            if(input.charAt(i) == marker.charAt(equalCounter)){
-                equalCounter++;
-                if(equalCounter == marker.length() -1){
-                    System.out.println("remove " + (i+1) + (i+2));
-                    equalCounter = 0;
-                    input = (input.substring(0,i) + input.substring(i +2,input.length()));
-                }
-            }else{
-                equalCounter = 0;
-                if(input.charAt(i) == marker.charAt(equalCounter)){
-                    equalCounter++;
-                }
-            }
-        }
-    }
 
-    private String insertStuffingBits(){
-        String output = data;
-
-        int equalCounter = 0;
-        for(int i=0; i < output.length(); i++){
-            if(output.charAt(i) == marker.charAt(equalCounter)){
-                equalCounter++;
-                if(equalCounter == marker.length() -1){
-                    System.out.println("Insert " + i);
-                    equalCounter = 0;
-                    output = output.substring(0,i) + stuffing + output.substring(i,output.length());
-                }
-            }else{
-                equalCounter = 0;
-                if(output.charAt(i) == marker.charAt(equalCounter)){
-                    equalCounter++;
-                }
-            }
-        }
-        return output;
-    }
 
 
     private String calcChecksum()
