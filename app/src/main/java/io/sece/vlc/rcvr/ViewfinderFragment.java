@@ -576,7 +576,7 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
 
     @Subscribe
     public void onProcessingResult(Processing.Result ev) {
-        Color c = new Color((int)(long)ev.frame.get(Frame.HUE), (int)(long)ev.frame.get(Frame.BRIGHTNESS));
+        Color c = ev.frame.getColorAttr(Frame.HUE);
         c = modem.detect(c);
         rxColor.setBackgroundColor(android.graphics.Color.rgb(c.red, c.green, c.blue));
     }

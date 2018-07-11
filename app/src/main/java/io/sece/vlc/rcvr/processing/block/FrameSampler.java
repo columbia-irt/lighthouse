@@ -21,7 +21,7 @@ public class FrameSampler implements ProcessingBlock {
 
 
     public Frame apply(Frame frame) {
-        long stamp = frame.get(Frame.IMAGE_TIMESTAMP);
+        long stamp = frame.getLongAttr(Frame.IMAGE_TIMESTAMP);
 
         if (stamp < lastAcceptedFrame + interval) return null;
         lastAcceptedFrame = stamp;

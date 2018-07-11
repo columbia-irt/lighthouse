@@ -20,7 +20,7 @@ public class TransmitMonitor implements ProcessingBlock {
     private double fpsExpected;
 
     private MovingAverage fpsReceived = new MovingAverage(AVG_WINDOW, AVG_WINDOW_UNIT);
-    private Uniq uniq = new Uniq();
+    private Uniq<Double> uniq = new Uniq<>();
 
     private Modem<Color> modem;
 
@@ -47,15 +47,15 @@ public class TransmitMonitor implements ProcessingBlock {
 
 
     public synchronized Frame apply(Frame frame) {
-
-        Color currColor =  modem.detect(new Color(((int)(long)frame.get(Frame.HUE)), (int)(long)frame.get(Frame.BRIGHTNESS)));
+        Color currColor = frame.getColorAttr(Frame.HUE);
+        currColor = modem.detect(currColor);
 
         if ( prevColor != null) {
 
             // detect Color Changes
             if(!prevColor.equals(currColor)){
 
-                long timestamp = frame.get(Frame.IMAGE_TIMESTAMP);
+                long timestamp = frame.getLongAttr(Frame.IMAGE_TIMESTAMP);
 
                 // Calculate the FPS moving average value
                 fpsReceived.update(1.0e9d / (double)(timestamp - previousTimestamp));

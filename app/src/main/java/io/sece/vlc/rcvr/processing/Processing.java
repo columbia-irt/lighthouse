@@ -99,8 +99,8 @@ public class Processing extends HandlerThread {
         if (currentThread().isInterrupted()) return;
 
         frame.set(img);
-        frame.set(Frame.IMAGE_TIMESTAMP, img.getTimestamp());
-        frame.set(Frame.RX_TIMESTAMP, System.nanoTime());
+        frame.setAttr(Frame.IMAGE_TIMESTAMP, img.getTimestamp());
+        frame.setAttr(Frame.RX_TIMESTAMP, System.nanoTime());
         frame.sequence = sequence.getAndIncrement();
 
         Frame f = frame;
@@ -125,7 +125,7 @@ public class Processing extends HandlerThread {
     private void processFrame(Frame frame) {
         // Anything invoked from here is executed on a worker thread from the thread pool. Make
         // sure the frame argument is released after you no longer need the data!
-        frame.set(Frame.PROCESSING_START, System.nanoTime());
+        frame.setAttr(Frame.PROCESSING_START, System.nanoTime());
 
         for (ProcessingBlock block : stage2) {
             if (currentThread().isInterrupted()) return;
@@ -134,8 +134,8 @@ public class Processing extends HandlerThread {
         }
 
         if (null != frame) {
-            frame.set(Frame.PROCESSING_END, System.nanoTime());
-            frame.set(Frame.CURRENT_SEQUENCE, sequence.get() - 1);
+            frame.setAttr(Frame.PROCESSING_END, System.nanoTime());
+            frame.setAttr(Frame.CURRENT_SEQUENCE, sequence.get() - 1);
             Bus.send(new Result(frame));
         }
     }

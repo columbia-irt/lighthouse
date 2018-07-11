@@ -87,8 +87,7 @@ public class HueDetector implements ProcessingBlock {
             brightness = Color.MAX_BRIGHTNESS;
         }
 
-        frame.set(Frame.HUE, avgHue);
-        frame.set(Frame.BRIGHTNESS, brightness);
+        frame.setAttr(Frame.HUE, new Color((int)avgHue, (int)brightness));
         return frame;
     }
 }

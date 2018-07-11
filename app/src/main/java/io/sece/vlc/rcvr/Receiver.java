@@ -41,10 +41,9 @@ public class Receiver<T extends Coordinate> {
 
     @Subscribe
     private void rx(Processing.Result ev) {
-        long h = ev.frame.get(Frame.HUE);
-        long b = ev.frame.get(Frame.BRIGHTNESS);
+        Color c = ev.frame.getColorAttr(Frame.HUE);
 
-        String currSymbol  =  modem.demodulate(new Color((int)h, (int)b));
+        String currSymbol  =  modem.demodulate(c);
 //        System.out.println(currSymbol + " " + ev.frame.get(Frame.IMAGE_TIMESTAMP));
         DataFrame dataFrame = (framingBlock.apply(currSymbol));
         if(dataFrame != null){

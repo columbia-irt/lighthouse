@@ -18,7 +18,7 @@ public class RateMonitor implements ProcessingBlock {
     private String id;
 
     private MovingAverage fps = new MovingAverage(AVG_WINDOW, AVG_WINDOW_UNIT);
-    private Uniq uniq = new Uniq();;
+    private Uniq<Double> uniq = new Uniq<>();
 
     private long previousTimestamp = -1;
 
@@ -42,7 +42,7 @@ public class RateMonitor implements ProcessingBlock {
 
 
     public synchronized Frame apply(Frame frame) {
-        long timestamp = frame.get(Frame.IMAGE_TIMESTAMP);
+        long timestamp = frame.getLongAttr(Frame.IMAGE_TIMESTAMP);
 
         if (previousTimestamp != -1) {
             // Calculate the FPS moving average value

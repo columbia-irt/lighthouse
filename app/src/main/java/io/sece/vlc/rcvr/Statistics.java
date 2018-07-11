@@ -79,13 +79,13 @@ public class Statistics extends AppCompatTextView {
 
     @Subscribe
     private void onResult(Processing.Result ev) {
-        long delay = ev.frame.get(Frame.PROCESSING_START) - ev.frame.get(Frame.IMAGE_TIMESTAMP);
+        long delay = ev.frame.getLongAttr(Frame.PROCESSING_START) - ev.frame.getLongAttr(Frame.IMAGE_TIMESTAMP);
         processingDelay.update(TimeUnit.NANOSECONDS.toMillis(delay));
 
-        long time = ev.frame.get(Frame.PROCESSING_END) - ev.frame.get(Frame.PROCESSING_START);
+        long time = ev.frame.getLongAttr(Frame.PROCESSING_END) - ev.frame.getLongAttr(Frame.PROCESSING_START);
         processingTime.update(TimeUnit.NANOSECONDS.toMillis(time));
 
-        queueLength.update(ev.frame.get(Frame.CURRENT_SEQUENCE) - ev.frame.sequence);
+        queueLength.update(ev.frame.getIntAttr(Frame.CURRENT_SEQUENCE) - ev.frame.sequence);
 
         updateStatistics();
     }

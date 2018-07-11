@@ -4,12 +4,16 @@ import android.graphics.ImageFormat;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.media.Image;
-import android.os.Bundle;
 
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import io.sece.vlc.Color;
 
 /**
  *
@@ -32,14 +36,13 @@ public class Frame implements CameraBridgeViewBase.CvCameraViewFrame {
     public static final String PROCESSING_START = "PROCESSING_START";
     public static final String PROCESSING_END = "PROCESSING_END";
     public static final String HUE = "HUE";
-    public static final String BRIGHTNESS = "BRIGHTNESS";
     public static final String CURRENT_SEQUENCE = "CURRENT_SEQUENCE";
 
     public int width;
     public int height;
     public long sequence; // Monotonically increasing frame sequence number
 
-    public Bundle attrs = new Bundle();
+    public HashMap<String, Object> attrs = new HashMap<>();
 
     private Mat y;      // Refers to the Image buffer for data
     private Mat uv;     // Refers to the Image buffer for data
@@ -76,6 +79,7 @@ public class Frame implements CameraBridgeViewBase.CvCameraViewFrame {
      * Create a copy of the frame that does not depend on Image buffers. The copy can be passed
      * around after the corresponding Image object has been closed.
      */
+    @SuppressWarnings("unchecked")
     public Frame copy() {
         Frame f = new Frame();
 
@@ -83,7 +87,7 @@ public class Frame implements CameraBridgeViewBase.CvCameraViewFrame {
         f.height = height;
         f.sequence = sequence;
 
-        f.attrs = (Bundle)attrs.clone();
+        f.attrs = (HashMap<String,Object>)((HashMap<String,Object>)attrs).clone();
 
         f.y = y.clone();
         f.uv = uv.clone();
@@ -92,12 +96,12 @@ public class Frame implements CameraBridgeViewBase.CvCameraViewFrame {
     }
 
 
-    public void set(Image image) {
+    public Image set(Image image) {
         checkImageFormat(image);
 
         width = image.getWidth();
         height = image.getHeight();
-        attrs.putLong(IMAGE_TIMESTAMP, image.getTimestamp());
+        attrs.put(IMAGE_TIMESTAMP, image.getTimestamp());
 
         Image.Plane[] p = image.getPlanes();
 
@@ -121,15 +125,46 @@ public class Frame implements CameraBridgeViewBase.CvCameraViewFrame {
 
         // Make sure the RGBA Mat is re-created next time it is accessed.
         refreshRGBA = true;
+
+        return image;
     }
 
 
-    public void set(String key, Long val) {
-        attrs.putLong(key, val);
+    public <T extends Number> T setAttr(String key, T val) {
+        attrs.put(key, val);
+        return val;
     }
 
-    public Long get(String key) {
-        return attrs.getLong(key);
+
+    public boolean setAttr(String key, boolean val) {
+        attrs.put(key, val);
+        return val;
+    }
+
+
+    public Color setAttr(String key, Color val) {
+        attrs.put(key, val);
+        return val;
+    }
+
+
+    public int getIntAttr(String key) {
+        return (int)attrs.get(key);
+    }
+
+
+    public long getLongAttr(String key) {
+        return (long)attrs.get(key);
+    }
+
+
+    public boolean getBooleanAttr(String key) {
+        return (boolean)attrs.get(key);
+    }
+
+
+    public Color getColorAttr(String key) {
+        return (Color)attrs.get(key);
     }
 
 
