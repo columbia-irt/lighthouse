@@ -1,13 +1,10 @@
 package io.sece.vlc.trx;
 
 import java.io.IOException;
-import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 
-import io.sece.vlc.RaptorCodeDecode;
-import io.sece.vlc.RaptorCodeEncoder;
-import io.sece.vlc.RaptorCodeParam;
+import io.sece.vlc.RaptorCode;
 
 
 public class Main {
@@ -53,22 +50,26 @@ public class Main {
         }*/
         System.out.println("LED transmitter is running");
 
-        RaptorCodeEncoder raptorCodeEncoder = new RaptorCodeEncoder();
-        RaptorCodeDecode raptorCodeDecode = new RaptorCodeDecode();
+        byte[] data = new byte[32];
+
+        for(int i = 0; i < data.length; i++)
+        {
+            data[i] = (byte)i;
+        }
+
+        RaptorCode raptorCode = new RaptorCode(data, 2);
 
         for(int i = 0; i < 256; i++)
         {
-            /*for(int j = 0; j < raptorCodeEncoder.getNextPackage(i).length; j++)
-            {
-                System.out.println("Package: " + i + " Byte: " + j + " content: " + raptorCodeEncoder.getNextPackage(i)[j]);
-            }*/
-            if(raptorCodeDecode.receiveNextPackage(raptorCodeEncoder.getNextPackage(i * 5)))
+            System.out.println(raptorCode.progress());
+            if(raptorCode.isDataReceived())
             {
                 System.out.println("Correct");
                 return;
             }
             else
             {
+                raptorCode.putPacket(raptorCode.getPacket((i + 10)* 5));
                 System.out.println("not yet");
             }
             try {
@@ -78,7 +79,6 @@ public class Main {
             {
                 throw new RuntimeException(e);
             }
-
         }
 
     }
