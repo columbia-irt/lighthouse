@@ -29,8 +29,7 @@ class Transmitter<T extends Coordinate> {
             long startTime = System.currentTimeMillis();
             long delta = 0;
             int count = 1;
-
-            System.out.println(data);
+            
             for(int i = 0; i < data.length(); i += modem.bits)
             {
                 led.set(modem.modulate(data, i));
