@@ -14,18 +14,46 @@ public class FrameSampler implements ProcessingBlock {
 
     private long interval;  // Sampling interval in nano seconds
     private long lastAcceptedFrame = 0;
+    private Modem<Color> modem;
+    private Color prevColor;
+    private int sameColorCounter = 0;
 
-    public FrameSampler(long interval, TimeUnit unit) {
+    public FrameSampler(long interval, TimeUnit unit, Modem modem) {
         this.interval = unit.toNanos(interval);
+        this.modem = modem;
     }
 
 
     public Frame apply(Frame frame) {
-        long stamp = frame.getLongAttr(Frame.IMAGE_TIMESTAMP);
+        Color currColor = frame.getColorAttr(Frame.HUE);
+        currColor = modem.detect(currColor);
 
-        if (stamp < lastAcceptedFrame + interval) return null;
-        lastAcceptedFrame = stamp;
-        return frame;
+        if(prevColor != null){
+            long stamp = frame.getLongAttr(Frame.IMAGE_TIMESTAMP);
+            if(prevColor == currColor){
+                sameColorCounter++;
+            }else{
+                System.out.println("color processed: " + sameColorCounter + " " + modem.demodulate(currColor));
+                sameColorCounter = 0;
+            }
+
+
+            if (stamp < lastAcceptedFrame + interval){
+                prevColor = currColor;
+                return null;
+            }
+            lastAcceptedFrame = stamp;
+            prevColor = currColor;
+            System.out.println("color processed: " + sameColorCounter + " " + modem.demodulate(currColor));
+            sameColorCounter = 0;
+            return frame;
+
+        }else {
+
+            prevColor = currColor;
+            return null;
+        }
+
     }
 
 

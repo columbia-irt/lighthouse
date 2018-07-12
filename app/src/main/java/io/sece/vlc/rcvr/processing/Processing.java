@@ -66,7 +66,7 @@ public class Processing extends HandlerThread {
         stage2 = Arrays.asList(
                 new RateMonitor("worker"),
                 new HueDetector(),
-                new FrameSampler(((1000 / ViewfinderModel.synced_fps)), TimeUnit.MILLISECONDS),
+                new FrameSampler(((1000 / ViewfinderModel.synced_fps)), TimeUnit.MILLISECONDS, modem),
                 new TransmitMonitor(ViewfinderModel.synced_fps, modem, 3)
         );
     }
