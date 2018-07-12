@@ -21,10 +21,10 @@ public class FSK4Modem extends FreqModem {
         this.e = e;
         this.s = s;
         this.w = w;
-        System.out.println("n (rgb) : " + n);
-        System.out.println("e (rgb) : " + e);
-        System.out.println("s (rgb) : " + s);
-        System.out.println("w (rgb) : " + w);
+        //System.out.println("n (rgb) : " + n);
+        //System.out.println("e (rgb) : " + e);
+        //System.out.println("s (rgb) : " + s);
+        //System.out.println("w (rgb) : " + w);
         states = 4;
         symbol = new Symbol(states);
         bits = symbol.bits;

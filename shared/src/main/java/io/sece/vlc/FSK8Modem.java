@@ -16,14 +16,14 @@ public class FSK8Modem extends FreqModem {
         this.w = w;
         this.nw = nw;
 
-        System.out.println("n (rgb) : " + n);
-        System.out.println("ne (rgb) : " + ne);
-        System.out.println("e (rgb) : " + e);
-        System.out.println("se (rgb) : " + se);
-        System.out.println("s (rgb) : " + s);
-        System.out.println("sw (rgb) : " + sw);
-        System.out.println("w (rgb) : " + w);
-        System.out.println("ne (rgb) : " + ne);
+        //System.out.println("n (rgb) : " + n);
+        //System.out.println("ne (rgb) : " + ne);
+        //System.out.println("e (rgb) : " + e);
+        //System.out.println("se (rgb) : " + se);
+        //System.out.println("s (rgb) : " + s);
+        //System.out.println("sw (rgb) : " + sw);
+        //System.out.println("w (rgb) : " + w);
+        //System.out.println("ne (rgb) : " + ne);
         states = 8;
         symbol = new Symbol(states);
         bits = symbol.bits;

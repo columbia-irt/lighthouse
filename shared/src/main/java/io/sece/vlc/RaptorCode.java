@@ -13,26 +13,32 @@ public class RaptorCode
     private ArrayDataDecoder decoder;
     private DataEncoder encoder;
     private EncodingPacket packet;
-    private FECParameters FEC_PARAMS;
+    private FECParameters fecParams;
     private SourceBlockDecoder sbd;
     private SourceBlockEncoder sbe;
 
-    private byte[] certificateData;
-    private int symbolAmount;
-    private int packetCount;
+    private byte[] data;
+    private int packetSize;
+    private int packetsReceived;
 
-
-    public RaptorCode(byte[] certificateData, int symbolAmount)
+    public RaptorCode(byte[] data, int packetSize)
     {
-        this.certificateData = certificateData;
-        this.packetCount = 0;
-        this.symbolAmount = symbolAmount;
+        if(packetSize > 1)
+        {
+            this.data = data;
+            this.packetsReceived = 0;
+            this.packetSize = packetSize;
 
-        FEC_PARAMS = FECParameters.newParameters(certificateData.length, symbolAmount,1);
-        decoder = OpenRQ.newDecoder(FEC_PARAMS, 0);
-        sbd = decoder.sourceBlock(0);
-        encoder = OpenRQ.newEncoder(certificateData, FEC_PARAMS);
-        sbe = encoder.sourceBlock(0);
+            fecParams = FECParameters.newParameters(data.length, packetSize - 1, 1);
+            decoder = OpenRQ.newDecoder(fecParams, 0);
+            sbd = decoder.sourceBlock(0);
+            encoder = OpenRQ.newEncoder(data, fecParams);
+            sbe = encoder.sourceBlock(0);
+        }
+        else
+        {
+            throw new IllegalArgumentException("packetSize");
+        }
     }
 
     static private int hamming(byte[] a, byte[] b) {
@@ -47,28 +53,39 @@ public class RaptorCode
 
     public void putPacket(byte[] data)
     {
-        packetCount += 1;
-        int esi = data[0];
-        byte[] tmp = new byte[data.length - 1];
+        if(data.length == packetSize) {
+            packetsReceived += 1;
+            int esi = data[0];
+            byte[] tmp = new byte[data.length - 1];
 
-        System.arraycopy(data,1,tmp, 0,data.length -1);
+            System.arraycopy(data, 1, tmp, 0, data.length - 1);
 
-        sbd.putEncodingPacket(sbd.dataDecoder().parsePacket(0, esi, tmp, false).value());
+            sbd.putEncodingPacket(sbd.dataDecoder().parsePacket(0, esi, tmp, false).value());
+
+            for(int i = 0; i < decoder.dataArray().length; i++)
+            {
+                System.out.println(i + ",Decoded: " + decoder.dataArray()[i] + " Encoded: " + this.data[i]);
+            }
+        }
+        else
+        {
+            throw new IllegalArgumentException();
+        }
     }
 
     public boolean isDataReceived()
     {
-        return (hamming(certificateData, decoder.dataArray()) == 0);
+        return (hamming(data, decoder.dataArray()) == 0);
     }
 
     public byte[] getPacket(int number)
     {
         packet = sbe.encodingPacket(number);
 
-        byte[] encData = new byte[FEC_PARAMS.symbolSize()+1];
+        byte[] encData = new byte[packetSize];
 
         encData[0] = (byte)number;
-        System.arraycopy(packet.asArray(),8,encData, 1,FEC_PARAMS.symbolSize());
+        System.arraycopy(packet.asArray(),8,encData, 1, fecParams.symbolSize());
 
         return encData;
     }
@@ -79,7 +96,7 @@ public class RaptorCode
             return 100;
 
 
-        return (int)(100*((double)packetCount/(((double)certificateData.length/(double)symbolAmount) + 1)));
+        return (int)(100*((double) packetsReceived /(((double)data.length/((double)(packetSize - 1))) + 1)));
     }
 
 }

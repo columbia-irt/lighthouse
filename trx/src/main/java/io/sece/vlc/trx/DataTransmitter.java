@@ -76,7 +76,7 @@ public class DataTransmitter implements Runnable {
             while(true) {
                 try
                 {
-                    System.out.println(data);
+                    //System.out.println(data);
                     t.tx(data);
                 }
                 catch (LEDException|InterruptedException e)

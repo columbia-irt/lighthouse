@@ -57,7 +57,7 @@ public class Main {
             data[i] = (byte)i;
         }
 
-        RaptorCode raptorCode = new RaptorCode(data, 2);
+        RaptorCode raptorCode = new RaptorCode(data, 3);
 
         for(int i = 0; i < 256; i++)
         {
@@ -69,7 +69,7 @@ public class Main {
             }
             else
             {
-                raptorCode.putPacket(raptorCode.getPacket((i + 10)* 5));
+                raptorCode.putPacket(raptorCode.getPacket(i * 3) );
                 System.out.println("not yet");
             }
             try {
