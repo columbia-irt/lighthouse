@@ -24,6 +24,8 @@ public class FramingBlock {
     private static final int TX_STATE_D1 = 1;
     private String tx_bits = "";
 
+    public static final String STARTING_SEQUENCE = "011110";
+
     int receiverState = RX_STATE_S0;
     int transmitterState = TX_STATE_D0;
 
@@ -119,7 +121,7 @@ public class FramingBlock {
                 }
                 transmitterState = TX_STATE_D0;
                 break;
-            default: break;
+            default: throw new RuntimeException("Error occurred by invoking addSymbolTX #defaultCase ");
         }
     }
 
