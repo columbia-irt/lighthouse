@@ -1,5 +1,9 @@
-package io.sece.vlc;
+package io.sece.vlc.modem;
 
+
+import io.sece.vlc.Color;
+import io.sece.vlc.FreqModem;
+import io.sece.vlc.Symbol;
 
 public class FSK2Modem extends FreqModem {
     private Color u;

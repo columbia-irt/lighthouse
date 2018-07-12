@@ -1,4 +1,8 @@
-package io.sece.vlc;
+package io.sece.vlc.modem;
+
+import io.sece.vlc.Color;
+import io.sece.vlc.FreqModem;
+import io.sece.vlc.Symbol;
 
 import static io.sece.vlc.Color.RGBtoHSB;
 

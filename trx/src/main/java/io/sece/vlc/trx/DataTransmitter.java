@@ -2,11 +2,11 @@ package io.sece.vlc.trx;
 
 import java.util.Random;
 
-import io.sece.vlc.FSK2Modem;
-import io.sece.vlc.FSK4Modem;
-import io.sece.vlc.FSK8Modem;
+import io.sece.vlc.modem.FSK2Modem;
+import io.sece.vlc.modem.FSK4Modem;
+import io.sece.vlc.modem.FSK8Modem;
 import io.sece.vlc.Modem;
-import io.sece.vlc.OOKModem;
+import io.sece.vlc.modem.OOKModem;
 
 public class DataTransmitter implements Runnable {
     private int FPS;

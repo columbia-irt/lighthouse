@@ -11,14 +11,14 @@ package io.sece.vlc;
  * The Symbol class is a helper class for modulators/demodulators and is
  * normally not exported out of the package.
  */
-class Symbol {
+public class Symbol {
     public int bits;   // Number of bits it takes to represent a symbol
 
     /**
      * Create a Symbol instance with the given number of states. The number
      * of states must be a power of 2 and must be at least 2.
      */
-    Symbol(int states) {
+    public Symbol(int states) {
         if (states < 2) {
             throw new IllegalArgumentException("Number of states must be at least 2");
         }

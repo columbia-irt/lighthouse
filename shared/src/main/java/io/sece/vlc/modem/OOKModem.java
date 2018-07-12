@@ -1,5 +1,9 @@
-package io.sece.vlc;
+package io.sece.vlc.modem;
 
+
+import io.sece.vlc.Amplitude;
+import io.sece.vlc.Modem;
+import io.sece.vlc.Symbol;
 
 /**
  * An implementation of an On-Off Keying (OOK) modulator. This is the simplest

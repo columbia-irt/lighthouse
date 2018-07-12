@@ -19,7 +19,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
-import android.util.Rational;
 import android.util.Size;
 import android.view.LayoutInflater;
 import android.view.Surface;
@@ -46,7 +45,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 import io.sece.vlc.Color;
-import io.sece.vlc.FSK4Modem;
+import io.sece.vlc.modem.FSK4Modem;
 import io.sece.vlc.rcvr.processing.Frame;
 import io.sece.vlc.rcvr.processing.Processing;
 import io.sece.vlc.rcvr.camera.CameraException;

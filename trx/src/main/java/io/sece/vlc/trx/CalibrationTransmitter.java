@@ -1,6 +1,6 @@
 package io.sece.vlc.trx;
 
-import io.sece.vlc.CalibrationModem;
+import io.sece.vlc.modem.CalibrationModem;
 import io.sece.vlc.Color;
 
 

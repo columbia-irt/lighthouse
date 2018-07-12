@@ -1,6 +1,9 @@
-package io.sece.vlc;
+package io.sece.vlc.modem;
 
 
+import io.sece.vlc.AmpModem;
+import io.sece.vlc.Amplitude;
+import io.sece.vlc.Symbol;
 
 public class ASK8Modem extends AmpModem {
     private Amplitude l1, l2, l3, l4, l5, l6, l7, l8;
