@@ -60,7 +60,11 @@ public class RaptorQ implements DataEncoder, DataDecoder {
         byte[] encData = new byte[packetSize];
 
         encData[0] = (byte)number;
-        System.arraycopy(packet.asArray(),8,encData, 1, fecParams.symbolSize());
+        System.arraycopy(packet.asArray(),8,encData, 1, packet.asArray().length - 8);
+        /*for (int i = 0; i < packet.asArray().length; i++)
+        {
+            System.out.println(packet.asArray()[i]);
+        }*/
         return encData;
     }
 

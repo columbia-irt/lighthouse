@@ -2,6 +2,10 @@ package io.sece.vlc.trx;
 
 import java.util.Random;
 
+import io.sece.vlc.CRC8;
+import io.sece.vlc.DataBitString;
+import io.sece.vlc.FramingBlock;
+import io.sece.vlc.RaptorQ;
 import io.sece.vlc.modem.FSK2Modem;
 import io.sece.vlc.modem.FSK4Modem;
 import io.sece.vlc.modem.FSK8Modem;
@@ -67,13 +71,37 @@ public class DataTransmitter implements Runnable {
             // connect LEDs with incompatible modulators. That should generate a compile-time error.
             t = new Transmitter<>(led, mod, (1000/this.getFPS()));
 
-            String data = mod.startSequence(2) + "11110000111100001111";
 
-            Random rand = new Random();
+            String data;
+
+            RaptorQ raptor = new RaptorQ(DataBitString.dataBitString(), 3);
+            FramingBlock framingBlock = new FramingBlock();
+
+
+            for(int i = 0; i < 256; i++)
+            {
+                byte[] tmp = raptor.getPacket(i*2);
+
+                String test = DataBitString.bytesToString(tmp) + String.format("%8s", Integer.toBinaryString((int)(CRC8.compute(tmp)&0xff))).replace(' ', '0');
+
+                data = framingBlock.applyTX(test,mod.bits);
+
+                data = "011110" + data;
+
+                try
+                {
+                    System.out.println(i + "    " + data);
+                    t.tx(data);
+                }
+                catch (LEDException|InterruptedException e)
+                {
+                    throw new RuntimeException(e);
+                }
+            }
 
 
             // Transmit the data stored in the buffer.
-            while(true) {
+            /*while(true) {
                 try
                 {
                     //System.out.println(data);
@@ -91,7 +119,7 @@ public class DataTransmitter implements Runnable {
                 {
                     throw new RuntimeException(e);
                 }
-            }
+            }*/
             //t.startTx();
             //led.set(Color.BLACK);
 

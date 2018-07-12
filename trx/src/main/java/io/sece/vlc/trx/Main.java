@@ -4,6 +4,11 @@ import java.io.IOException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 
+import io.sece.vlc.CRC8;
+import io.sece.vlc.DataBitString;
+import io.sece.vlc.FramingBlock;
+import io.sece.vlc.RaptorQ;
+
 
 public class Main {
     public static ColorLEDInterface led;
@@ -47,5 +52,25 @@ public class Main {
             System.out.println(e.getMessage());
         }*/
         System.out.println("LED transmitter is running");
+
+        String data;
+        RaptorQ raptor = new RaptorQ(DataBitString.dataBitString(), 4);
+
+        FramingBlock framingBlock = new FramingBlock();
+
+
+        for(int i = 0; i < 256; i++)
+        {
+            byte[] tmp = raptor.getPacket(i);
+
+            String test = DataBitString.bytesToString(tmp) + String.format("%8s", Integer.toBinaryString((int)(CRC8.compute(tmp)&0xff))).replace(' ', '0');
+
+            data = framingBlock.applyTX(test,2);
+
+            data = "011110" + data;
+
+            System.out.println(i + "    " + data);
+        }
+
     }
 }
