@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 
-import io.sece.vlc.RaptorCode;
-
 
 public class Main {
     public static ColorLEDInterface led;
@@ -49,37 +47,5 @@ public class Main {
             System.out.println(e.getMessage());
         }*/
         System.out.println("LED transmitter is running");
-
-        byte[] data = new byte[32];
-
-        for(int i = 0; i < data.length; i++)
-        {
-            data[i] = (byte)i;
-        }
-
-        RaptorCode raptorCode = new RaptorCode(data, 3);
-
-        for(int i = 0; i < 256; i++)
-        {
-            System.out.println(raptorCode.progress());
-            if(raptorCode.isDataReceived())
-            {
-                System.out.println("Correct");
-                return;
-            }
-            else
-            {
-                raptorCode.putPacket(raptorCode.getPacket(i * 3) );
-                System.out.println("not yet");
-            }
-            try {
-                Thread.sleep(1000);
-            }
-            catch (InterruptedException e)
-            {
-                throw new RuntimeException(e);
-            }
-        }
-
     }
 }
