@@ -22,6 +22,15 @@ public class Receiver<T extends Coordinate> {
     private Modem<Color> modem;
     private FramingBlock framingBlock;
     private RaptorQ raptor;
+    String allBits = "";
+
+    public static class Event extends Bus.Event {
+        public String bits;
+
+        public Event(String bits) {
+            this.bits = bits;
+        }
+    }
 
 
     public Receiver(Modem modem) {
@@ -38,11 +47,12 @@ public class Receiver<T extends Coordinate> {
         Color c = ev.frame.getColorAttr(Frame.HUE);
 
         String currSymbol  =  modem.demodulate(c);
-
+        allBits += currSymbol;
+        Bus.send(new Event(currSymbol));
         String data = (framingBlock.applyRX(currSymbol));
         if(data != null){
             System.out.println("Received Frame " + data);
-
+            allBits = "";
             byte[] receivedData = DataBitString.dataBitString(data.substring(0, data.length() - 8));
             String receivedCRC = (data.substring(data.length() - 8, data.length()));
             String calcCRC = String.format("%8s", Integer.toBinaryString((int)CRC8.compute(receivedData)).replace(' ', '0'));
