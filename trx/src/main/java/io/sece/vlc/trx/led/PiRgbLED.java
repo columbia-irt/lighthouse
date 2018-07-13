@@ -16,7 +16,7 @@ public class PiRgbLED implements ColorLEDInterface {
     private PiPwmLED green;
     private PiPwmLED blue;
 
-    public PiRgbLED(PiGPIOPin red, PiGPIOPin green, PiGPIOPin blue)
+    public PiRgbLED(PiGPIOPin red, PiGPIOPin green, PiGPIOPin blue) throws LEDException
     {
         this.red = new PiPwmLED(red);
         this.green = new PiPwmLED(green);

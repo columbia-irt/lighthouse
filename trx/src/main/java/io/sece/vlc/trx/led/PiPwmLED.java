@@ -15,10 +15,25 @@ import io.sece.vlc.trx.LEDException;
 public class PiPwmLED implements ContinuousLEDInterface {
     private PiGPIOPin pin;
 
-    public PiPwmLED(PiGPIOPin pin)
+
+    public PiPwmLED(PiGPIOPin pin) throws LEDException
+    {
+        // Set the PWM frequency to the maximum value by default. The library may set a lower
+        // value depending on the sample rate used.
+        this(pin, 40000);
+    }
+
+
+    public PiPwmLED(PiGPIOPin pin, int pwmFrequency) throws LEDException
     {
         this.pin = pin;
+        try {
+            pin.setPWMFrequency(pwmFrequency);
+        } catch (PiGPIOException e) {
+            throw new LEDException(e);
+        }
     }
+
 
     @Override
     public void set(Integer value) throws LEDException

@@ -34,4 +34,10 @@ public class PiGPIOPin
         }
         PiGPIO.gpioPWM(gpio, value);
     }
+
+
+    public int setPWMFrequency(int value) throws PiGPIOException
+    {
+        return PiGPIO.gpioSetPWMfrequency(gpio, value);
+    }
 }
