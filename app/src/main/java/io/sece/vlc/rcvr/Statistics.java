@@ -25,6 +25,7 @@ public class Statistics extends AppCompatTextView {
     private MovingAverage queueLength = new MovingAverage(100, TimeUnit.MILLISECONDS);
     private boolean transmitInProgress = false;
     private double transmitFPS = 0;
+    private String frame = "";
 
 
     public Statistics(Context context) {
@@ -43,8 +44,8 @@ public class Statistics extends AppCompatTextView {
 
     private void updateStatistics() {
         setText(String.format(Locale.US,
-                "Camera frame rate: %.1f fps\nProcessing delay: %.0f ms\nProcessing time: %.0f ms\nProcessing queue: %.0f\nProcessing frame rate: %.1f fps\nStatus: %b (%.0f)",
-                cameraFrameRate, processingDelay.value, processingTime.value, queueLength.value, workerFrameRate, transmitInProgress, transmitFPS));
+                "Camera frame rate: %.1f fps\nProcessing delay: %.0f ms\nProcessing time: %.0f ms\nProcessing queue: %.0f\nProcessing frame rate: %.1f fps\nStatus: %b (%.0f)\nFrame: %s",
+                cameraFrameRate, processingDelay.value, processingTime.value, queueLength.value, workerFrameRate, transmitInProgress, transmitFPS, frame));
     }
 
 
@@ -94,6 +95,12 @@ public class Statistics extends AppCompatTextView {
     private void onResult(TransmitMonitor.Event ev) {
         transmitFPS = ev.fps;
         transmitInProgress = ev.transmissionInProgress;
+        updateStatistics();
+    }
+
+    @Subscribe
+    private void onResult(Receiver.Event ev) {
+        frame = ev.bits;
         updateStatistics();
     }
 }

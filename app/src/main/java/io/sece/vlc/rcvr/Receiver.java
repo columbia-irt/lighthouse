@@ -22,7 +22,7 @@ public class Receiver<T extends Coordinate> {
     private Modem<Color> modem;
     private FramingBlock framingBlock;
     private RaptorQ raptor;
-    String allBits = "";
+
 
     public static class Event extends Bus.Event {
         public String bits;
@@ -37,7 +37,7 @@ public class Receiver<T extends Coordinate> {
         this.modem = modem;
         framingBlock = new FramingBlock();
         Bus.subscribe(this);
-        raptor = new RaptorQ(DataBitString.dataBitString(DataBitString.DATA_BIT_STRING), 4);
+        raptor = new RaptorQ(DataBitString.stringToByte(DataBitString.DATA_BIT_STRING), 4);
     }
 
 
@@ -47,19 +47,23 @@ public class Receiver<T extends Coordinate> {
         Color c = ev.frame.getColorAttr(Frame.HUE);
 
         String currSymbol  =  modem.demodulate(c);
-        allBits += currSymbol;
-        Bus.send(new Event(currSymbol));
         String data = (framingBlock.applyRX(currSymbol));
+        Bus.send(new Receiver.Event(framingBlock.rx_bits));
         if(data != null){
             System.out.println("Received Frame " + data);
-            allBits = "";
-            byte[] receivedData = DataBitString.dataBitString(data.substring(0, data.length() - 8));
-            String receivedCRC = (data.substring(data.length() - 8, data.length()));
-            String calcCRC = String.format("%8s", Integer.toBinaryString((int)CRC8.compute(receivedData)).replace(' ', '0'));
+            byte[] receivedData = DataBitString.stringToByte(data);
 
-            if(calcCRC.equals(receivedCRC)){
+            if (receivedData.length < 16) {
+                System.out.println("Frame too short");
+                return;
+            }
+
+            int receivedCRC = receivedData[0] & 0xff;
+            int calcCRC = CRC8.compute(receivedData, 1, receivedData.length - 1);
+
+            if (calcCRC == receivedCRC) {
                 System.out.println("CRC8 correct");
-                raptor.putPacket(receivedData);
+                raptor.putPacket(receivedData, 1);
             }else{
                 System.out.println("CRC is incorrect");
             }

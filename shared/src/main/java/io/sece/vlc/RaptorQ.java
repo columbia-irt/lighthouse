@@ -42,9 +42,14 @@ public class RaptorQ implements DataEncoder, DataDecoder {
 
 
     public void putPacket(byte[] data) {
-        if (data.length > packetSize)
+        putPacket(data, 0);
+    }
+
+
+    public void putPacket(byte[] data, int offset) {
+        if (data.length - offset > packetSize)
             throw new IllegalArgumentException("data.length > packetSize");
-        sbd.putEncodingPacket(sbd.dataDecoder().parsePacket(0, data[0] & 0xff, data, 1, data.length - 1, true).value());
+        sbd.putEncodingPacket(sbd.dataDecoder().parsePacket(0, data[offset] & 0xff, data, offset + 1, data.length - offset - 1, true).value());
     }
 
 

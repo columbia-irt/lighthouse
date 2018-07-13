@@ -29,7 +29,7 @@ public class FramingBlock {
     private static final int RX_STATE_DS1 = 4;
     private static final int RX_STATE_DS2 = 5;
 
-    private String rx_bits = "";
+    public String rx_bits = "";
     private final int RX_MAX = 150;
 
     private static final int TX_STATE_D0 = 0;
@@ -101,6 +101,7 @@ public class FramingBlock {
         //System.out.println("State: " + receiverState);
         return null;
     }
+
 
     private void storeRX(String input){
         if(rx_bits.length() != RX_MAX){

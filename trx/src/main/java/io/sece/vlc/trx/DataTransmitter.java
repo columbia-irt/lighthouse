@@ -82,9 +82,15 @@ public class DataTransmitter implements Runnable {
             {
                 byte[] tmp = raptor.getPacket(i);
 
-                String test = DataBitString.bytesToString(tmp) + String.format("%8s", Integer.toBinaryString((int)(CRC8.compute(tmp)&0xff))).replace(' ', '0');
+                byte[] tmp2 = new byte[tmp.length + 1];
+                tmp2[0] = (byte)CRC8.compute(tmp);
+                System.arraycopy(tmp, 0, tmp2, 1, tmp.length);
 
-                data = framingBlock.applyTX(test,mod.bits);
+                String test = DataBitString.bytesToString(tmp2);
+
+                //String test = DataBitString.bytesToString(tmp) + String.format("%8s", Integer.toBinaryString((int)(CRC8.compute(tmp)&0xff))).replace(' ', '0');
+
+                data = framingBlock.applyTX(test, mod.bits);
 
                 data = FramingBlock.STARTING_SEQUENCE + data;
 
