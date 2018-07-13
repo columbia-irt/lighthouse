@@ -1,6 +1,7 @@
 package io.sece.vlc.trx;
 
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import io.sece.vlc.CRC8;
 import io.sece.vlc.DataBitString;
@@ -69,7 +70,7 @@ public class DataTransmitter implements Runnable {
             // LEDInterface object to a particular Modulator. Note this should
             // enforce strict type checking and it should not be possible to
             // connect LEDs with incompatible modulators. That should generate a compile-time error.
-            t = new Transmitter<>(led, mod, (1000/this.getFPS()));
+            t = new Transmitter<>(led, mod, 1000000000/this.getFPS(), TimeUnit.NANOSECONDS);
 
 
             String data;
