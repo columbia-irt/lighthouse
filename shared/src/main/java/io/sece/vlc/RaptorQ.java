@@ -53,7 +53,7 @@ public class RaptorQ implements DataEncoder, DataDecoder {
 
         byte[] data = new byte[1 + packet.symbolsLength()];
         data[0] = (byte)packet.encodingSymbolID();
-        System.arraycopy(packet.symbols().array(), 0, data, 1, packet.symbolsLength());
+        packet.symbols().get(data, 1, packet.symbolsLength());
         return data;
     }
 
