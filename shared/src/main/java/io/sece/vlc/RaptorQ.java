@@ -42,30 +42,19 @@ public class RaptorQ implements DataEncoder, DataDecoder {
 
 
     public void putPacket(byte[] data) {
-        if (data.length != packetSize)
-            throw new IllegalArgumentException("data.length != packetSize");
-
-        int esi = data[0] & 0xff;
-
-        byte[] tmp = new byte[data.length - 1];
-        System.arraycopy(data, 1, tmp, 0, tmp.length);
-
-        sbd.putEncodingPacket(sbd.dataDecoder().parsePacket(0, esi, tmp, false).value());
+        if (data.length > packetSize)
+            throw new IllegalArgumentException("data.length > packetSize");
+        sbd.putEncodingPacket(sbd.dataDecoder().parsePacket(0, data[0] & 0xff, data, 1, data.length - 1, true).value());
     }
 
 
     public byte[] getPacket(int number) {
         packet = sbe.encodingPacket(number % 256);
 
-        byte[] encData = new byte[packetSize];
-
-        encData[0] = (byte)number;
-        System.arraycopy(packet.asArray(),8,encData, 1, packet.asArray().length - 8);
-        /*for (int i = 0; i < packet.asArray().length; i++)
-        {
-            System.out.println(packet.asArray()[i]);
-        }*/
-        return encData;
+        byte[] data = new byte[1 + packet.symbolsLength()];
+        data[0] = (byte)packet.encodingSymbolID();
+        System.arraycopy(packet.symbols().array(), 0, data, 1, packet.symbolsLength());
+        return data;
     }
 
 
