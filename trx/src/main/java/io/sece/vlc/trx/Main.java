@@ -53,7 +53,7 @@ public class Main {
         }*/
         System.out.println("LED transmitter is running");
 
-        String data;
+        /*String data;
         RaptorQ raptor = new RaptorQ(DataBitString.dataBitString(), 4);
 
         FramingBlock framingBlock = new FramingBlock();
@@ -70,7 +70,7 @@ public class Main {
             data = "011110" + data;
 
             System.out.println(i + "    " + data);
-        }
+        }*/
 
     }
 }

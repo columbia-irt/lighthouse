@@ -75,13 +75,13 @@ public class DataTransmitter implements Runnable {
 
             String data;
 
-            RaptorQ raptor = new RaptorQ(DataBitString.dataBitString(), 3);
+            RaptorQ raptor = new RaptorQ(DataBitString.dataBitString(DataBitString.DATA_BIT_STRING), 3);
             FramingBlock framingBlock = new FramingBlock();
 
 
             for(int i = 0; i < 256; i++)
             {
-                byte[] tmp = raptor.getPacket(i*2);
+                byte[] tmp = raptor.getPacket(i);
 
                 String test = DataBitString.bytesToString(tmp) + String.format("%8s", Integer.toBinaryString((int)(CRC8.compute(tmp)&0xff))).replace(' ', '0');
 
