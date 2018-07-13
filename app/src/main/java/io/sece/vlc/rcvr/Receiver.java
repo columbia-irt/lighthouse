@@ -17,9 +17,6 @@ import io.sece.vlc.rcvr.processing.Processing;
 
 public class Receiver<T extends Coordinate> {
     private Modem<Color> modem;
-    private boolean transmissionStarted = false;
-    private SynchronizationModule synchronizationModule;
-    private int delay = 50;
     private FramingBlock framingBlock;
 
 
@@ -31,20 +28,15 @@ public class Receiver<T extends Coordinate> {
     }
 
 
-    public int getDelay() {
-        return delay;
-    }
-
 
     @Subscribe
     private void rx(Processing.Result ev) {
         Color c = ev.frame.getColorAttr(Frame.HUE);
 
         String currSymbol  =  modem.demodulate(c);
-//        System.out.println(currSymbol + " " + ev.frame.get(Frame.IMAGE_TIMESTAMP));
+
         String data = (framingBlock.applyRX(currSymbol));
         if(data != null){
-
             System.out.println("Received Frame " + data);
         }
     }
