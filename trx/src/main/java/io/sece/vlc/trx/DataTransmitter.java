@@ -1,6 +1,5 @@
 package io.sece.vlc.trx;
 
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import io.sece.vlc.CRC8;
@@ -75,7 +74,7 @@ public class DataTransmitter implements Runnable {
 
             String data;
 
-            RaptorQ raptor = new RaptorQ(DataBitString.dataBitString(DataBitString.DATA_BIT_STRING), 3);
+            RaptorQ raptor = new RaptorQ(DataBitString.stringToByte(DataBitString.DATA_BIT_STRING), 3);
             FramingBlock framingBlock = new FramingBlock();
 
 
@@ -87,7 +86,7 @@ public class DataTransmitter implements Runnable {
 
                 data = framingBlock.applyTX(test,mod.bits);
 
-                data = "011110" + data;
+                data = FramingBlock.STARTING_SEQUENCE + data;
 
                 try
                 {
