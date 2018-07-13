@@ -98,6 +98,7 @@ public class FramingBlock {
             default:
                 throw new RuntimeException("Error occurred by invoking applyRX #defaultCase ");
         }
+        //System.out.println("State: " + receiverState);
         return null;
     }
 
@@ -130,10 +131,16 @@ public class FramingBlock {
             case TX_STATE_D1:
                 if(symbol.equals("11")){
                     tx_bits += "1111";
-                }else{
-                    tx_bits += symbol;
+                    transmitterState = TX_STATE_D0;
+                }else if(symbol.equals("01"))
+                {
+                    tx_bits += "01";
+                    transmitterState = TX_STATE_D1;
                 }
-                transmitterState = TX_STATE_D0;
+                else{
+                    tx_bits += symbol;
+                    transmitterState = TX_STATE_D0;
+                }
                 break;
             default: throw new RuntimeException("Error occurred by invoking addSymbolTX #defaultCase ");
         }
