@@ -85,7 +85,7 @@ public class Statistics extends AppCompatTextView {
         long time = ev.frame.getLongAttr(Frame.PROCESSING_END) - ev.frame.getLongAttr(Frame.PROCESSING_START);
         processingTime.update(TimeUnit.NANOSECONDS.toMillis(time));
 
-        queueLength.update(ev.frame.getIntAttr(Frame.CURRENT_SEQUENCE) - ev.frame.sequence);
+//        queueLength.update(ev.frame.getIntAttr(Frame.CURRENT_SEQUENCE) - ev.frame.sequence);
 
         updateStatistics();
     }

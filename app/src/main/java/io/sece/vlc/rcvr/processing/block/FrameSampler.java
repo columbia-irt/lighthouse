@@ -33,7 +33,7 @@ public class FrameSampler implements ProcessingBlock {
             if(prevColor == currColor){
                 sameColorCounter++;
             }else{
-                System.out.println("color processed: " + sameColorCounter + " " + modem.demodulate(currColor));
+//                System.out.println("color processed: " + sameColorCounter + " " + modem.demodulate(currColor));
                 sameColorCounter = 0;
             }
 
@@ -44,7 +44,7 @@ public class FrameSampler implements ProcessingBlock {
             }
             lastAcceptedFrame = stamp;
             prevColor = currColor;
-            System.out.println("color processed: " + sameColorCounter + " " + modem.demodulate(currColor));
+//            System.out.println("color processed: " + sameColorCounter + " " + modem.demodulate(currColor));
             sameColorCounter = 0;
             return frame;
 
