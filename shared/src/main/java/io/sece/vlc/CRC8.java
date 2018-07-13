@@ -4,6 +4,7 @@ package io.sece.vlc;
 /*
  * Based on the polynomial = X^8 + X^5 + X^4 + 1.
  * http://reveng.sourceforge.net/crc-catalogue/
+ * https://users.ece.cmu.edu/~koopman/roses/dsn04/koopman04_crc_poly_embedded.pdf
  */
 public class CRC8 {
     private static final byte[] table;
