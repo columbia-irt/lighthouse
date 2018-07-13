@@ -63,6 +63,7 @@ public class Receiver<T extends Coordinate> {
 
             if (calcCRC == receivedCRC) {
                 System.out.println("CRC8 correct");
+                Bus.send(new Receiver.Event("crc correct"));
                 raptor.putPacket(receivedData, 1);
             }else{
                 System.out.println("CRC is incorrect");
