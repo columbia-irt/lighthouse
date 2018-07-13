@@ -2,12 +2,24 @@ package io.sece.vlc;
 
 /**
  * Created by alex on 7/9/18.
+ *
+ * This class represents FSK4 stuffing and unstuffing of a framing block containing data and crc checksum
+ *
+ *  applyRx(String bits):
+ *      - receives a sequence of bits including startingsequence (011110) + data + crc8 checksum
+ *      - checks and drops startingsequence and returns unstuffed data+crc8
+ *
+ *  applyTx(String sequence, int bitsCount):
+ *      - receives bits including data and crc8 WITHOUT starting sequence, bitsCount represents amount of bits being a symbol
+ *      - returns stuffed bitsequence for startingsequence (011110)
+ *
+ * TODO: Replacing type String of rx_bits and tx_bits with StringBuilder
  */
 
 public class FramingBlock {
 
     /**
-     *  Different statuses for Receiver Parts
+     *  different statuses for Receiver Parts
      */
 
     private static final int RX_STATE_S0 = 0;
@@ -62,6 +74,8 @@ public class FramingBlock {
             case RX_STATE_DS1:
                 if(bits.equals("11")){
                     receiverState = RX_STATE_DS2;
+                }else if(bits.equals("01")){
+                    storeRX("01");
                 }else{
                     storeRX("01" + bits);
                     receiverState = RX_STATE_D;
