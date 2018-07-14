@@ -74,7 +74,7 @@ public class DataTransmitter implements Runnable {
 
             String data;
 
-            RaptorQ raptor = new RaptorQ(BitString.toBytes(BitString.DEFAULT_DATA), 3);
+            RaptorQ raptor = new RaptorQ(BitString.DEFAULT_DATA, 3);
             FramingBlock framingBlock = new FramingBlock();
 
 

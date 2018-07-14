@@ -55,7 +55,7 @@ public class Main {
 
         String data;
         String received = "";
-        RaptorQ raptor = new RaptorQ(BitString.toBytes(BitString.DEFAULT_DATA), 4);
+        RaptorQ raptor = new RaptorQ(BitString.DEFAULT_DATA, 4);
 
         FramingBlock framingBlock = new FramingBlock();
         int i = 0;

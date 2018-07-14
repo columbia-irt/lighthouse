@@ -37,7 +37,7 @@ public class Receiver<T extends Coordinate> {
         this.modem = modem;
         framingBlock = new FramingBlock();
         Bus.subscribe(this);
-        raptor = new RaptorQ(BitString.toBytes(BitString.DEFAULT_DATA), 4);
+        raptor = new RaptorQ(BitString.DEFAULT_DATA, 4);
     }
 
 
