@@ -3,7 +3,7 @@ package io.sece.vlc.trx;
 import java.util.concurrent.TimeUnit;
 
 import io.sece.vlc.CRC8;
-import io.sece.vlc.DataBitString;
+import io.sece.vlc.BitString;
 import io.sece.vlc.FramingBlock;
 import io.sece.vlc.RaptorQ;
 import io.sece.vlc.modem.FSK2Modem;
@@ -74,7 +74,7 @@ public class DataTransmitter implements Runnable {
 
             String data;
 
-            RaptorQ raptor = new RaptorQ(DataBitString.stringToByte(DataBitString.DATA_BIT_STRING), 3);
+            RaptorQ raptor = new RaptorQ(BitString.toBytes(BitString.DEFAULT_DATA), 3);
             FramingBlock framingBlock = new FramingBlock();
 
 
@@ -86,9 +86,9 @@ public class DataTransmitter implements Runnable {
                 tmp2[0] = (byte)CRC8.compute(tmp);
                 System.arraycopy(tmp, 0, tmp2, 1, tmp.length);
 
-                String test = DataBitString.bytesToString(tmp2);
+                String test = BitString.fromBytes(tmp2);
 
-                //String test = DataBitString.bytesToString(tmp) + String.format("%8s", Integer.toBinaryString((int)(CRC8.compute(tmp)&0xff))).replace(' ', '0');
+                //String test = BitString.bytesToString(tmp) + String.format("%8s", Integer.toBinaryString((int)(CRC8.compute(tmp)&0xff))).replace(' ', '0');
 
                 data = framingBlock.applyTX(test, mod.bits);
 

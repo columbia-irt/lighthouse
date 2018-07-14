@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 
+import io.sece.vlc.BitString;
 import io.sece.vlc.CRC8;
-import io.sece.vlc.DataBitString;
 import io.sece.vlc.FramingBlock;
 import io.sece.vlc.RaptorQ;
 
@@ -55,7 +55,7 @@ public class Main {
 
         String data;
         String received = "";
-        RaptorQ raptor = new RaptorQ(DataBitString.stringToByte(DataBitString.DATA_BIT_STRING), 4);
+        RaptorQ raptor = new RaptorQ(BitString.toBytes(BitString.DEFAULT_DATA), 4);
 
         FramingBlock framingBlock = new FramingBlock();
         int i = 0;
@@ -64,7 +64,7 @@ public class Main {
         {
             byte[] tmp = raptor.getPacket(i);
 
-            String test = DataBitString.bytesToString(tmp) + String.format("%8s", Integer.toBinaryString((int) (CRC8.compute(tmp) & 0xff))).replace(' ', '0');
+            String test = BitString.fromBytes(tmp) + String.format("%8s", Integer.toBinaryString((int) (CRC8.compute(tmp) & 0xff))).replace(' ', '0');
 
             data = framingBlock.applyTX(test, 2);
 
@@ -93,13 +93,13 @@ public class Main {
             System.out.println("currData: " + currData);
             String currCRC = received.substring(received.length() - 8, received.length());
             System.out.println("currCRC: " + currCRC);
-            String calcCRC = String.format("%8s", Integer.toBinaryString((int)CRC8.compute(DataBitString.stringToByte(currData)))).replace(' ', '0');
+            String calcCRC = String.format("%8s", Integer.toBinaryString((int)CRC8.compute(BitString.toBytes(currData)))).replace(' ', '0');
             System.out.println("calcCRC: " + calcCRC);
 
             if(currCRC.equals(calcCRC))
             {
                 System.out.println("CRC stimmt");
-                raptor.putPacket(DataBitString.stringToByte(currData));
+                raptor.putPacket(BitString.toBytes(currData));
             }
             else
             {

@@ -5,7 +5,7 @@ import com.google.common.eventbus.Subscribe;
 import io.sece.vlc.CRC8;
 import io.sece.vlc.Color;
 import io.sece.vlc.Coordinate;
-import io.sece.vlc.DataBitString;
+import io.sece.vlc.BitString;
 import io.sece.vlc.FramingBlock;
 import io.sece.vlc.Modem;
 import io.sece.vlc.RaptorQ;
@@ -37,7 +37,7 @@ public class Receiver<T extends Coordinate> {
         this.modem = modem;
         framingBlock = new FramingBlock();
         Bus.subscribe(this);
-        raptor = new RaptorQ(DataBitString.stringToByte(DataBitString.DATA_BIT_STRING), 4);
+        raptor = new RaptorQ(BitString.toBytes(BitString.DEFAULT_DATA), 4);
     }
 
 
@@ -51,7 +51,7 @@ public class Receiver<T extends Coordinate> {
         Bus.send(new Receiver.Event(framingBlock.rx_bits));
         if(data != null){
             System.out.println("Received Frame " + data);
-            byte[] receivedData = DataBitString.stringToByte(data);
+            byte[] receivedData = BitString.toBytes(data);
 
             if (receivedData.length < 16) {
                 System.out.println("Frame too short");
