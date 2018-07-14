@@ -17,8 +17,17 @@ public class ViewfinderModel extends ViewModel {
     public Point roiCenter = DEFAULT_ROI_CENTER;
     public int roiRadius = DEFAULT_ROI_RADIUS;
 
-    public static final int synced_fps = 1;
     public CameraSessionParams cameraParams = new CameraSessionParams();
 
+    private int baudRate = 10;
     public String transmissionID;
+
+    public int getBaudRate() {
+        return baudRate;
+    }
+
+    public void setBaudRate(int baudRate) {
+        this.baudRate = baudRate;
+        Bus.send(new Bus.BaudRateChange(this.baudRate));
+    }
 }

@@ -55,7 +55,7 @@ public class Processing extends HandlerThread {
     }
 
 
-    public Processing(RectF roi, Modem modem) {
+    public Processing(RectF roi, int baudRate, Modem modem) {
         super("Processing");
 
         stage1 = Arrays.asList(
@@ -66,8 +66,8 @@ public class Processing extends HandlerThread {
         stage2 = Arrays.asList(
                 new RateMonitor("worker"),
                 new HueDetector(),
-                new FrameSampler(((1000 / ViewfinderModel.synced_fps)), TimeUnit.MILLISECONDS, modem),
-                new TransmitMonitor(ViewfinderModel.synced_fps, modem, 3)
+                new FrameSampler(baudRate, modem),
+                new TransmitMonitor(baudRate, modem, 3)
         );
     }
 

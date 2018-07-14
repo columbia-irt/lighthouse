@@ -1,9 +1,12 @@
 package io.sece.vlc.rcvr.processing.block;
 
+import com.google.common.eventbus.Subscribe;
+
 import java.util.concurrent.TimeUnit;
 
 import io.sece.vlc.Color;
 import io.sece.vlc.Modem;
+import io.sece.vlc.rcvr.Bus;
 import io.sece.vlc.rcvr.ViewfinderModel;
 import io.sece.vlc.rcvr.processing.Frame;
 import io.sece.vlc.rcvr.processing.ProcessingBlock;
@@ -18,9 +21,16 @@ public class FrameSampler implements ProcessingBlock {
     private Color prevColor;
     private int sameColorCounter = 0;
 
-    public FrameSampler(long interval, TimeUnit unit, Modem modem) {
-        this.interval = unit.toNanos(interval);
+    public FrameSampler(int baudRate, Modem modem) {
+        this.interval = 1000000000 / baudRate;
         this.modem = modem;
+        Bus.subscribe(this);
+    }
+
+
+    @Subscribe
+    public void onBaudRateChange(Bus.BaudRateChange event) {
+        this.interval = 1000000000 / event.baudRate;
     }
 
 
@@ -48,13 +58,10 @@ public class FrameSampler implements ProcessingBlock {
             sameColorCounter = 0;
             return frame;
 
-        }else {
-
+        } else {
             prevColor = currColor;
             return null;
         }
 
     }
-
-
 }

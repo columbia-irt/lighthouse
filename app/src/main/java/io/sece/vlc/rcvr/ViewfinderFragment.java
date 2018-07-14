@@ -18,6 +18,8 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.util.Size;
 import android.view.LayoutInflater;
@@ -252,7 +254,7 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
 
         // Once the target frame size is known, create the image reader object
         CompletableFuture f1 = haveSource.thenApply(v -> {
-            processing = new Processing(overlay.normalizeBoundingBox(roi.boundingBox()), modem);
+            processing = new Processing(overlay.normalizeBoundingBox(roi.boundingBox()), model.getBaudRate(), modem);
             processing.start();
             imageReader = createImageReader(processing, S.frameResolution);
             S.setSurfaces(Arrays.asList(surface.getHolder().getSurface(), imageReader.getSurface()));
@@ -460,6 +462,22 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
             button.setText("Start");
             fpsText.setEnabled(true);
         }
+        fpsText.setText(Integer.toString(model.getBaudRate()));
+
+        fpsText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                try {
+                    model.setBaudRate(Integer.parseInt(s.toString()));
+                } catch(NumberFormatException e) { }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) { }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+            });
 
         trx = new TransmitterAPI(getContext(),"http://192.168.1.102:8000/");
         button.setOnClickListener(v -> {
@@ -487,6 +505,7 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
                         button.setText("Stop");
                         fpsText.setEnabled(false);
                     } else {
+                        button.setText("Start");
                         fpsText.setEnabled(true);
                         Toast.makeText(getContext(), ex.getMessage(), Toast.LENGTH_LONG).show();
                     }

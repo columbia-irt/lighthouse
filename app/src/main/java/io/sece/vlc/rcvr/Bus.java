@@ -17,6 +17,14 @@ public class Bus extends AsyncEventBus {
     public static class Event {
     }
 
+    public static class BaudRateChange extends Event {
+        public int baudRate;
+
+        public BaudRateChange(int baudRate) {
+            this.baudRate = baudRate;
+        }
+    }
+
     private Bus() {
         super(runnable -> {
             if (Looper.myLooper() == Looper.getMainLooper()) runnable.run();
