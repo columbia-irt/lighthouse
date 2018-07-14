@@ -88,47 +88,17 @@ public class DataTransmitter implements Runnable {
 
                 String test = BitString.fromBytes(tmp2);
 
-                //String test = BitString.bytesToString(tmp) + String.format("%8s", Integer.toBinaryString((int)(CRC8.compute(tmp)&0xff))).replace(' ', '0');
-
                 data = framingBlock.applyTX(test, mod.bits);
 
                 data = FramingBlock.STARTING_SEQUENCE + data;
 
-                try
-                {
+                try {
                     System.out.println(i + "    " + data);
                     t.tx(data);
-                }
-                catch (LEDException|InterruptedException e)
-                {
+                } catch (LEDException|InterruptedException e) {
                     throw new RuntimeException(e);
                 }
             }
-
-
-            // Transmit the data stored in the buffer.
-            /*while(true) {
-                try
-                {
-                    //System.out.println(data);
-                    t.tx(data);
-                }
-                catch (LEDException|InterruptedException e)
-                {
-                    throw new RuntimeException(e);
-                }
-                try
-                {
-                    Thread.sleep((rand.nextInt(2500) + 500));
-                }
-                catch (InterruptedException e)
-                {
-                    throw new RuntimeException(e);
-                }
-            }*/
-            //t.startTx();
-            //led.set(Color.BLACK);
-
         }
         catch (IllegalArgumentException e)
         {
