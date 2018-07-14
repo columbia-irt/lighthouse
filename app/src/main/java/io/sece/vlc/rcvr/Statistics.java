@@ -23,8 +23,9 @@ public class Statistics extends AppCompatTextView {
     private MovingAverage processingDelay = new MovingAverage(100, TimeUnit.MILLISECONDS);
     private MovingAverage processingTime = new MovingAverage(100, TimeUnit.MILLISECONDS);
     private MovingAverage queueLength = new MovingAverage(100, TimeUnit.MILLISECONDS);
-    private boolean transmitInProgress = false;
-    private double transmitFPS = 0;
+    private boolean signalLock = false;
+    private double signalRate = 0;
+    private double completed = 0d;
     private String frame = "";
 
 
@@ -43,9 +44,18 @@ public class Statistics extends AppCompatTextView {
 
 
     private void updateStatistics() {
-        setText(String.format(Locale.US,
-                "Camera frame rate: %.1f fps\nProcessing delay: %.0f ms\nProcessing time: %.0f ms\nProcessing queue: %.0f\nProcessing frame rate: %.1f fps\nStatus: %b (%.0f)\nFrame: %s",
-                cameraFrameRate, processingDelay.value, processingTime.value, queueLength.value, workerFrameRate, transmitInProgress, transmitFPS, frame));
+        StringBuilder b = new StringBuilder();
+
+        b.append(String.format(Locale.US, "Camera frame rate: %.1f fps\n", cameraFrameRate));
+        b.append(String.format(Locale.US, "Processing delay: %.0f ms\n", processingDelay.value));
+        b.append(String.format(Locale.US, "Processing time: %.0f ms\n", processingTime.value));
+        b.append(String.format(Locale.US, "Processing frame rate: %.1f fps\n", workerFrameRate));
+        b.append(String.format(Locale.US, "Queue length: %.0f\n", queueLength.value));
+        b.append(String.format(Locale.US, "Signal: locked=%b rate=%.0f Bd\n", signalLock, signalRate));
+        b.append(String.format(Locale.US, "Transferred: %.1f %%\n", completed));
+        b.append(String.format(Locale.US, "Receiving: %s", frame));
+
+        setText(b.toString());
     }
 
 
@@ -69,7 +79,7 @@ public class Statistics extends AppCompatTextView {
         // destroyed, e.g., as result of a rotation event.
         if (getContext() == null) return;
 
-        if (ev.id == "camera") {
+        if (ev.id.equals("camera")) {
             cameraFrameRate = ev.fps;
         } else {
             workerFrameRate = ev.fps;
@@ -86,20 +96,19 @@ public class Statistics extends AppCompatTextView {
         long time = ev.frame.getLongAttr(Frame.PROCESSING_END) - ev.frame.getLongAttr(Frame.PROCESSING_START);
         processingTime.update(TimeUnit.NANOSECONDS.toMillis(time));
 
-//        queueLength.update(ev.frame.getIntAttr(Frame.CURRENT_SEQUENCE) - ev.frame.sequence);
-
+        queueLength.update(ev.frame.getLongAttr(Frame.CURRENT_SEQUENCE) - ev.frame.sequence);
         updateStatistics();
     }
 
     @Subscribe
-    private void onResult(TransmitMonitor.Event ev) {
-        transmitFPS = ev.fps;
-        transmitInProgress = ev.transmissionInProgress;
+    private void onMonitorUpdate(TransmitMonitor.Event ev) {
+        signalRate = ev.fps;
+        signalLock = ev.transmissionInProgress;
         updateStatistics();
     }
 
     @Subscribe
-    private void onResult(Receiver.Event ev) {
+    private void onFrameUpdate(Receiver.Event ev) {
         frame = ev.bits;
         updateStatistics();
     }

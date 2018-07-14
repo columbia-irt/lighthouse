@@ -12,11 +12,6 @@ import io.sece.vlc.RaptorQ;
 import io.sece.vlc.rcvr.processing.Frame;
 import io.sece.vlc.rcvr.processing.Processing;
 
-/**
- * Created by alex on 6/22/18.
- *
- * This class contains the basic setup of the Receiver including Modulation, FPS, Transmissionstarting
- */
 
 public class Receiver<T extends Coordinate> {
     private Modem<Color> modem;
@@ -39,7 +34,6 @@ public class Receiver<T extends Coordinate> {
         Bus.subscribe(this);
         raptor = new RaptorQ(BitString.DEFAULT_DATA, 4);
     }
-
 
 
     @Subscribe
@@ -79,9 +73,7 @@ public class Receiver<T extends Coordinate> {
                 }
             }
         }
-
     }
-
 }
 
 
