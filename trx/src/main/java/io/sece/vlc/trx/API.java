@@ -176,8 +176,6 @@ public class API {
             byte [] response;
             TransmissionID transID;
 
-
-
             Reader isr =  new InputStreamReader(he.getRequestBody(),"utf-8");
             Gson gson = new GsonBuilder().create();
             transID = gson.fromJson(isr, TransmissionID.class);
@@ -211,9 +209,7 @@ public class API {
                 }
             }
 
-
-            response = jsonString.getBytes();
-
+            response = ("{response: \"" + jsonString + "\"}").getBytes();
             he.sendResponseHeaders(200, response.length);
             OutputStream os = he.getResponseBody();
             os.write(response);

@@ -389,7 +389,7 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
         super.onResume();
         Bus.subscribe(this);
 
-        initTrxControl(getView().findViewById(R.id.txValue), getView().findViewById(R.id.txButton), getView().findViewById(R.id.txColor));
+        initTrxControl(getView().findViewById(R.id.txFPS), getView().findViewById(R.id.txButton), getView().findViewById(R.id.txColor));
 
         onSurfaceReady(surfaceView, surface -> {
             if (state != NO_SESSION) return;
@@ -452,28 +452,47 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
     }
 
 
-    private void initTrxControl(EditText text, Button button, TextView indicator) {
+    private void initTrxControl(EditText fpsText, Button button, TextView indicator) {
+        if (model.transmissionID != null) {
+            button.setText("Stop");
+            fpsText.setEnabled(false);
+        } else {
+            button.setText("Start");
+            fpsText.setEnabled(true);
+        }
+
         trx = new TransmitterAPI(getContext(),"http://192.168.1.102:8000/");
         button.setOnClickListener(v -> {
-            final CharSequence old = button.getText();
-            final int hue = Integer.parseInt(text.getText().toString());
+            final int fps = Integer.parseInt(fpsText.getText().toString());
 
             button.setText(R.string.working);
             button.setEnabled(false);
+            fpsText.setEnabled(false);
 
-            CompletableFuture<JSONObject> f = trx.calibrate(hue, 15);
-            f.whenComplete((obj, ex) -> {
-                button.setText(old);
-                button.setEnabled(true);
-                if (null != ex)
-                    Toast.makeText(getContext(), ex.getMessage(), Toast.LENGTH_LONG).show();
-            });
-            // FIXME: The following should turned into thenAccept when done with debugging
-            f.whenComplete((obj, ex) -> {
-                Color c = new Color(hue);
-                indicator.setBackgroundColor(android.graphics.Color.rgb(c.red, c.green, c.blue));
-                indicator.setText(String.format(Locale.US, "TX: %d", hue));
-            });
+            if (model.transmissionID != null) {
+                CompletableFuture<String> f = trx.stop(model.transmissionID);
+                f.whenComplete((response, ex) -> {
+                    model.transmissionID = null;
+                    button.setText("Start");
+                    button.setEnabled(true);
+                    fpsText.setEnabled(true);
+                    if (null != ex)
+                        Toast.makeText(getContext(), ex.getMessage(), Toast.LENGTH_LONG).show();
+                });
+            } else {
+                CompletableFuture<String> f = trx.transmit(fps, 360, "fsk4");
+                f.whenComplete((obj, ex) -> {
+                    if (obj != null) {
+                        model.transmissionID = obj;
+                        button.setText("Stop");
+                        fpsText.setEnabled(false);
+                    } else {
+                        fpsText.setEnabled(true);
+                        Toast.makeText(getContext(), ex.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                    button.setEnabled(true);
+                });
+            }
         });
 
 

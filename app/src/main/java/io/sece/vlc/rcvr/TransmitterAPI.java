@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 
 public class TransmitterAPI {
@@ -48,18 +49,24 @@ public class TransmitterAPI {
     }
 
 
-    public CompletableFuture<JSONObject> transmit(int fps, int duration, String modulator) {
+    public CompletableFuture<String> transmit(int fps, int duration, String modulator) {
         JSONObject data = new JSONObject();
         try {
             data.put("FPS", fps);
             data.put("timeout", duration);
             data.put("modulator", modulator);
         } catch (JSONException e) {
-            CompletableFuture<JSONObject> rv = new CompletableFuture<>();
+            CompletableFuture<String> rv = new CompletableFuture<>();
             rv.completeExceptionally(e);
             return rv;
         }
-        return jsonRequest(Request.Method.POST, "transmit", data);
+        return jsonRequest(Request.Method.POST, "transmit", data).thenApply(o -> {
+            try {
+                return o.getString("tID");
+            } catch (JSONException e) {
+                throw new CompletionException(e);
+            }
+        });
     }
 
 
@@ -74,5 +81,24 @@ public class TransmitterAPI {
             return rv;
         }
         return jsonRequest(Request.Method.POST, "calibration", data);
+    }
+
+
+    public CompletableFuture<String> stop(String id) {
+        JSONObject data = new JSONObject();
+        try {
+            data.put("tID", id);
+        } catch (JSONException e) {
+            CompletableFuture<String> rv = new CompletableFuture<>();
+            rv.completeExceptionally(e);
+            return rv;
+        }
+        return jsonRequest(Request.Method.POST, "off", data).thenApply(o -> {
+            try {
+                return o.getString("response");
+            } catch (JSONException e) {
+                throw new CompletionException(e);
+            }
+        });
     }
 }
