@@ -19,7 +19,7 @@ public class ViewfinderModel extends ViewModel {
 
     public CameraSessionParams cameraParams = new CameraSessionParams();
 
-    private int baudRate = 10;
+    private int baudRate = 15;
     public String transmissionID;
 
     public int getBaudRate() {

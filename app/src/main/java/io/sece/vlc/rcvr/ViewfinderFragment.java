@@ -239,6 +239,11 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
                         if (!granted)
                             throw new CameraException(getString(R.string.camera_access_denied));
                         selectCameraSource(S, targetSize, ImageFormat.YUV_420_888);
+
+                        // Set transmission baud rate to half the camera frame rate by default.
+                        model.setBaudRate(S.fps / 2);
+                        EditText t = getView().findViewById(R.id.txFPS);
+                        t.setText(Integer.toString(model.getBaudRate()));
                     } catch (CameraException e) {
                         throw new CompletionException(e);
                     }
