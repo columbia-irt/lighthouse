@@ -46,6 +46,7 @@ import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
+import io.sece.vlc.BitString;
 import io.sece.vlc.Color;
 import io.sece.vlc.modem.FSK4Modem;
 import io.sece.vlc.rcvr.processing.Frame;
@@ -364,6 +365,7 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
         model = ViewModelProviders.of(this).get(ViewfinderModel.class);
 
         receiver = new Receiver(new FSK4Modem());
+        receiver.start();
     }
 
 
@@ -653,9 +655,26 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
 //        });
 //    }
 
+
+    private static int hammingDistance(byte[] a, byte[] b) {
+        if (a.length != b.length)
+            throw new IllegalArgumentException("a.length != b.length");
+
+        int rv = 0;
+        for (int i = 0; i < a.length; i++)
+            rv += Integer.bitCount((a[i] & 0xff) ^ (b[i] & 0xff));
+        return rv;
+    }
+
+
     @Subscribe
     public void onTransferCompleted(Bus.TransferCompleted ev) {
-        ConfirmationDialog d = ConfirmationDialog.newInstance(ev.msg, true);
+        String msg = "Failure";
+        if (hammingDistance(ev.data, BitString.DEFAULT_DATA) == 0)
+            msg = "Success";
+
+        ConfirmationDialog d = ConfirmationDialog.newInstance(msg, false);
         d.show(getChildFragmentManager(), FRAGMENT_DIALOG);
+        d.completed.whenComplete((v, t) -> receiver.start());
     }
 }

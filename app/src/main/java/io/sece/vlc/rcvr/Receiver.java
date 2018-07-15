@@ -5,7 +5,6 @@ import android.util.Log;
 import com.google.common.eventbus.Subscribe;
 
 import io.sece.vlc.Color;
-import io.sece.vlc.Coordinate;
 import io.sece.vlc.BitString;
 import io.sece.vlc.DataFrame;
 import io.sece.vlc.Modem;
@@ -14,29 +13,41 @@ import io.sece.vlc.rcvr.processing.Frame;
 import io.sece.vlc.rcvr.processing.Processing;
 
 
-public class Receiver<T extends Coordinate> {
+public class Receiver {
     private static final String TAG = "Receiver";
     private Modem<Color> modem;
-    private DataFrame dataFrame = new DataFrame();
-    private RaptorQDecoder decoder = new RaptorQDecoder(BitString.DEFAULT_DATA.length, DataFrame.MAX_PAYLOAD_SIZE);
-    private int frameErrors = 0;
-    private int frameTotal = 0;
+    private DataFrame dataFrame;
+    private RaptorQDecoder decoder;
+    private int frameErrors;
+    private int frameTotal;
 
 
     public Receiver(Modem modem) {
         this.modem = modem;
+    }
+
+
+    private void updateCounters(int frameTotal, int frameErrors) {
+        this.frameTotal = frameTotal;
+        this.frameErrors = frameErrors;
+        Bus.send(new Bus.FrameStats(this.frameTotal, this.frameErrors));
+    }
+
+
+    public void start() {
+        dataFrame = new DataFrame();
+        Bus.send(new Bus.FrameUpdate(dataFrame.getCurrentData()));
+
+        decoder = new RaptorQDecoder(BitString.DEFAULT_DATA.length, DataFrame.MAX_PAYLOAD_SIZE);
+        Bus.send(new Bus.ProgressUpdate(decoder.percentCompleted()));
+
+        updateCounters(0, 0);
         Bus.subscribe(this);
     }
 
 
-    private static int hammingDistance(byte[] a, byte[] b) {
-        if (a.length != b.length)
-            throw new IllegalArgumentException("a.length != b.length");
-
-        int rv = 0;
-        for (int i = 0; i < a.length; i++)
-            rv += Integer.bitCount((a[i] & 0xff) ^ (b[i] & 0xff));
-        return rv;
+    public void stop() {
+        Bus.unsubscribe(this);
     }
 
 
@@ -48,23 +59,21 @@ public class Receiver<T extends Coordinate> {
         Bus.send(new Bus.FrameUpdate(dataFrame.getCurrentData()));
         if (!complete) return;
 
-        frameTotal++;
+        updateCounters(frameTotal + 1, frameErrors);
         Log.d(TAG, "Frame: " + dataFrame.getCurrentData());
 
         if (dataFrame.errorsDetected()) {
-            Log.w(TAG, "Frame errors detected");
-            frameErrors++;
-            Bus.send(new Bus.FrameStats(frameTotal, frameErrors));
+            Log.w(TAG, "Corrupted frame received");
+            updateCounters(frameTotal, frameErrors + 1);
             return;
         }
-        Bus.send(new Bus.FrameStats(frameTotal, frameErrors));
 
         byte[] payload = dataFrame.getPayload();
         dataFrame.reset();
 
         if (payload.length < decoder.minPacketSize() || payload.length > decoder.maxPacketSize()) {
             Log.w(TAG, "Invalid payload size " + payload.length);
-            frameErrors++;
+            updateCounters(frameTotal, frameErrors + 1);
             return;
         }
 
@@ -73,19 +82,14 @@ public class Receiver<T extends Coordinate> {
             Log.d(TAG, "Progress: " + decoder.percentCompleted());
         } catch(Exception e) {
             Log.w(TAG, "Error while decoding frame payload", e);
-            frameErrors++;
+            updateCounters(frameTotal, frameErrors + 1);
             return;
         }
         Bus.send(new Bus.ProgressUpdate(decoder.percentCompleted()));
 
-        if (!decoder.hasCompleted()) return;
-
-        String msg;
-        if (hammingDistance(BitString.DEFAULT_DATA, decoder.getData()) == 0)
-            msg = "Transfer completed successfully";
-        else
-            msg = "Transfer failed";
-
-        Bus.send(new Bus.TransferCompleted(msg));
+        if (decoder.hasCompleted()) {
+            stop();
+            Bus.send(new Bus.TransferCompleted(decoder.getData()));
+        }
     }
 }

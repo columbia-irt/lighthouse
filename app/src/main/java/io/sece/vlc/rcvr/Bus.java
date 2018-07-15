@@ -54,10 +54,11 @@ public class Bus extends AsyncEventBus {
     }
 
     public static class TransferCompleted extends Event {
-        public String msg;
+        public byte[] data;
 
-        public TransferCompleted(String msg) {
-            this.msg = msg;
+        public TransferCompleted(byte[] src) {
+            data = new byte[src.length];
+            System.arraycopy(src, 0, data, 0, src.length);
         }
     }
 
