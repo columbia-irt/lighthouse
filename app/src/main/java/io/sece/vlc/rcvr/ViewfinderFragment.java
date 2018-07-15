@@ -495,7 +495,7 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
                         Toast.makeText(getContext(), ex.getMessage(), Toast.LENGTH_LONG).show();
                 });
             } else {
-                CompletableFuture<String> f = trx.transmit(fps, 360, "fsk4");
+                CompletableFuture<String> f = trx.transmit(fps, 60 * 60 * 24, "fsk4");
                 f.whenComplete((obj, ex) -> {
                     if (obj != null) {
                         model.transmissionID = obj;
@@ -652,4 +652,10 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
 //            }
 //        });
 //    }
+
+    @Subscribe
+    public void onTransferCompleted(Bus.TransferCompleted ev) {
+        ConfirmationDialog d = ConfirmationDialog.newInstance(ev.msg, true);
+        d.show(getChildFragmentManager(), FRAGMENT_DIALOG);
+    }
 }
