@@ -44,10 +44,7 @@ public class RoIExtractor implements ProcessingBlock {
         return roi;
     }
 
-
-    @Subscribe
-    public synchronized void onRoIEvent(ViewfinderFragment.RoIEvent ev) {
-        // This handler will be invoked on the UI thread
-        roi = new RectF(ev.boundingBox);
+    public synchronized void setBoundingBox(RectF roi) {
+        this.roi = new RectF(roi);
     }
 }

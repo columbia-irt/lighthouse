@@ -86,14 +86,6 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
 
     private FSK4Modem modem = new FSK4Modem();
 
-    public static class RoIEvent extends Bus.Event {
-        public RectF boundingBox;
-
-        RoIEvent(RectF boundingBox) {
-            this.boundingBox = boundingBox;
-        }
-    }
-
 
     private static Size selectFrameResolution(Size[] choices, Size target) throws CameraException {
         return selectFrameResolution(choices, target, new Size(0, 0));
@@ -222,14 +214,14 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
 //            Point old = model.roiCenter;
 //            model.roiCenter = roi.center(new Point(x, y));
 //            if (!old.equals(model.roiCenter))
-//                Bus.send(new RoIEvent(overlay.normalizeBoundingBox(roi.boundingBox())));
+//                Bus.send(new Bus.RoIEvent(overlay.normalizeBoundingBox(roi.boundingBox())));
 //        });
 
         gc.onZoom(f -> {
             int old = model.roiRadius;
             model.roiRadius = roi.radius(Math.round(model.roiRadius * f));
             if (old != model.roiRadius)
-                Bus.send(new RoIEvent(overlay.normalizeBoundingBox(roi.boundingBox())));
+                Bus.send(new Bus.RoIEvent(overlay.normalizeBoundingBox(roi.boundingBox())));
         });
 
         overlay.add(roi);

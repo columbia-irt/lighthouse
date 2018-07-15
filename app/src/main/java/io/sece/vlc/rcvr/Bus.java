@@ -1,5 +1,6 @@
 package io.sece.vlc.rcvr;
 
+import android.graphics.RectF;
 import android.os.Handler;
 import android.os.Looper;
 
@@ -24,6 +25,51 @@ public class Bus extends AsyncEventBus {
             this.baudRate = baudRate;
         }
     }
+
+    public static class FrameUpdate extends Event {
+        public String data;
+
+        public FrameUpdate(String src) {
+            data = src;
+        }
+    }
+
+    public static class ProgressUpdate extends Event {
+        public float completed;
+
+        public ProgressUpdate(float completed) {
+            this.completed = completed;
+        }
+    }
+
+
+    public static class FrameStats extends Event {
+        public int total;
+        public int errors;
+
+        public FrameStats(int total, int errors) {
+            this.total = total;
+            this.errors = errors;
+        }
+    }
+
+    public static class TransferCompleted extends Event {
+        public String msg;
+
+        public TransferCompleted(String msg) {
+            this.msg = msg;
+        }
+    }
+
+
+    public static class RoIEvent extends Event {
+        public RectF boundingBox;
+
+        RoIEvent(RectF boundingBox) {
+            this.boundingBox = boundingBox;
+        }
+    }
+
 
     private Bus() {
         super(runnable -> {

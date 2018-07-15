@@ -1,8 +1,6 @@
 package io.sece.vlc.rcvr.processing.block;
 
 
-import com.google.common.eventbus.Subscribe;
-
 import java.util.concurrent.TimeUnit;
 
 import io.sece.vlc.Color;
@@ -45,13 +43,11 @@ public class TransmitMonitor implements ProcessingBlock {
         this.baudRate = baudRate;
         this.modem = modem;
         this.offset = offset;
-        Bus.subscribe(this);
     }
 
 
-    @Subscribe
-    public void onBaudRateChange(Bus.BaudRateChange ev) {
-        this.baudRate = ev.baudRate;
+    public void setBaudRate(int baudRate) {
+        this.baudRate = baudRate;
     }
 
 

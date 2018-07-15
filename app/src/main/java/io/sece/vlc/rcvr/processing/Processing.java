@@ -5,6 +5,7 @@ import android.media.Image;
 import android.os.HandlerThread;
 import android.util.Log;
 
+import com.google.common.eventbus.Subscribe;
 
 import java.util.Arrays;
 import java.util.List;
@@ -17,7 +18,6 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import io.sece.vlc.Modem;
 import io.sece.vlc.rcvr.Bus;
-import io.sece.vlc.rcvr.ViewfinderModel;
 import io.sece.vlc.rcvr.processing.block.FrameSampler;
 import io.sece.vlc.rcvr.processing.block.HueDetector;
 import io.sece.vlc.rcvr.processing.block.RateMonitor;
@@ -41,6 +41,10 @@ public class Processing extends HandlerThread {
     private Frame frame = new Frame();
     private AtomicLong sequence = new AtomicLong(0);
 
+    private RoIExtractor roiExtractor;
+    private FrameSampler sampler;
+    private TransmitMonitor monitor;
+
     private List<ProcessingBlock> stage1;
     private List<ProcessingBlock> stage2;
 
@@ -57,17 +61,24 @@ public class Processing extends HandlerThread {
 
     public Processing(RectF roi, int baudRate, Modem modem) {
         super("Processing");
+        Bus.subscribe(this);
+
+        this.modem = modem;
+
+        roiExtractor = new RoIExtractor(roi);
+        sampler = new FrameSampler(baudRate);
+        monitor = new TransmitMonitor(baudRate, modem, 3);
 
         stage1 = Arrays.asList(
                 new RateMonitor("camera"),
-                new RoIExtractor(roi)
+                roiExtractor
         );
 
         stage2 = Arrays.asList(
                 new RateMonitor("worker"),
                 new HueDetector(),
-                new FrameSampler(baudRate, modem),
-                new TransmitMonitor(baudRate, modem, 3)
+                sampler,
+                monitor
         );
     }
 
@@ -81,6 +92,7 @@ public class Processing extends HandlerThread {
 
     public void shutdown() throws InterruptedException {
         Log.d(TAG, "Shutting down processing pipeline");
+        Bus.unsubscribe(this);
 
         interrupt();
         quit();
@@ -138,5 +150,18 @@ public class Processing extends HandlerThread {
             frame.setAttr(Frame.CURRENT_SEQUENCE, sequence.get() - 1);
             Bus.send(new Result(frame));
         }
+    }
+
+
+    @Subscribe
+    private void onBaudRateChange(Bus.BaudRateChange ev) {
+        sampler.setBaudRate(ev.baudRate);
+        monitor.setBaudRate(ev.baudRate);
+    }
+
+
+    @Subscribe
+    private void onRoIEvent(Bus.RoIEvent ev) {
+        roiExtractor.setBoundingBox(ev.boundingBox);
     }
 }
