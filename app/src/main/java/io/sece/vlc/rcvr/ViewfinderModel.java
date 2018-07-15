@@ -8,6 +8,7 @@ import io.sece.vlc.rcvr.camera.CameraSessionParams;
 
 
 public class ViewfinderModel extends ViewModel {
+    public static final int NO_BAUD_RATE = -1;
     public static final int DEFAULT_ROI_RADIUS = 60;
     public static final Point DEFAULT_ROI_CENTER = new Point(-1, -1);
 
@@ -19,7 +20,7 @@ public class ViewfinderModel extends ViewModel {
 
     public CameraSessionParams cameraParams = new CameraSessionParams();
 
-    private int baudRate = 15;
+    private int baudRate = -1;
     public String transmissionID;
 
     public int getBaudRate() {
