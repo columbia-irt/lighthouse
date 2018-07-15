@@ -24,6 +24,7 @@ public class Receiver {
 
     public Receiver(Modem modem) {
         this.modem = modem;
+        reset();
     }
 
 
@@ -34,7 +35,7 @@ public class Receiver {
     }
 
 
-    public void start() {
+    public void reset() {
         dataFrame = new DataFrame();
         Bus.send(new Bus.FrameUpdate(dataFrame.getCurrentData()));
 
@@ -42,12 +43,18 @@ public class Receiver {
         Bus.send(new Bus.ProgressUpdate(decoder.percentCompleted()));
 
         updateCounters(0, 0);
-        Bus.subscribe(this);
     }
 
 
     public void stop() {
         Bus.unsubscribe(this);
+    }
+
+
+    public void start() {
+        Bus.subscribe(this);
+        Bus.send(new Bus.FrameUpdate(dataFrame.getCurrentData()));
+        Bus.send(new Bus.ProgressUpdate(decoder.percentCompleted()));
     }
 
 

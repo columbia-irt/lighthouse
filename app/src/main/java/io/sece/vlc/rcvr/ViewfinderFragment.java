@@ -82,7 +82,6 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
     private TransmitterAPI trx;
     private Processing processing;
 
-    private Receiver receiver;
     public static long timeToStartSynchronized;
 
     private FSK4Modem modem = new FSK4Modem();
@@ -366,8 +365,8 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
         super.onCreate(savedInstanceState);
         model = ViewModelProviders.of(this).get(ViewfinderModel.class);
 
-        receiver = new Receiver(new FSK4Modem());
-        receiver.start();
+        if (model.receiver == null)
+            model.receiver = new Receiver(new FSK4Modem());
     }
 
 
@@ -393,6 +392,8 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
         Bus.subscribe(this);
 
         initTrxControl(getView().findViewById(R.id.txFPS), getView().findViewById(R.id.txButton), getView().findViewById(R.id.txColor));
+
+        model.receiver.start();
 
         onSurfaceReady(surfaceView, surface -> {
             if (state != NO_SESSION) return;
@@ -424,6 +425,8 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
     public void onPause() {
         super.onPause();
         Bus.unsubscribe(this);
+
+        model.receiver.stop();
 
         if (null != imageReader) {
             imageReader.setOnImageAvailableListener(null, null);
@@ -677,6 +680,9 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
 
         ConfirmationDialog d = ConfirmationDialog.newInstance(msg, false);
         d.show(getChildFragmentManager(), FRAGMENT_DIALOG);
-        d.completed.whenComplete((v, t) -> receiver.start());
+        d.completed.whenComplete((v, t) -> {
+            model.receiver.reset();
+            model.receiver.start();
+        });
     }
 }

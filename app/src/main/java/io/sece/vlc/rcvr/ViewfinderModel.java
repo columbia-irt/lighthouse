@@ -23,6 +23,8 @@ public class ViewfinderModel extends ViewModel {
     private int baudRate = -1;
     public String transmissionID;
 
+    public Receiver receiver;
+
     public int getBaudRate() {
         return baudRate;
     }
