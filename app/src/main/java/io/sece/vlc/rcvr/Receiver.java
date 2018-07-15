@@ -9,7 +9,7 @@ import io.sece.vlc.Coordinate;
 import io.sece.vlc.BitString;
 import io.sece.vlc.DataFrame;
 import io.sece.vlc.Modem;
-import io.sece.vlc.RaptorQ;
+import io.sece.vlc.RaptorQDecoder;
 import io.sece.vlc.rcvr.processing.Frame;
 import io.sece.vlc.rcvr.processing.Processing;
 
@@ -18,7 +18,7 @@ public class Receiver<T extends Coordinate> {
     private static final String TAG = "Receiver";
     private Modem<Color> modem;
     private DataFrame dataFrame = new DataFrame();
-    private RaptorQ decoder = new RaptorQ(BitString.DEFAULT_DATA, DataFrame.MAX_PAYLOAD_SIZE);
+    private RaptorQDecoder decoder = new RaptorQDecoder(BitString.DEFAULT_DATA.length, DataFrame.MAX_PAYLOAD_SIZE);
     private int frameErrors = 0;
     private int frameTotal = 0;
 
@@ -26,6 +26,17 @@ public class Receiver<T extends Coordinate> {
     public Receiver(Modem modem) {
         this.modem = modem;
         Bus.subscribe(this);
+    }
+
+
+    private static int hammingDistance(byte[] a, byte[] b) {
+        if (a.length != b.length)
+            throw new IllegalArgumentException("a.length != b.length");
+
+        int rv = 0;
+        for (int i = 0; i < a.length; i++)
+            rv += Integer.bitCount((a[i] & 0xff) ^ (b[i] & 0xff));
+        return rv;
     }
 
 
@@ -70,7 +81,7 @@ public class Receiver<T extends Coordinate> {
         if (!decoder.hasCompleted()) return;
 
         String msg;
-        if (decoder.hammingDistance() == 0)
+        if (hammingDistance(BitString.DEFAULT_DATA, decoder.getData()) == 0)
             msg = "Transfer completed successfully";
         else
             msg = "Transfer failed";

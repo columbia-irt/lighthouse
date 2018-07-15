@@ -2,15 +2,13 @@ package io.sece.vlc.trx;
 
 import java.util.concurrent.TimeUnit;
 
-import io.sece.vlc.CRC8;
 import io.sece.vlc.BitString;
 import io.sece.vlc.DataFrame;
-import io.sece.vlc.RaptorQ;
+import io.sece.vlc.RaptorQEncoder;
 import io.sece.vlc.modem.FSK2Modem;
 import io.sece.vlc.modem.FSK4Modem;
 import io.sece.vlc.modem.FSK8Modem;
 import io.sece.vlc.Modem;
-import io.sece.vlc.modem.OOKModem;
 
 public class DataTransmitter implements Runnable {
     private int FPS;
@@ -67,7 +65,7 @@ public class DataTransmitter implements Runnable {
         t = new Transmitter<>(led, mod, 1000000000 / this.getFPS(), TimeUnit.NANOSECONDS);
 
 
-        RaptorQ encoder = new RaptorQ(BitString.DEFAULT_DATA, DataFrame.MAX_PAYLOAD_SIZE);
+        RaptorQEncoder encoder = new RaptorQEncoder(BitString.DEFAULT_DATA, DataFrame.MAX_PAYLOAD_SIZE);
         DataFrame dataFrame = new DataFrame();
 
         int i = 0;
