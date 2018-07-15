@@ -4,7 +4,7 @@ import net.fec.openrq.parameters.FECParameters;
 
 
 abstract class RaptorQ {
-    static final int OVERHEAD = 1;
+    static final int OVERHEAD = 0;
     final FECParameters fecParams;
     private final int dataLength;
     final int packetSize;
