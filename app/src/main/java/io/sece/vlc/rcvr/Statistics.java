@@ -9,6 +9,7 @@ import com.google.common.eventbus.Subscribe;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import io.sece.vlc.BitString;
 import io.sece.vlc.rcvr.processing.Frame;
 import io.sece.vlc.rcvr.processing.block.RateMonitor;
 import io.sece.vlc.rcvr.processing.Processing;
@@ -25,8 +26,10 @@ public class Statistics extends AppCompatTextView {
     private MovingAverage queueLength = new MovingAverage(100, TimeUnit.MILLISECONDS);
     private boolean signalLock = false;
     private double signalRate = 0;
-    private double completed = 0d;
-    private String frame = "";
+    private float completed = 0f;
+    private String frameData = "";
+    private int framesTotal = 0;
+    private int framesError = 0;
 
 
     public Statistics(Context context) {
@@ -53,7 +56,8 @@ public class Statistics extends AppCompatTextView {
         b.append(String.format(Locale.US, "Queue length: %.0f\n", queueLength.value));
         b.append(String.format(Locale.US, "Signal: locked=%b rate=%.0f Bd\n", signalLock, signalRate));
         b.append(String.format(Locale.US, "Transferred: %.1f %%\n", completed));
-        b.append(String.format(Locale.US, "Receiving: %s", frame));
+        b.append(String.format(Locale.US, "Frames: total=%d, errors=%d\n", framesTotal, framesError));
+        b.append(String.format(Locale.US, "Receiving: %s", frameData));
 
         setText(b.toString());
     }
@@ -108,8 +112,21 @@ public class Statistics extends AppCompatTextView {
     }
 
     @Subscribe
-    private void onFrameUpdate(Receiver.Event ev) {
-        frame = ev.bits;
+    private void onFrameUpdate(Bus.FrameUpdate ev) {
+        frameData = ev.data;
+        updateStatistics();
+    }
+
+    @Subscribe
+    private void onProgressUpdate(Bus.ProgressUpdate ev) {
+        completed = ev.completed;
+        updateStatistics();
+    }
+
+    @Subscribe
+    private void onFrameStats(Bus.FrameStats ev) {
+        framesTotal = ev.total;
+        framesError = ev.errors;
         updateStatistics();
     }
 }
