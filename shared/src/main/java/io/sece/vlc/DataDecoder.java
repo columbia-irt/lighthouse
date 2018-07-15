@@ -15,4 +15,6 @@ public interface DataDecoder {
     void putPacket(byte[] data);
     float percentCompleted();
     boolean hasCompleted();
+    int minPacketSize();
+    int maxPacketSize();
 }

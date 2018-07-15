@@ -53,6 +53,17 @@ public class RaptorQ implements DataEncoder, DataDecoder {
     }
 
 
+    public int minPacketSize() {
+        int r = data.length % packetSize;
+        return r == 0 ? packetSize : r;
+    }
+
+
+    public int maxPacketSize() {
+        return packetSize;
+    }
+
+
     public byte[] getPacket(int number) {
         packet = sbe.encodingPacket(number % 256);
 
@@ -73,6 +84,7 @@ public class RaptorQ implements DataEncoder, DataDecoder {
             return 100f;
 
         float needed = sbd.numberOfSourceSymbols() + sbd.symbolOverhead();
-        return 100f * sbd.availableRepairSymbols().size() / needed;
+        int ss = sbd.numberOfSourceSymbols() - sbd.missingSourceSymbols().size();
+        return 100f * (ss + sbd.availableRepairSymbols().size()) / needed;
     }
 }
