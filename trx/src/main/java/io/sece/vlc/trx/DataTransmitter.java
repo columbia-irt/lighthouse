@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit;
 
 import io.sece.vlc.CRC8;
 import io.sece.vlc.BitString;
-import io.sece.vlc.FramingBlock;
+import io.sece.vlc.DataFrame;
 import io.sece.vlc.RaptorQ;
 import io.sece.vlc.modem.FSK2Modem;
 import io.sece.vlc.modem.FSK4Modem;
@@ -34,75 +34,56 @@ public class DataTransmitter implements Runnable {
         this.led = led;
     }
 
+
     @Override
     public String toString() {
         return "FPS: " + FPS + " - timeout:" + timeout + " - modulator: " + modulator;
     }
 
 
-
     @Override
-    public void run()
-    {
-        try {
-            Transmitter<?> t;
-            Modem mod;
+    public void run() {
+        Transmitter<?> t;
+        Modem mod;
 
-            System.out.println(this.getModulator());
-            switch (this.getModulator())
-            {
-                case "fsk2":
-                    mod = new FSK2Modem();
-                    break;
-                case "fsk4":
-                    mod = new FSK4Modem();
-                    break;
-                case "fsk8":
-                    mod = new FSK8Modem();
-                    break;
-                default:
-                    System.out.println("default");
-                    mod = new OOKModem();
-                    break;
-            }
-            // Create an transmitter implementation which connects a particular
-            // LEDInterface object to a particular Modulator. Note this should
-            // enforce strict type checking and it should not be possible to
-            // connect LEDs with incompatible modulators. That should generate a compile-time error.
-            t = new Transmitter<>(led, mod, 1000000000/this.getFPS(), TimeUnit.NANOSECONDS);
+        System.out.println(this.getModulator());
+        switch (this.getModulator()) {
+            case "fsk2":
+                mod = new FSK2Modem();
+                break;
 
+            case "fsk4":
+                mod = new FSK4Modem();
+                break;
 
-            String data;
+            case "fsk8":
+                mod = new FSK8Modem();
+                break;
 
-            RaptorQ raptor = new RaptorQ(BitString.DEFAULT_DATA, 3);
-            FramingBlock framingBlock = new FramingBlock();
-
-
-            for(int i = 0; i < 256; i++)
-            {
-                byte[] tmp = raptor.getPacket(i);
-
-                byte[] tmp2 = new byte[tmp.length + 1];
-                tmp2[0] = (byte)CRC8.compute(tmp);
-                System.arraycopy(tmp, 0, tmp2, 1, tmp.length);
-
-                String test = BitString.fromBytes(tmp2);
-
-                data = framingBlock.applyTX(test, mod.bits);
-
-                data = FramingBlock.STARTING_SEQUENCE + data;
-
-                try {
-                    System.out.println(i + "    " + data);
-                    t.tx(data);
-                } catch (LEDException|InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }
+            default:
+                throw new IllegalArgumentException("Unsupported modulator");
         }
-        catch (IllegalArgumentException e)
-        {
-            throw new IllegalArgumentException();
+
+        t = new Transmitter<>(led, mod, 1000000000 / this.getFPS(), TimeUnit.NANOSECONDS);
+
+
+        RaptorQ encoder = new RaptorQ(BitString.DEFAULT_DATA, DataFrame.MAX_PAYLOAD_SIZE);
+        DataFrame dataFrame = new DataFrame();
+
+        int i = 0;
+        try {
+            while (true) {
+                if (Thread.interrupted()) break;
+
+                dataFrame.setPayload(encoder.getPacket(i));
+                System.out.println(i + "\t" + dataFrame.getCurrentData());
+                t.tx(dataFrame.tx(mod.bits));
+
+                i = (i + 1) % 256;
+            }
+        } catch (LEDException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
         }
     }
 }

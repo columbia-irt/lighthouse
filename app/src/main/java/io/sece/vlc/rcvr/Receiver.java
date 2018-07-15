@@ -1,12 +1,13 @@
 package io.sece.vlc.rcvr;
 
+import android.util.Log;
+
 import com.google.common.eventbus.Subscribe;
 
-import io.sece.vlc.CRC8;
 import io.sece.vlc.Color;
 import io.sece.vlc.Coordinate;
 import io.sece.vlc.BitString;
-import io.sece.vlc.FramingBlock;
+import io.sece.vlc.DataFrame;
 import io.sece.vlc.Modem;
 import io.sece.vlc.RaptorQ;
 import io.sece.vlc.rcvr.processing.Frame;
@@ -14,25 +15,17 @@ import io.sece.vlc.rcvr.processing.Processing;
 
 
 public class Receiver<T extends Coordinate> {
+    private static final String TAG = "Receiver";
     private Modem<Color> modem;
-    private FramingBlock framingBlock;
-    private RaptorQ raptor;
-
-
-    public static class Event extends Bus.Event {
-        public String bits;
-
-        public Event(String bits) {
-            this.bits = bits;
-        }
-    }
+    private DataFrame dataFrame = new DataFrame();
+    private RaptorQ decoder = new RaptorQ(BitString.DEFAULT_DATA, DataFrame.MAX_PAYLOAD_SIZE);
+    private int frameErrors = 0;
+    private int frameTotal = 0;
 
 
     public Receiver(Modem modem) {
         this.modem = modem;
-        framingBlock = new FramingBlock();
         Bus.subscribe(this);
-        raptor = new RaptorQ(BitString.DEFAULT_DATA, 4);
     }
 
 
@@ -40,40 +33,48 @@ public class Receiver<T extends Coordinate> {
     private void rx(Processing.Result ev) {
         Color c = ev.frame.getColorAttr(Frame.HUE);
 
-        String currSymbol  =  modem.demodulate(c);
-        String data = (framingBlock.applyRX(currSymbol));
-        Bus.send(new Receiver.Event(framingBlock.rx_bits));
-        if(data != null){
-            System.out.println("Received Frame " + data);
-            byte[] receivedData = BitString.toBytes(data);
+        boolean complete = dataFrame.rx(modem.demodulate(c));
+        Bus.send(new Bus.FrameUpdate(dataFrame.getCurrentData()));
+        if (!complete) return;
 
-            if (receivedData.length < 16) {
-                System.out.println("Frame too short");
-                return;
-            }
+        frameTotal++;
+        Log.d(TAG, "Frame: " + dataFrame.getCurrentData());
 
-            int receivedCRC = receivedData[0] & 0xff;
-            int calcCRC = CRC8.compute(receivedData, 1, receivedData.length - 1);
-
-            if (calcCRC == receivedCRC) {
-                System.out.println("CRC8 correct");
-                Bus.send(new Receiver.Event("crc correct"));
-                raptor.putPacket(receivedData, 1);
-            }else{
-                System.out.println("CRC is incorrect");
-            }
-            if(raptor.hasCompleted()){
-                if(raptor.hammingDistance() == 0)
-                {
-                    System.out.println("Transmission completed successfully");
-                }
-                else
-                {
-                    System.out.println("Unsuccessful transmission completed");
-                }
-            }
+        if (dataFrame.errorsDetected()) {
+            Log.w(TAG, "Frame errors detected");
+            frameErrors++;
+            Bus.send(new Bus.FrameStats(frameTotal, frameErrors));
+            return;
         }
+        Bus.send(new Bus.FrameStats(frameTotal, frameErrors));
+
+        byte[] payload = dataFrame.getPayload();
+        dataFrame.reset();
+
+        if (payload.length < decoder.minPacketSize() || payload.length > decoder.maxPacketSize()) {
+            Log.w(TAG, "Invalid payload size " + payload.length);
+            frameErrors++;
+            return;
+        }
+
+        try {
+            decoder.putPacket(payload);
+            Log.d(TAG, "Progress: " + decoder.percentCompleted());
+        } catch(Exception e) {
+            Log.w(TAG, "Error while decoding frame payload", e);
+            frameErrors++;
+            return;
+        }
+        Bus.send(new Bus.ProgressUpdate(decoder.percentCompleted()));
+
+        if (!decoder.hasCompleted()) return;
+
+        String msg;
+        if (decoder.hammingDistance() == 0)
+            msg = "Transfer completed successfully";
+        else
+            msg = "Transfer failed";
+
+        Bus.send(new Bus.TransferCompleted(msg));
     }
 }
-
-
