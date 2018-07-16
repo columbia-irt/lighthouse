@@ -66,7 +66,7 @@ public class DataTransmitter implements Runnable {
 
 
         RaptorQEncoder encoder = new RaptorQEncoder(BitString.DEFAULT_DATA, DataFrame.MAX_PAYLOAD_SIZE);
-        DataFrame dataFrame = new DataFrame();
+        DataFrame dataFrame = new DataFrame(mod);
 
         int i = 0;
         try {

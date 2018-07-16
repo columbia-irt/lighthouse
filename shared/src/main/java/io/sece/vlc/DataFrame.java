@@ -137,31 +137,30 @@ public class DataFrame {
         String input = buffer.toString();
 
         for(int i = 0; i < input.length(); i += width)
-            tx(b, input.substring(i, i + width));
+            tx(b, modem.modulate(input.substring(i, i + width)));
         return b.toString();
     }
 
 
-    private void tx(StringBuilder b, String s) {
+    private void tx(StringBuilder b, Color s) {
         switch(state) {
             case START:
-                if (s.equals("01")) state = TX_STATE_D1;
-                b.append(s);
+                if (s.equals(Color.RED)) state = TX_STATE_D1;
+                b.append(modem.demodulate(s));
                 break;
 
             case TX_STATE_D1:
-                if (s.equals("11")) {
-                    b.append("1111");
+                if (s.equals(Color.BLUE)) {
+                    b.append(modem.demodulate(s) + modem.demodulate(s));
                     state = START;
-                } else if(s.equals("01")) {
-                    b.append("01");
+                } else if(s.equals(Color.RED)) {
+                    b.append(modem.demodulate(s));
                     state = TX_STATE_D1;
                 } else {
                     b.append(s);
                     state = START;
                 }
                 break;
-
             default:
                 throw new RuntimeException("Bug: Invalid state reached");
         }
