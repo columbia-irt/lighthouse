@@ -25,10 +25,7 @@ public class FrameSampler implements ProcessingBlock {
         if(next == 0) next = frame.getLongAttr(Frame.IMAGE_TIMESTAMP);
 
         long ts = frame.getLongAttr(Frame.IMAGE_TIMESTAMP);
-        System.out.println(ts + " TS ");
-        System.out.println(next + " Next ");
         if (ts < next) return null;
-        System.out.println("FRAME RETURNED");
         next += interval;
         return frame;
     }
