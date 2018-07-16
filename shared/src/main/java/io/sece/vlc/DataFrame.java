@@ -19,7 +19,11 @@ public class DataFrame {
     private int state = START;
     private StringBuilder buffer = new StringBuilder();
     private byte[] data;
+    private Modem<Color> modem;
 
+    public DataFrame(Modem modem){
+        this.modem = modem;
+    }
 
     public String getCurrentData() {
         return buffer.toString();
@@ -63,45 +67,45 @@ public class DataFrame {
     }
 
 
-    public boolean rx(String bits) {
+    public boolean rx(Color color) {
         try {
             switch (state) {
                 case START:
-                    if (bits.equals("01")) state = RX_STATE_S1;
+                    if (color.equals(Color.RED)) state = RX_STATE_S1;
                     break;
 
                 case RX_STATE_S1:
-                    state = bits.equals("11") ? RX_STATE_S2 : START;
+                    state = color.equals(Color.BLUE) ? RX_STATE_S2 : START;
                     break;
 
                 case RX_STATE_S2:
-                    state = bits.equals("10") ? RX_STATE_D : START;
+                    state = color.equals(Color.GREEN) ? RX_STATE_D : START;
                     break;
 
                 case RX_STATE_D:
-                    if (bits.equals("01"))
+                    if (color.equals(Color.RED))
                         state = RX_STATE_DS1;
                     else
-                        store(bits);
+                        store(modem.demodulate(color));
                     break;
 
                 case RX_STATE_DS1:
-                    if (bits.equals("11")) {
+                    if (color.equals(Color.BLUE)) {
                         state = RX_STATE_DS2;
-                    } else if (bits.equals("01")) {
-                        store("01");
+                    } else if (color.equals(Color.RED)) {
+                        store(modem.demodulate(color));
                     } else {
-                        store("01" + bits);
+                        store(modem.demodulate(Color.RED) + modem.demodulate(color));
                         state = RX_STATE_D;
                     }
                     break;
 
                 case RX_STATE_DS2:
-                    if (bits.equals("10")) {
+                    if (color.equals(Color.GREEN)) {
                         data = BitString.toBytes(buffer.toString());
                         return true;
-                    } else if (bits.equals("11")) {
-                        store("0111");
+                    } else if (color.equals(Color.BLUE)) {
+                        store(modem.demodulate(Color.RED) + modem.demodulate(Color.BLUE));
                         state = RX_STATE_D;
                     } else {
                         reset(START);

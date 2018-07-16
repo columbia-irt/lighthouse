@@ -36,7 +36,7 @@ public class Receiver {
 
 
     public void reset() {
-        dataFrame = new DataFrame();
+        dataFrame = new DataFrame(modem);
         Bus.send(new Bus.FrameUpdate(dataFrame.getCurrentData()));
 
         decoder = new RaptorQDecoder(BitString.DEFAULT_DATA.length, DataFrame.MAX_PAYLOAD_SIZE);
@@ -60,9 +60,8 @@ public class Receiver {
 
     @Subscribe
     private void rx(Processing.Result ev) {
-        Color c = ev.frame.getColorAttr(Frame.HUE);
-
-        boolean complete = dataFrame.rx(modem.demodulate(c));
+        Color c = modem.detect(ev.frame.getColorAttr(Frame.HUE));
+        boolean complete = dataFrame.rx(c);
         Bus.send(new Bus.FrameUpdate(dataFrame.getCurrentData()));
         if (!complete) return;
 
