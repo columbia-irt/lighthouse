@@ -5,57 +5,45 @@ import io.sece.vlc.Color;
 import io.sece.vlc.FreqModem;
 import io.sece.vlc.Symbol;
 
+
 public class FSK8Modem extends FreqModem {
+    private static final int N = 0;
+    private static final int E = 1;
+    private static final int S = 2;
+    private static final int W = 3;
+    private static final int NE = 4;
+    private static final int SE = 5;
+    private static final int SW = 6;
+    private static final int NW = 7;
+
     private Symbol symbol;
-    private Color n, e, s, w, ne, se, sw, nw;
+    private Color[] color = new Color[8];
 
-    public FSK8Modem(Color n, Color ne, Color e, Color se, Color s, Color sw, Color w, Color nw) {
-        this.n = n;
-        this.ne = ne;
-        this.e = e;
-        this.se = se;
-        this.s = s;
-        this.sw = sw;
-        this.w = w;
-        this.nw = nw;
 
-        //System.out.println("n (rgb) : " + n);
-        //System.out.println("ne (rgb) : " + ne);
-        //System.out.println("e (rgb) : " + e);
-        //System.out.println("se (rgb) : " + se);
-        //System.out.println("s (rgb) : " + s);
-        //System.out.println("sw (rgb) : " + sw);
-        //System.out.println("w (rgb) : " + w);
-        //System.out.println("ne (rgb) : " + ne);
+    public FSK8Modem() {
         states = 8;
         symbol = new Symbol(states);
         bits = symbol.bits;
-    }
 
+        color[N] = Color.BLACK;
 
-    public FSK8Modem(int offset)
-    {
-        this(new Color((((0 * 45) + offset)%360)), new Color((((1 * 45) + offset)%360)), new Color((((2 * 45) + offset)%360)), new Color((((3 * 45) + offset)%360)), new Color((((4 * 45) + offset)%360)),new Color((((5 * 45) + offset)%360)) ,new Color((((6 * 45) + offset)%360)) ,new Color((((7 * 45) + offset)%360)));
-    }
-
-    public FSK8Modem()
-    {
-        this(0);
+        for (int i = 1; i < states; i++)
+            color[i] = new Color(Math.round(i * 360 / 7));
     }
 
 
     @Override
     public Color modulate(String data, int offset) {
         switch(symbol.fromBits(data, offset)) {
-            case 0: return n;
-            case 2: return e;
-            case 4: return s;
-            case 6: return w;
+            case 0: return color[N];
+            case 2: return color[E];
+            case 4: return color[S];
+            case 6: return color[W];
 
-            case 1: return ne;
-            case 3: return se;
-            case 5: return sw;
-            case 7: return nw;
+            case 1: return color[NE];
+            case 3: return color[SE];
+            case 5: return color[SW];
+            case 7: return color[NW];
         }
         throw new AssertionError();
     }
@@ -63,7 +51,7 @@ public class FSK8Modem extends FreqModem {
 
     @Override
     public Color detect(Color input) {
-        return input.nearestNeighbor(n, e, s, w, ne, se, sw, nw);
+        return input.nearestNeighbor(color[N], color[E], color[S], color[W], color[NE], color[SE], color[SW], color[NW]);
     }
 
 
@@ -73,15 +61,15 @@ public class FSK8Modem extends FreqModem {
 
         input = detect(input);
 
-        if      (input.equals(n)) sym = 0;
-        else if (input.equals(e)) sym = 2;
-        else if (input.equals(s)) sym = 4;
-        else if (input.equals(w)) sym = 6;
+        if      (input.equals(color[N])) sym = 0;
+        else if (input.equals(color[E])) sym = 2;
+        else if (input.equals(color[S])) sym = 4;
+        else if (input.equals(color[W])) sym = 6;
 
-        else if (input.equals(ne)) sym = 1;
-        else if (input.equals(se)) sym = 3;
-        else if (input.equals(sw)) sym = 5;
-        else if (input.equals(nw)) sym = 7;
+        else if (input.equals(color[NE])) sym = 1;
+        else if (input.equals(color[SE])) sym = 3;
+        else if (input.equals(color[SW])) sym = 5;
+        else if (input.equals(color[NW])) sym = 7;
         else
             throw new IllegalArgumentException();
 
