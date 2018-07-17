@@ -4,6 +4,7 @@ import java.util.concurrent.TimeUnit;
 
 import io.sece.vlc.BitString;
 import io.sece.vlc.DataFrame;
+import io.sece.vlc.LineCoder;
 import io.sece.vlc.RaptorQEncoder;
 import io.sece.vlc.modem.FSK2Modem;
 import io.sece.vlc.modem.FSK4Modem;
@@ -64,9 +65,9 @@ public class DataTransmitter implements Runnable {
 
         t = new Transmitter<>(led, mod, 1000000000 / this.getFPS(), TimeUnit.NANOSECONDS);
 
-
-        RaptorQEncoder encoder = new RaptorQEncoder(BitString.DEFAULT_DATA, DataFrame.MAX_PAYLOAD_SIZE);
-        DataFrame dataFrame = new DataFrame(mod);
+        RaptorQEncoder dataEncoder = new RaptorQEncoder(BitString.DEFAULT_DATA, DataFrame.MAX_PAYLOAD_SIZE);
+        LineCoder lineCoder = new LineCoder(mod, DataFrame.MAX_SIZE);
+        DataFrame dataFrame = new DataFrame();
 
         int i = 0;
         try {
@@ -74,11 +75,12 @@ public class DataTransmitter implements Runnable {
                 if (Thread.interrupted()) break;
 
                 dataFrame.seqNumber = i;
-                dataFrame.payload = encoder.getPacket(i);
-                String bits = dataFrame.tx(mod.bits);
-                System.out.println(i + "\t" + bits);
-                t.tx(bits);
+                dataFrame.payload = dataEncoder.getPacket(i);
 
+                String bits = lineCoder.tx(dataFrame.encode());
+                System.out.println(i + "\t" + bits);
+
+                t.tx(bits);
                 i = (i + 1) % 256;
             }
         } catch (LEDException e) {
