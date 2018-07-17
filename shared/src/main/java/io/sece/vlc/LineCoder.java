@@ -50,11 +50,23 @@ public class LineCoder {
                     break;
 
                 case RX_STATE_S1:
-                    state = color.equals(Color.BLUE) ? RX_STATE_S2 : START;
+                    if(color.equals(Color.BLUE)){
+                        state = RX_STATE_S2;
+                    }else if(color.equals(Color.RED)){
+                        state = RX_STATE_S1;
+                    }else{
+                        state = START;
+                    }
                     break;
 
                 case RX_STATE_S2:
-                    state = color.equals(Color.GREEN) ? RX_STATE_D : START;
+                    if(color.equals(Color.GREEN)){
+                        state = RX_STATE_D;
+                    }else if(color.equals(Color.RED)){
+                        state = RX_STATE_S1;
+                    }else{
+                        state = START;
+                    }
                     break;
 
                 case RX_STATE_D:
