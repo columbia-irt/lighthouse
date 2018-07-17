@@ -8,6 +8,7 @@ package io.sece.vlc;
  */
 public class CRC8 {
     private static final byte[] table;
+    private byte value;
 
     static {
         table = new byte[256];
@@ -31,22 +32,45 @@ public class CRC8 {
     }
 
 
-    private CRC8() { }
+    public CRC8() {
+        this(0);
+    }
 
 
-    public static int compute(byte[] data)
-    {
+    public CRC8(int seed) {
+        value = (byte)seed;
+    }
+
+
+    public CRC8 add(int data) {
+        value = table[(value ^ (byte)data) & 0xff];
+        return this;
+    }
+
+
+    public CRC8 add(byte[] data) {
+        return add(data, 0, data.length);
+    }
+
+
+    public CRC8 add(byte[] data, int offset, int length) {
+        for (int i = 0; i < length; i++)
+            value = table[(value ^ data[i + offset]) & 0x0ff];
+        return this;
+    }
+
+
+    public byte compute() {
+        return value;
+    }
+
+
+    public static byte compute(byte[] data) {
         return compute(data, 0, data.length);
     }
 
 
-    public static int compute(byte[] data, int offset, int length)
-    {
-        int crc8 = 0;
-
-        for (int i = 0; i < length; i++)
-            crc8 = table[(crc8 ^ data[i + offset]) & 0x0FF];
-
-        return crc8 & 0x0FF;
+    public static byte compute(byte[] data, int offset, int length) {
+        return new CRC8().add(data, offset, length).compute();
     }
 }
