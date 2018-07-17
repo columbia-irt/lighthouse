@@ -35,7 +35,7 @@ public class Receiver {
         lineCoder.reset();
         Bus.send(new Bus.FrameUpdate(lineCoder.getCurrentData()));
 
-        dataDecoder = new RaptorQDecoder(BitString.DEFAULT_DATA.length, DataFrame.MAX_PAYLOAD_SIZE);
+        dataDecoder = new RaptorQDecoder(BitString.DEFAULT_DATA.length / 8, DataFrame.MAX_PAYLOAD_SIZE);
         Bus.send(new Bus.ProgressUpdate(dataDecoder.percentCompleted()));
 
         updateCounters(0, 0);
