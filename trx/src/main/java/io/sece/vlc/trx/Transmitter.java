@@ -11,9 +11,11 @@ import io.sece.vlc.Modem;
  *
  */
 class Transmitter<T extends Coordinate> {
+    private static final long NO_TIMESTAMP = Long.MIN_VALUE;
     private LEDInterface<T> led;
     private Modem<T> modem;
     private long interval;
+    private long timestamp = NO_TIMESTAMP;
 
 
     public Transmitter(LEDInterface<T> led, Modem<T> modem, int interval, TimeUnit unit)
@@ -31,26 +33,18 @@ class Transmitter<T extends Coordinate> {
 
     public void tx(String data) throws LEDException, InterruptedException
     {
-        long deadline;
-
         if (data.length() % modem.bits != 0)
             throw new IllegalArgumentException("Invalid number of bits");
 
         int n = data.length() / modem.bits;
-        long start = System.nanoTime();
+
+        if (timestamp == NO_TIMESTAMP)
+            timestamp = System.nanoTime();
 
         for (int i = 0; i < n; i++) {
             led.set(modem.modulate(data, i * modem.bits));
-            deadline = start + (interval * (i + 1));
-            Sleeper.sleepNanos(deadline - System.nanoTime());
+            timestamp += interval;
+            Sleeper.sleepNanos(timestamp - System.nanoTime());
         }
-    }
-
-
-    public void startTx() throws LEDException, InterruptedException
-    {
-        int amount = 8; //Amount of symbols should be calculated through interval
-        this.tx(modem.startSequence(amount));
-        this.tx("1000001");
     }
 }
