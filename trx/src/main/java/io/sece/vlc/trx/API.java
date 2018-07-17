@@ -150,6 +150,7 @@ public class API {
                     System.out.println(transTrx);
 
                     threadTrans = new Thread(transTrx);
+                    threadTrans.setPriority(Thread.MAX_PRIORITY);
                     threadDog = new Thread(new WatchDog(threadTrans, transTrx.getTimeout(), Main.led));
                     threadDog.start();
                     threadTrans.start();
