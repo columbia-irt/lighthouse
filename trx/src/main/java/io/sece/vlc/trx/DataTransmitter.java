@@ -73,9 +73,11 @@ public class DataTransmitter implements Runnable {
             while (true) {
                 if (Thread.interrupted()) break;
 
-                dataFrame.setPayload(encoder.getPacket(i));
-                System.out.println(i + "\t" + dataFrame.getCurrentData());
-                t.tx(dataFrame.tx(mod.bits));
+                dataFrame.seqNumber = i;
+                dataFrame.payload = encoder.getPacket(i);
+                String bits = dataFrame.tx(mod.bits);
+                System.out.println(i + "\t" + bits);
+                t.tx(bits);
 
                 i = (i + 1) % 256;
             }

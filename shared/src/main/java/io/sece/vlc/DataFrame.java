@@ -2,7 +2,7 @@ package io.sece.vlc;
 
 
 public class DataFrame {
-    public static final int MAX_PAYLOAD_SIZE = 4;
+    public static final int MAX_PAYLOAD_SIZE = 3;
     private static final int MAX_FRAME_SIZE = (1 + MAX_PAYLOAD_SIZE) * 2 * 8;
     public static final String FRAME_MARKER = "011110";
 
@@ -15,10 +15,16 @@ public class DataFrame {
     private static final int TX_STATE_D1 = 1;
 
     private static final class FrameTooLong extends IndexOutOfBoundsException { }
+    private static final class FrameTooShort extends IndexOutOfBoundsException { }
 
     private int state = START;
-    private StringBuilder buffer = new StringBuilder();
-    private byte[] data;
+
+    public int seqNumber;
+    public byte checksum;
+    public byte[] payload = new byte[0];
+
+    private StringBuilder bitString = new StringBuilder();
+
     private Modem<Color> modem;
 
     public DataFrame(Modem modem){
@@ -26,32 +32,15 @@ public class DataFrame {
     }
 
     public String getCurrentData() {
-        return buffer.toString();
+        return bitString.toString();
     }
 
 
     public boolean errorsDetected() {
-        if (data.length <= 1) return true;
-        int a = data[0] & 0xff;
-        int b = CRC8.compute(data, 1, data.length - 1);
-        return a != b;
-    }
-
-
-    public byte[] getPayload() {
-        byte[] rv = new byte[data.length - 1];
-        System.arraycopy(data, 1, rv, 0, rv.length);
-        return rv;
-    }
-
-
-    public void setPayload(byte[] payload) {
-        data = new byte[payload.length + 1];
-        System.arraycopy(payload, 0, data, 1, payload.length);
-        data[0] = (byte)CRC8.compute(data, 1, payload.length);
-
-        buffer.setLength(0);
-        buffer.append(BitString.fromBytes(data));
+        if (payload.length <= 0) return true;
+        CRC8 crc = new CRC8();
+        crc.add(seqNumber).add(payload);
+        return checksum != crc.compute();
     }
 
 
@@ -61,9 +50,31 @@ public class DataFrame {
 
 
     private void reset(int state) {
-        buffer.setLength(0);
-        data = null;
+        bitString.setLength(0);
+        payload = null;
         this.state = state;
+    }
+
+
+    public void parse(byte[] data) {
+        if (data.length < 2)
+            throw new FrameTooShort();
+        checksum = data[0];
+        seqNumber = data[1] & 0xff;
+        payload = new byte[data.length - 2];
+        System.arraycopy(data, 2, payload, 0, data.length - 2);
+    }
+
+
+    public byte[] encode() {
+        CRC8 crc = new CRC8();
+        crc.add(seqNumber).add(payload);
+
+        byte[] rv = new byte[payload.length + 2];
+        rv[0] = checksum = crc.compute();
+        rv[1] = (byte)seqNumber;
+        System.arraycopy(payload, 0, rv, 2, payload.length);
+        return rv;
     }
 
 
@@ -102,8 +113,12 @@ public class DataFrame {
 
                 case RX_STATE_DS2:
                     if (color.equals(Color.GREEN)) {
-                        data = BitString.toBytes(buffer.toString());
-                        return true;
+                        try {
+                            parse(BitString.toBytes(bitString.toString()));
+                            return true;
+                        } catch (FrameTooShort e) {
+                            return false;
+                        }
                     } else if (color.equals(Color.BLUE)) {
                         store(modem.demodulate(Color.RED) + modem.demodulate(Color.BLUE));
                         state = RX_STATE_D;
@@ -124,17 +139,17 @@ public class DataFrame {
 
 
     private void store(String input) {
-        if (input.length() + buffer.length() > MAX_FRAME_SIZE)
+        if (input.length() + bitString.length() > MAX_FRAME_SIZE)
             throw new FrameTooLong();
 
-        buffer.append(input);
+        bitString.append(input);
     }
 
 
     public String tx(int width) {
         state = START;
         StringBuilder b = new StringBuilder(FRAME_MARKER);
-        String input = buffer.toString();
+        String input = BitString.fromBytes(encode());
 
         for(int i = 0; i < input.length(); i += width)
             tx(b, modem.modulate(input.substring(i, i + width)));

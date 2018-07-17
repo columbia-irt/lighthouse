@@ -74,7 +74,8 @@ public class Receiver {
             return;
         }
 
-        byte[] payload = dataFrame.getPayload();
+        int seq = dataFrame.seqNumber;
+        byte[] payload = dataFrame.payload;
         dataFrame.reset();
 
         if (payload.length < decoder.minPacketSize() || payload.length > decoder.maxPacketSize()) {
@@ -84,7 +85,7 @@ public class Receiver {
         }
 
         try {
-            decoder.putPacket(payload);
+            decoder.putPacket(seq, payload);
             Log.d(TAG, "Progress: " + decoder.percentCompleted());
         } catch(Exception e) {
             Log.w(TAG, "Error while decoding frame payload", e);
