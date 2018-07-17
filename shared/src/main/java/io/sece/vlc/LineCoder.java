@@ -42,7 +42,7 @@ public class LineCoder {
     }
 
 
-    public String rx(Color color) {
+    public BitString rx(Color color) {
         try {
             switch (state) {
                 case START:
@@ -77,7 +77,7 @@ public class LineCoder {
 
                 case RX_STATE_DS2:
                     if (color.equals(Color.GREEN)) {
-                        String rv = buffer.toString();
+                        BitString rv = new BitString(buffer.toString());
                         reset();
                         return rv;
                     } else if (color.equals(Color.BLUE)) {
@@ -107,13 +107,13 @@ public class LineCoder {
     }
 
 
-    public String tx(byte[] data) {
+    public String tx(BitString data) {
         state = START;
 
         buffer.setLength(0);
         buffer.append(FRAME_MARKER);
 
-        String input = BitString.fromBytes(data);
+        String input = data.toString();
 
         for(int i = 0; i < input.length(); i += modem.bits)
             tx(buffer, modem.modulate(input.substring(i, i + modem.bits)));

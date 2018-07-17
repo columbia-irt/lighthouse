@@ -65,7 +65,7 @@ public class Receiver {
     private void rx(Processing.Result ev) {
         Color c = modem.detect(ev.frame.getColorAttr(Frame.HUE));
 
-        String frame = lineCoder.rx(c);
+        BitString frame = lineCoder.rx(c);
         Bus.send(new Bus.FrameUpdate(lineCoder.getCurrentData()));
         if (frame == null) return;
 
@@ -73,7 +73,7 @@ public class Receiver {
         Log.d(TAG, "Frame: " + frame);
 
         try {
-            dataFrame.parse(BitString.toBytes(frame));
+            dataFrame.parse(frame);
         } catch (DataFrame.FrameTooShort e) {
             Log.w(TAG, "Too short frame received");
             updateCounters(frameTotal, frameErrors + 1);

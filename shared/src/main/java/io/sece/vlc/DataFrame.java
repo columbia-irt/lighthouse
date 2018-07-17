@@ -14,21 +14,23 @@ public class DataFrame {
     public boolean error;
 
 
-    public void parse(byte[] data) throws FrameTooShort {
-        if (data.length < 2)
+    public void parse(BitString input) throws FrameTooShort {
+        int bytes = input.length / 8;
+
+        if (bytes < MIN_SIZE)
             throw new FrameTooShort();
 
-        checksum = data[0];
-        seqNumber = data[1] & 0xff;
+        checksum = input.data[0];
+        seqNumber = input.data[1] & 0xff;
 
-        payload = new byte[data.length - 2];
-        System.arraycopy(data, 2, payload, 0, data.length - 2);
+        payload = new byte[bytes - 2];
+        System.arraycopy(input.data, 2, payload, 0, bytes - 2);
 
-        error = checksum != CRC8.compute(data, 1, data.length - 1);
+        error = checksum != CRC8.compute(input.data, 1, bytes - 1);
     }
 
 
-    public byte[] encode() {
+    public BitString encode() {
         CRC8 crc = new CRC8();
         crc.add(seqNumber).add(payload);
 
@@ -38,6 +40,6 @@ public class DataFrame {
         rv[1] = (byte)seqNumber;
         System.arraycopy(payload, 0, rv, 2, payload.length);
 
-        return rv;
+        return new BitString(rv);
     }
 }
