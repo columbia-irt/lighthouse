@@ -157,7 +157,7 @@ public class DataFrame {
                     b.append(modem.demodulate(s));
                     state = TX_STATE_D1;
                 } else {
-                    b.append(s);
+                    b.append(modem.demodulate(s));
                     state = START;
                 }
                 break;
