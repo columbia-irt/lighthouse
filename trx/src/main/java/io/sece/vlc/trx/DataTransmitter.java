@@ -77,7 +77,7 @@ public class DataTransmitter implements Runnable {
                 dataFrame.seqNumber = i;
                 dataFrame.payload = dataEncoder.getPacket(i);
 
-                String bits = lineCoder.tx(dataFrame.encode());
+                String bits = lineCoder.tx(dataFrame.pack());
                 System.out.println(i + "\t" + bits);
 
                 t.tx(bits);

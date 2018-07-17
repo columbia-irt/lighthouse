@@ -73,7 +73,7 @@ public class Receiver {
         Log.d(TAG, "Frame: " + frame);
 
         try {
-            dataFrame.parse(frame);
+            dataFrame.unpack(frame);
         } catch (DataFrame.FrameTooShort e) {
             Log.w(TAG, "Too short frame received");
             updateCounters(frameTotal, frameErrors + 1);

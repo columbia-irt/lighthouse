@@ -14,7 +14,7 @@ public class DataFrame {
     public boolean error;
 
 
-    public void parse(BitString input) throws FrameTooShort {
+    public void unpack(BitString input) throws FrameTooShort {
         int bytes = input.length / 8;
 
         if (bytes < MIN_SIZE)
@@ -30,7 +30,7 @@ public class DataFrame {
     }
 
 
-    public BitString encode() {
+    public BitString pack() {
         CRC8 crc = new CRC8();
         crc.add(seqNumber).add(payload);
 
