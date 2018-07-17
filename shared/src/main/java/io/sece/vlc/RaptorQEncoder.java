@@ -19,12 +19,10 @@ public class RaptorQEncoder extends RaptorQ implements DataEncoder {
     }
 
 
-    public byte[] getPacket(int number) {
-        EncodingPacket p = encoder.encodingPacket(number % 256);
-
-        byte[] data = new byte[1 + p.symbolsLength()];
-        data[0] = (byte)p.encodingSymbolID();
-        p.symbols().get(data, 1, p.symbolsLength());
+    public byte[] getPacket(int seqNumber) {
+        EncodingPacket p = encoder.encodingPacket(seqNumber);
+        byte[] data = new byte[p.symbolsLength()];
+        p.symbols().get(data, 0, p.symbolsLength());
         return data;
     }
 }

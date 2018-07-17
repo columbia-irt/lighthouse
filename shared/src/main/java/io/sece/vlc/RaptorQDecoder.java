@@ -17,15 +17,15 @@ public class RaptorQDecoder extends RaptorQ implements DataDecoder {
     }
 
 
-    public void putPacket(byte[] data) {
-        putPacket(data, 0);
+    public void putPacket(int seqNumber, byte[] data) {
+        putPacket(seqNumber, data, 0, data.length);
     }
 
 
-    public void putPacket(byte[] data, int offset) {
-        if (data.length - offset > packetSize)
-            throw new IllegalArgumentException("data.length > packetSize");
-        blockDecoder.putEncodingPacket(blockDecoder.dataDecoder().parsePacket(0, data[offset] & 0xff, data, offset + 1, data.length - offset - 1, true).value());
+    public void putPacket(int seqNumber, byte[] data, int offset, int length) {
+        if (length > packetSize)
+            throw new IllegalArgumentException("length > packetSize");
+        blockDecoder.putEncodingPacket(blockDecoder.dataDecoder().parsePacket(0, seqNumber, data, offset, length, true).value());
     }
 
 

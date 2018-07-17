@@ -1,7 +1,7 @@
 package io.sece.vlc;
 
 public interface DataDecoder {
-    void putPacket(byte[] data);
+    void putPacket(int seqNumber, byte[] data);
     float percentCompleted();
     boolean hasCompleted();
     int minPacketSize();

@@ -16,7 +16,7 @@ abstract class RaptorQ {
 
         this.dataLength = dataLength;
         this.packetSize = packetSize;
-        fecParams = FECParameters.newParameters(dataLength, packetSize - 1, 1);
+        fecParams = FECParameters.newParameters(dataLength, packetSize, 1);
     }
 
 
