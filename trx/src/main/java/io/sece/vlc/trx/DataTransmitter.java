@@ -65,7 +65,7 @@ public class DataTransmitter implements Runnable {
 
         t = new Transmitter<>(led, mod, 1000000000 / this.getFPS(), TimeUnit.NANOSECONDS);
 
-        RaptorQEncoder dataEncoder = new RaptorQEncoder(BitString.DEFAULT_DATA, DataFrame.MAX_PAYLOAD_SIZE);
+        RaptorQEncoder dataEncoder = new RaptorQEncoder(BitString.DEFAULT_DATA.data, DataFrame.MAX_PAYLOAD_SIZE);
         LineCoder lineCoder = new LineCoder(mod, DataFrame.MAX_SIZE);
         DataFrame dataFrame = new DataFrame();
 

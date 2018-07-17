@@ -675,7 +675,7 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
     @Subscribe
     public void onTransferCompleted(Bus.TransferCompleted ev) {
         String msg = "Failure";
-        if (hammingDistance(ev.data, BitString.DEFAULT_DATA) == 0)
+        if (hammingDistance(ev.data, BitString.DEFAULT_DATA.data) == 0)
             msg = "Success";
 
         ConfirmationDialog d = ConfirmationDialog.newInstance(msg, false);
