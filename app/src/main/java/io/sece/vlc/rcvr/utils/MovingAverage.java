@@ -9,15 +9,6 @@ public class MovingAverage {
 
     public double value = Double.NaN;
 
-    public static class Change {
-        public double value;
-        public double window;
-
-        public Change(MovingAverage value) {
-            this.value = value.value;
-            this.window = value.window;
-        }
-    }
 
     public MovingAverage(long window, TimeUnit unit) {
         this.window = unit.toNanos(window);

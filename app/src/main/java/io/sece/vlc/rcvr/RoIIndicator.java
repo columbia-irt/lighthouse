@@ -5,25 +5,43 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.graphics.RectF;
 
+import com.google.common.eventbus.Subscribe;
+
+import io.sece.vlc.DataFrame;
+import io.sece.vlc.rcvr.processing.block.TransmitMonitor;
 
 public class RoIIndicator extends GraphicOverlay.Graphic {
     private Point center;
     private int radius;
 
-    private static Paint paint1;
-    private static Paint paint2;
+    private static Paint paint;
+    private static Paint shadow;
+    private static Paint arc1;
+    private static Paint arc2;
+    private double completed = 0.0d;
+    private double unchecked = 0.0d;
+
 
     static {
-        paint1 = new Paint();
-        paint1.setStyle(Paint.Style.STROKE);
-        paint1.setStrokeWidth(6.0f);
-        paint1.setColor(Color.WHITE);
+        paint = new Paint();
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setAntiAlias(true);
+        paint.setStrokeWidth(15.0f);
+        paint.setColor(Color.WHITE);
 
-        paint2 = new Paint();
-        paint2.setStyle(Paint.Style.STROKE);
-        paint2.setStrokeWidth(14.0f);
-        paint2.setColor(Color.BLACK);
+        shadow = new Paint(paint);
+        shadow.setStrokeWidth(20.0f);
+        shadow.setColor(Color.BLACK);
+        shadow.setAlpha(127);
+
+        arc1 = new Paint(paint);
+        arc1.setStrokeWidth(35.0f);
+        arc1.setColor(Color.RED);
+
+        arc2 = new Paint(arc1);
+        arc2.setAlpha(127);
     }
 
 
@@ -31,6 +49,7 @@ public class RoIIndicator extends GraphicOverlay.Graphic {
         super(overlay);
         this.center(center);
         this.radius(radius);
+        Bus.subscribe(this);
     }
 
 
@@ -110,9 +129,11 @@ public class RoIIndicator extends GraphicOverlay.Graphic {
 
     @Override
     public void draw(Canvas canvas) {
-        Rect rect = new Rect(center.x - radius, center.y - radius, center.x + radius, center.y + radius);
-        canvas.drawRect(rect, paint2);
-        canvas.drawRect(rect, paint1);
+        RectF bb = new RectF(center.x - radius, center.y - radius, center.x + radius, center.y + radius);
+        canvas.drawCircle(center.x, center.y, radius, shadow);
+        canvas.drawCircle(center.x, center.y, radius, paint);
+        canvas.drawArc(bb, 270, (int)(completed * 360d / 100d), false, arc1);
+        canvas.drawArc(bb, 270, (int)(unchecked * 360d / 100d), false, arc2);
     }
 
 
@@ -124,4 +145,30 @@ public class RoIIndicator extends GraphicOverlay.Graphic {
     public Rect boundingBox() {
         return boundingBox(center, radius);
     }
+
+
+    @Subscribe
+    private void onProgressUpdate(Bus.ProgressUpdate ev) {
+        completed = ev.completed;
+        postInvalidate();
+    }
+
+
+    @Subscribe
+    private void onFrameUpdate(Bus.FrameUpdate ev) {
+        unchecked = completed + 100d / 11d * (double)ev.data.length() / (double)(DataFrame.MAX_SIZE * 8);
+        postInvalidate();
+    }
+
+
+    @Subscribe
+    private void onMonitorUpdate(TransmitMonitor.Event ev) {
+        if (ev.transmissionInProgress) {
+            paint.setColor(Color.YELLOW);
+        } else {
+            paint.setColor(Color.WHITE);
+        }
+        postInvalidate();
+    }
+
 }

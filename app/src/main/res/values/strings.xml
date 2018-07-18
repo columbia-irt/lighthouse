@@ -4,5 +4,5 @@
     <string name="camera2_not_supported">This device does not support Camera2 API.</string>
     <string name="exposure_label">EV Compensation: %1$s</string>
     <string name="fps_indicator">FPS: %1$.1f</string>
-    <string name="working">Working...</string>
+    <string name="working">Working</string>
 </resources>

@@ -9,7 +9,7 @@ import io.sece.vlc.rcvr.camera.CameraSessionParams;
 
 public class ViewfinderModel extends ViewModel {
     public static final int NO_BAUD_RATE = -1;
-    public static final int DEFAULT_ROI_RADIUS = 60;
+    public static final int DEFAULT_ROI_RADIUS = 100;
     public static final Point DEFAULT_ROI_CENTER = new Point(-1, -1);
 
     private static final Size DESIRED_RESOLUTION = new Size(1080, 1080);

@@ -391,7 +391,7 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
         super.onResume();
         Bus.subscribe(this);
 
-        initTrxControl(getView().findViewById(R.id.txFPS), getView().findViewById(R.id.txButton), getView().findViewById(R.id.txColor));
+        initTrxControl(getView().findViewById(R.id.txFPS), getView().findViewById(R.id.txButton));
 
         model.receiver.start();
 
@@ -458,7 +458,7 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
     }
 
 
-    private void initTrxControl(EditText fpsText, Button button, TextView indicator) {
+    private void initTrxControl(EditText fpsText, Button button) {
         if (model.transmissionID != null) {
             button.setText("Stop");
             fpsText.setEnabled(false);
