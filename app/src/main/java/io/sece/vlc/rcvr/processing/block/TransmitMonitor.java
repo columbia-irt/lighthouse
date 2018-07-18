@@ -14,7 +14,7 @@ import io.sece.vlc.rcvr.utils.Uniq;
 
 public class TransmitMonitor implements ProcessingBlock {
     // The window over which to calculate the moving average FPS
-    private static final long AVG_WINDOW = 300;
+    private static final long AVG_WINDOW = 600;
     private static final TimeUnit AVG_WINDOW_UNIT = TimeUnit.MILLISECONDS;
 
     private int baudRate;
@@ -26,7 +26,8 @@ public class TransmitMonitor implements ProcessingBlock {
 
     private long previousTimestamp = -1;
     private Color prevColor;
-    private int offset;
+    private int tolerance;
+    private int count = 3;
 
     public static class Event extends Bus.Event {
         public boolean transmissionInProgress = false;
@@ -39,10 +40,10 @@ public class TransmitMonitor implements ProcessingBlock {
     }
 
 
-    public TransmitMonitor(int baudRate, Modem modem, int offset) {
+    public TransmitMonitor(int baudRate, Modem modem, double tolerance) {
         this.baudRate = baudRate;
         this.modem = modem;
-        this.offset = offset;
+        this.tolerance = (int)Math.round(baudRate * tolerance / 100.0d);
     }
 
 
@@ -52,30 +53,30 @@ public class TransmitMonitor implements ProcessingBlock {
 
 
     public synchronized Frame apply(Frame frame) {
-        Color currColor = frame.getColorAttr(Frame.HUE);
-        currColor = modem.detect(currColor);
+        Color c = frame.getColorAttr(Frame.HUE);
+        c = modem.detect(c);
 
-        if ( prevColor != null) {
+        long timestamp = frame.getLongAttr(Frame.IMAGE_TIMESTAMP);
 
-            // detect Color Changes
-            if(!prevColor.equals(currColor)){
-
-                long timestamp = frame.getLongAttr(Frame.IMAGE_TIMESTAMP);
-
-                // Calculate the FPS moving average value
-                fpsReceived.update(1.0e9d / (double)(timestamp - previousTimestamp));
-
-                // Round the average value to one decimal point to make sure we don't send updates
-                // too often
-                double calcFPS = Math.round(10.0d * fpsReceived.value) / 10.0d;
-
-                if (uniq.hasChanged(calcFPS)){
-                    Bus.send(new Event(calcFPS, (calcFPS > (baudRate - offset) && calcFPS < (baudRate + offset))));
-                }
-                previousTimestamp = timestamp;
-            }
+        if (prevColor != null && !prevColor.equals(c)) {
+            // Calculate the FPS moving average value
+            fpsReceived.update(baudRate);
+            count = 3;
+        } else {
+            if (count == 0)
+                fpsReceived.update(0);
+            count--;
+            if (count < 0) count = 0;
         }
-        prevColor = currColor;
+
+        // Round the average value to one decimal point to make sure we don't send updates
+        // too often
+        double calcFPS = Math.round(10.0d * fpsReceived.value) / 10.0d;
+
+        if (uniq.hasChanged(calcFPS))
+            Bus.send(new Event(calcFPS, (calcFPS > (baudRate - tolerance) && calcFPS < (baudRate + tolerance))));
+
+        prevColor = c;
         return frame;
     }
 }

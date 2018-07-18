@@ -67,7 +67,7 @@ public class Processing extends HandlerThread {
 
         roiExtractor = new RoIExtractor(roi);
         sampler = new FrameSampler(baudRate);
-        monitor = new TransmitMonitor(baudRate, modem, 3);
+        monitor = new TransmitMonitor(baudRate, modem, 10);
 
         stage1 = Arrays.asList(
                 new RateMonitor("camera"),
