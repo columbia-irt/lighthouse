@@ -7,17 +7,17 @@ import io.sece.vlc.Symbol;
 
 
 public class FSK8Modem extends FreqModem {
-    private static final int N = 0;
-    private static final int E = 1;
-    private static final int S = 2;
-    private static final int W = 3;
-    private static final int NE = 4;
-    private static final int SE = 5;
-    private static final int SW = 6;
-    private static final int NW = 7;
+    public static final int N = 0;
+    public static final int E = 1;
+    public static final int S = 2;
+    public static final int W = 3;
+    public static final int NE = 4;
+    public static final int SE = 5;
+    public static final int SW = 6;
+    public static final int NW = 7;
 
     private Symbol symbol;
-    private Color[] color = new Color[8];
+    public Color[] color = new Color[8];
 
 
     public FSK8Modem() {

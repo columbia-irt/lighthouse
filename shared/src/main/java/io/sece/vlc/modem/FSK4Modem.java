@@ -6,7 +6,7 @@ import io.sece.vlc.FreqModem;
 import io.sece.vlc.Symbol;
 
 public class FSK4Modem extends FreqModem {
-    private Color n, e, s, w;
+    public Color n, e, s, w;
     private Symbol symbol;
 
 

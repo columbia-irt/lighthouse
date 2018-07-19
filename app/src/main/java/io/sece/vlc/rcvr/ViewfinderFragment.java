@@ -49,6 +49,7 @@ import java.util.concurrent.CompletionException;
 import io.sece.vlc.BitString;
 import io.sece.vlc.Color;
 import io.sece.vlc.modem.FSK4Modem;
+import io.sece.vlc.modem.FSK8Modem;
 import io.sece.vlc.rcvr.processing.Frame;
 import io.sece.vlc.rcvr.processing.Processing;
 import io.sece.vlc.rcvr.camera.CameraException;
@@ -620,6 +621,7 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
         Color c = ev.frame.getColorAttr(Frame.HUE);
         c = modem.detect(c);
         rxColor.setBackgroundColor(android.graphics.Color.rgb(c.red, c.green, c.blue));
+        rxColor.setText("RX: " + ev.frame.getColorAttr(Frame.HUE).hue);
     }
 
 
