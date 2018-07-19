@@ -2,7 +2,7 @@ package io.sece.vlc;
 
 
 public class DataFrame {
-    public static final int MAX_PAYLOAD_SIZE = 5; //3 for FSK4
+    public static final int MAX_PAYLOAD_SIZE = 4; //3 for FSK4 for FSK8 we need 4 so that MAX_SIZE is 6 and therefor % 3 = 0
     public static final int MAX_SIZE = 2 + MAX_PAYLOAD_SIZE;
     public static final int MIN_SIZE = 2;
 

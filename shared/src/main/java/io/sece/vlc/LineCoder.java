@@ -148,8 +148,9 @@ public class LineCoder {
 
         String input = data.toString();
 
-        for(int i = 0; i < input.length(); i += modem.bits)
+        for(int i = 0; i < input.length(); i += modem.bits) {
             tx(buffer, modem.modulate(input.substring(i, i + modem.bits)));
+        }
 
         return buffer.toString();
     }
