@@ -24,7 +24,7 @@ public class OOKModem extends Modem<Amplitude> {
     }
 
     @Override
-    public Amplitude modulate(String data, int offset) {
+    protected Amplitude modulate(String data, int offset) {
         switch(symbol.fromBits(data, offset)) {
         case 0: return off;
         case 1: return on;

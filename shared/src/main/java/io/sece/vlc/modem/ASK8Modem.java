@@ -28,7 +28,7 @@ public class ASK8Modem extends AmpModem {
     }
 
     @Override
-    public Amplitude modulate(String data, int offset) {
+    protected Amplitude modulate(String data, int offset) {
         switch(symbol.fromBits(data, offset)) {
         case 0: return l1;
         case 1: return l2;

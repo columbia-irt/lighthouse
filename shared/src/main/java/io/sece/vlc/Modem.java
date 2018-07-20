@@ -1,6 +1,9 @@
 package io.sece.vlc;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * An abstract base class for all modulators and demodulators. The base class
  * declares API to modulate a bit set into a LED signal and to demodulate a
@@ -18,11 +21,17 @@ public abstract class Modem<V extends Coordinate> {
     public int bits;
     public int states;
 
-    public V modulate(String data) {
-        return modulate(data, 0);
+    public List<V> modulate(String data) {
+        if ((data.length() % bits) != 0)
+            throw new IllegalArgumentException("Bug: Modulator input does not have correct width");
+
+        List<V> rv = new ArrayList<>();
+        for(int i = 0; i < data.length(); i+= bits)
+            rv.add(modulate(data, i ));
+        return rv;
     }
 
-    public abstract V modulate(String data, int offset);
+    protected abstract V modulate(String data, int offset);
     public abstract StringBuilder demodulate(StringBuilder buf, int offset, V input);
     public abstract V detect(V input);
 
@@ -30,5 +39,4 @@ public abstract class Modem<V extends Coordinate> {
     public String demodulate(V input) {
         return demodulate(new StringBuilder(), 0, input).toString();
     }
-
 }

@@ -34,7 +34,7 @@ public class FSK4Modem extends FreqModem {
     }
 
     @Override
-    public Color modulate(String data, int offset) {
+    protected Color modulate(String data, int offset) {
         switch(symbol.fromBits(data, offset)) {
         case 0: return n;
         case 1: return e;

@@ -33,7 +33,7 @@ public class FSK8Modem extends FreqModem {
 
 
     @Override
-    public Color modulate(String data, int offset) {
+    protected Color modulate(String data, int offset) {
         switch(symbol.fromBits(data, offset)) {
             case 0: return color[N];
             case 2: return color[E];

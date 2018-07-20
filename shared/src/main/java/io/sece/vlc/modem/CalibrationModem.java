@@ -25,7 +25,7 @@ public class CalibrationModem extends FreqModem
     }
 
     @Override
-    public Color modulate(String data, int offset) {
+    protected Color modulate(String data, int offset) {
         switch(symbol.fromBits(data, offset)) {
             case 0: return d;
             case 1: return u;
