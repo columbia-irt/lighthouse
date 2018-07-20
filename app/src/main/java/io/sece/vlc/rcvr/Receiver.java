@@ -67,7 +67,7 @@ public class Receiver {
 
         BitString frame = lineCoder.rx(c);
         Bus.send(new Bus.FrameUpdate(lineCoder.getCurrentData()));
-        if (frame == null) return;
+        if (frame == null || frame.length == 0) return;
 
         updateCounters(frameTotal + 1, frameErrors);
         Log.d(TAG, "Frame: " + frame);
