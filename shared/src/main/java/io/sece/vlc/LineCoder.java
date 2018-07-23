@@ -54,6 +54,12 @@ public class LineCoder {
     }
 
 
+    public float percentCompleted() {
+        if (maxSize == NO_MAX_SIZE) return 0f;
+        return (float)get().size() / (float)maxSize * 100f;
+    }
+
+
     private void store(int... symbols) throws FrameTooLong {
         if (maxSize != NO_MAX_SIZE && (buffer.size() + symbols.length) > maxSize)
             throw new FrameTooLong();

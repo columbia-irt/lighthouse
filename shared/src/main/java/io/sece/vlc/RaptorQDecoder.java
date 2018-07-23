@@ -44,6 +44,11 @@ public class RaptorQDecoder extends RaptorQ implements DataDecoder {
     }
 
 
+    public float packetPercentage() {
+        return 100f / (float)blockDecoder.numberOfSourceSymbols() + (float)blockDecoder.symbolOverhead();
+    }
+
+
     public byte[] getData() {
         return dataDecoder.dataArray();
     }

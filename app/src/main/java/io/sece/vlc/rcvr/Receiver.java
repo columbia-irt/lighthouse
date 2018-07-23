@@ -24,6 +24,7 @@ public class Receiver {
     private LineCoder lineCoder;
     private Symbol symbol;
     private RaptorQDecoder dataDecoder;
+    private float packetSize;
 
 
     public Receiver(Modem modem) {
@@ -37,7 +38,8 @@ public class Receiver {
     public void reset() {
         lineCoder.reset();
         dataDecoder = new RaptorQDecoder(BitVector.DEFAULT_DATA.length / 8, DataFrame.MAX_PAYLOAD_SIZE);
-        Bus.send(new Bus.ProgressUpdate(dataDecoder.percentCompleted()));
+        packetSize = dataDecoder.packetPercentage();
+        Bus.send(new Bus.DataProgress(dataDecoder.percentCompleted()));
     }
 
 
@@ -48,7 +50,7 @@ public class Receiver {
 
     public void start() {
         Bus.subscribe(this);
-        Bus.send(new Bus.ProgressUpdate(dataDecoder.percentCompleted()));
+        Bus.send(new Bus.DataProgress(dataDecoder.percentCompleted()));
     }
 
 
@@ -62,6 +64,11 @@ public class Receiver {
         } catch (LineCoder.FrameTooLong e) {
             Log.d(TAG, "Frame too long");
             return;
+        } finally {
+            float pct = lineCoder.percentCompleted();
+            pct = pct / 100 * packetSize;
+            pct += dataDecoder.percentCompleted();
+            Bus.send(new Bus.TransferProgress(pct));
         }
 
         if (symbols == null || symbols.size() == 0) return;
@@ -92,7 +99,7 @@ public class Receiver {
             Log.d(TAG, "Error while decoding payload", e);
             return;
         }
-        Bus.send(new Bus.ProgressUpdate(dataDecoder.percentCompleted()));
+        Bus.send(new Bus.DataProgress(dataDecoder.percentCompleted()));
 
         if (dataDecoder.hasCompleted()) {
             stop();

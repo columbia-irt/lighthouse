@@ -18,10 +18,10 @@ public class RoIIndicator extends GraphicOverlay.Graphic {
 
     private static Paint paint;
     private static Paint shadow;
-    private static Paint arc1;
-    private static Paint arc2;
-    private double completed = 0.0d;
-    private double unchecked = 0.0d;
+    private static Paint dataProgressStyle;
+    private static Paint transferProgressStyle;
+    private double dataProgress = 0.0d;
+    private double transferProgress = 0.0d;
 
 
     static {
@@ -36,12 +36,12 @@ public class RoIIndicator extends GraphicOverlay.Graphic {
         shadow.setColor(Color.BLACK);
         shadow.setAlpha(127);
 
-        arc1 = new Paint(paint);
-        arc1.setStrokeWidth(35.0f);
-        arc1.setColor(Color.RED);
+        dataProgressStyle = new Paint(paint);
+        dataProgressStyle.setStrokeWidth(35.0f);
+        dataProgressStyle.setColor(Color.RED);
 
-        arc2 = new Paint(arc1);
-        arc2.setAlpha(127);
+        transferProgressStyle = new Paint(dataProgressStyle);
+        transferProgressStyle.setAlpha(127);
     }
 
 
@@ -127,13 +127,23 @@ public class RoIIndicator extends GraphicOverlay.Graphic {
     }
 
 
-    @Override
-    public void draw(Canvas canvas) {
-        RectF bb = new RectF(center.x - radius, center.y - radius, center.x + radius, center.y + radius);
+    private void drawROI(Canvas canvas) {
         canvas.drawCircle(center.x, center.y, radius, shadow);
         canvas.drawCircle(center.x, center.y, radius, paint);
-        canvas.drawArc(bb, 270, (int)(completed * 360d / 100d), false, arc1);
-        canvas.drawArc(bb, 270, (int)(unchecked * 360d / 100d), false, arc2);
+    }
+
+
+    private void drawProgressIndicator(Canvas canvas) {
+        RectF r = new RectF(boundingBox());
+        canvas.drawArc(r, 270, (int)(transferProgress * 360d / 100d), false, transferProgressStyle);
+        canvas.drawArc(r, 270, (int)(dataProgress * 360d / 100d), false, dataProgressStyle);
+    }
+
+
+    @Override
+    public void draw(Canvas canvas) {
+        drawROI(canvas);
+        drawProgressIndicator(canvas);
     }
 
 
@@ -148,14 +158,21 @@ public class RoIIndicator extends GraphicOverlay.Graphic {
 
 
     @Subscribe
-    private void onProgressUpdate(Bus.ProgressUpdate ev) {
-        completed = ev.completed;
+    private void onUpdate(Bus.DataProgress ev) {
+        dataProgress = ev.completed;
         postInvalidate();
     }
 
 
     @Subscribe
-    private void onMonitorUpdate(TransmitMonitor.Event ev) {
+    private void onUpdate(Bus.TransferProgress ev) {
+        transferProgress = ev.completed;
+        postInvalidate();
+    }
+
+
+    @Subscribe
+    private void onUpdate(TransmitMonitor.Event ev) {
         if (ev.transmissionInProgress) {
             paint.setColor(Color.YELLOW);
         } else {

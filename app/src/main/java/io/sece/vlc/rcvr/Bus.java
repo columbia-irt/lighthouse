@@ -26,15 +26,29 @@ public class Bus extends AsyncEventBus {
         }
     }
 
-    public static class ProgressUpdate extends Event {
+
+    public static class ProgressUpdate extends Event { }
+
+
+    public static class DataProgress extends ProgressUpdate {
         public float completed;
 
-        public ProgressUpdate(float completed) {
+        public DataProgress(float completed) {
             this.completed = completed;
         }
     }
 
-    public static class TransferCompleted extends Event {
+
+    public static class TransferProgress extends ProgressUpdate {
+        public float completed;
+
+        public TransferProgress(float completed) {
+            this.completed = completed;
+        }
+    }
+
+
+    public static class TransferCompleted extends ProgressUpdate {
         public byte[] data;
 
         public TransferCompleted(byte[] src) {

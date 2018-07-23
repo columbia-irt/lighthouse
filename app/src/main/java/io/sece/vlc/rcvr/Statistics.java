@@ -25,7 +25,6 @@ public class Statistics extends AppCompatTextView {
     private MovingAverage queueLength = new MovingAverage(100, TimeUnit.MILLISECONDS);
     private boolean signalLock = false;
     private double signalRate = 0;
-    private float completed = 0f;
 
 
     public Statistics(Context context) {
@@ -51,7 +50,6 @@ public class Statistics extends AppCompatTextView {
         b.append(String.format(Locale.US, "Processing frame rate: %.1f fps\n", workerFrameRate));
         b.append(String.format(Locale.US, "Queue length: %.0f\n", queueLength.value));
         b.append(String.format(Locale.US, "Signal: locked=%b rate=%.0f Bd\n", signalLock, signalRate));
-        b.append(String.format(Locale.US, "Transferred: %.1f %%\n", completed));
 
         setText(b.toString());
     }
@@ -102,12 +100,6 @@ public class Statistics extends AppCompatTextView {
     private void onMonitorUpdate(TransmitMonitor.Event ev) {
         signalRate = ev.fps;
         signalLock = ev.transmissionInProgress;
-        updateStatistics();
-    }
-
-    @Subscribe
-    private void onProgressUpdate(Bus.ProgressUpdate ev) {
-        completed = ev.completed;
         updateStatistics();
     }
 }
