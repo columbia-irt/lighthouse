@@ -26,9 +26,6 @@ public class Statistics extends AppCompatTextView {
     private boolean signalLock = false;
     private double signalRate = 0;
     private float completed = 0f;
-    private String frameData = "";
-    private int framesTotal = 0;
-    private int framesError = 0;
 
 
     public Statistics(Context context) {
@@ -109,21 +106,8 @@ public class Statistics extends AppCompatTextView {
     }
 
     @Subscribe
-    private void onFrameUpdate(Bus.FrameUpdate ev) {
-        frameData = ev.data;
-        updateStatistics();
-    }
-
-    @Subscribe
     private void onProgressUpdate(Bus.ProgressUpdate ev) {
         completed = ev.completed;
-        updateStatistics();
-    }
-
-    @Subscribe
-    private void onFrameStats(Bus.FrameStats ev) {
-        framesTotal = ev.total;
-        framesError = ev.errors;
         updateStatistics();
     }
 }

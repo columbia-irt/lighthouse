@@ -155,13 +155,6 @@ public class RoIIndicator extends GraphicOverlay.Graphic {
 
 
     @Subscribe
-    private void onFrameUpdate(Bus.FrameUpdate ev) {
-        unchecked = completed + 100d / 11d * (double)ev.data.length() / (double)(DataFrame.MAX_SIZE * 8);
-        postInvalidate();
-    }
-
-
-    @Subscribe
     private void onMonitorUpdate(TransmitMonitor.Event ev) {
         if (ev.transmissionInProgress) {
             paint.setColor(Color.YELLOW);

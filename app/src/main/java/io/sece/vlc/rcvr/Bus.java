@@ -26,30 +26,11 @@ public class Bus extends AsyncEventBus {
         }
     }
 
-    public static class FrameUpdate extends Event {
-        public String data;
-
-        public FrameUpdate(String src) {
-            data = src;
-        }
-    }
-
     public static class ProgressUpdate extends Event {
         public float completed;
 
         public ProgressUpdate(float completed) {
             this.completed = completed;
-        }
-    }
-
-
-    public static class FrameStats extends Event {
-        public int total;
-        public int errors;
-
-        public FrameStats(int total, int errors) {
-            this.total = total;
-            this.errors = errors;
         }
     }
 
