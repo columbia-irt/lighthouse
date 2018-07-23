@@ -21,24 +21,26 @@ public class DataFrame {
             throw new FrameTooShort();
 
         checksum = input.data[0];
-        seqNumber = input.data[1] & 0xff;
+        error = checksum != CRC8.compute(input.data, 1, bytes - 1);
 
         payload = new byte[bytes - 2];
-        System.arraycopy(input.data, 2, payload, 0, bytes - 2);
+        System.arraycopy(input.data, 1, payload, 0, bytes - 2);
 
-        error = checksum != CRC8.compute(input.data, 1, bytes - 1);
+        seqNumber = input.data[bytes - 1] & 0xff;
     }
 
 
     public BitVector pack() {
-        CRC8 crc = new CRC8();
-        crc.add(seqNumber).add(payload);
 
         byte[] rv = new byte[payload.length + 2];
 
+        CRC8 crc = new CRC8();
+        crc.add(payload).add(seqNumber);
         rv[0] = checksum = crc.compute();
-        rv[1] = (byte)seqNumber;
-        System.arraycopy(payload, 0, rv, 2, payload.length);
+
+        System.arraycopy(payload, 0, rv, 1, payload.length);
+
+        rv[1 + payload.length] = (byte)seqNumber;
 
         return new BitVector(rv);
     }
