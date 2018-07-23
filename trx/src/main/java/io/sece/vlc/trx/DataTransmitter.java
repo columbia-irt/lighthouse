@@ -45,8 +45,8 @@ public class DataTransmitter implements Runnable {
 
     @Override
     public void run() {
-        Transmitter<?> trx;
-        Modem modem;
+        Transmitter trx;
+        Modem<?> modem;
 
         System.out.println(this.getModulator());
         switch (this.getModulator()) {
@@ -66,7 +66,7 @@ public class DataTransmitter implements Runnable {
                 throw new IllegalArgumentException("Unsupported modulator");
         }
 
-        Symbol sym = new Symbol(modem.states);
+        Symbol symbol = new Symbol(modem.states);
         RaptorQEncoder dataEncoder = new RaptorQEncoder(BitVector.DEFAULT_DATA.data, DataFrame.MAX_PAYLOAD_SIZE);
         LineCoder lineCoder = new LineCoder(new int[] {1, 3, 2});
         DataFrame dataFrame = new DataFrame();
@@ -81,11 +81,9 @@ public class DataTransmitter implements Runnable {
                 dataFrame.seqNumber = i;
                 dataFrame.payload = dataEncoder.getPacket(i);
 
-                BitVector frame = dataFrame.pack();
-                System.out.println(i + "\t" + frame.toString());
-                List<Integer> symbols = sym.fromBits(frame);
-                symbols = lineCoder.encode(symbols);
-                trx.enqueue(modem.modulate(symbols));
+                BitVector bits = dataFrame.pack();
+                System.out.println(i + "\t" + bits.toString());
+                trx.enqueue(modem.modulate(lineCoder.encode(symbol.fromBits(bits))));
                 i = (i + 1) % 256;
             }
         } catch (InterruptedException e) {
