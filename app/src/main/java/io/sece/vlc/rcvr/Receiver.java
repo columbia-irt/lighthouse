@@ -4,12 +4,15 @@ import android.util.Log;
 
 import com.google.common.eventbus.Subscribe;
 
+import java.util.List;
+
 import io.sece.vlc.Color;
-import io.sece.vlc.BitString;
+import io.sece.vlc.BitVector;
 import io.sece.vlc.DataFrame;
 import io.sece.vlc.LineCoder;
 import io.sece.vlc.Modem;
 import io.sece.vlc.RaptorQDecoder;
+import io.sece.vlc.Symbol;
 import io.sece.vlc.rcvr.processing.Frame;
 import io.sece.vlc.rcvr.processing.Processing;
 
@@ -19,33 +22,22 @@ public class Receiver {
     private Modem<Color> modem;
     private DataFrame dataFrame = new DataFrame();
     private LineCoder lineCoder;
+    private Symbol symbol;
     private RaptorQDecoder dataDecoder;
-    private int frameErrors;
-    private int frameTotal;
 
 
     public Receiver(Modem modem) {
         this.modem = modem;
-        lineCoder = new LineCoder(modem, DataFrame.MAX_SIZE);
+        symbol = new Symbol(modem.states);
+        lineCoder = new LineCoder(new int[] {1,3, 2}, DataFrame.MAX_SIZE * 8 / symbol.bits);
         reset();
     }
 
 
     public void reset() {
         lineCoder.reset();
-        Bus.send(new Bus.FrameUpdate(lineCoder.getCurrentData()));
-
-        dataDecoder = new RaptorQDecoder(BitString.DEFAULT_DATA.length / 8, DataFrame.MAX_PAYLOAD_SIZE);
+        dataDecoder = new RaptorQDecoder(BitVector.DEFAULT_DATA.length / 8, DataFrame.MAX_PAYLOAD_SIZE);
         Bus.send(new Bus.ProgressUpdate(dataDecoder.percentCompleted()));
-
-        updateCounters(0, 0);
-    }
-
-
-    private void updateCounters(int frameTotal, int frameErrors) {
-        this.frameTotal = frameTotal;
-        this.frameErrors = frameErrors;
-        Bus.send(new Bus.FrameStats(this.frameTotal, this.frameErrors));
     }
 
 
@@ -56,49 +48,48 @@ public class Receiver {
 
     public void start() {
         Bus.subscribe(this);
-        Bus.send(new Bus.FrameUpdate(lineCoder.getCurrentData()));
         Bus.send(new Bus.ProgressUpdate(dataDecoder.percentCompleted()));
     }
 
 
     @Subscribe
     private void rx(Processing.Result ev) {
-        Color c = modem.detect(ev.frame.getColorAttr(Frame.HUE));
+        int s = modem.demodulate(ev.frame.getColorAttr(Frame.HUE));
 
-        BitString frame = lineCoder.rx(c);
-        Bus.send(new Bus.FrameUpdate(lineCoder.getCurrentData()));
-        if (frame == null || frame.length == 0) return;
+        List<Integer> symbols;
+        try {
+            symbols = lineCoder.decode(s);
+        } catch (LineCoder.FrameTooLong e) {
+            Log.d(TAG, "Frame too long");
+            return;
+        }
 
-        updateCounters(frameTotal + 1, frameErrors);
-        Log.d(TAG, "Frame: " + frame);
+        if (symbols == null || symbols.size() == 0) return;
+
+        BitVector frame = symbol.toBits(symbols);
 
         try {
             dataFrame.unpack(frame);
         } catch (DataFrame.FrameTooShort e) {
-            Log.w(TAG, "Too short frame received");
-            updateCounters(frameTotal, frameErrors + 1);
+            Log.d(TAG, "Frame too short");
             return;
         }
 
         if (dataFrame.error) {
-            Log.w(TAG, "Corrupted frame received");
-            updateCounters(frameTotal, frameErrors + 1);
+            Log.d(TAG, "Frame corrupted");
             return;
         }
 
         if (dataFrame.payload.length < dataDecoder.minPacketSize()
                 || dataFrame.payload.length > dataDecoder.maxPacketSize()) {
-            Log.w(TAG, "Invalid payload size " + dataFrame.payload.length);
-            updateCounters(frameTotal, frameErrors + 1);
+            Log.d(TAG, "Invalid payload size " + dataFrame.payload.length);
             return;
         }
 
         try {
             dataDecoder.putPacket(dataFrame.seqNumber, dataFrame.payload);
-            Log.d(TAG, "Progress: " + dataDecoder.percentCompleted());
         } catch(Exception e) {
-            Log.w(TAG, "Error while decoding frame payload", e);
-            updateCounters(frameTotal, frameErrors + 1);
+            Log.d(TAG, "Error while decoding payload", e);
             return;
         }
         Bus.send(new Bus.ProgressUpdate(dataDecoder.percentCompleted()));

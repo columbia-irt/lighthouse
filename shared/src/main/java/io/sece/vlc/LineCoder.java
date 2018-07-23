@@ -15,7 +15,7 @@ public class LineCoder {
     private static final int STATE_RESET = 6;
     private static final int STATE_D1 = 1;
 
-    private static final class FrameTooLong extends RuntimeException { }
+    public static final class FrameTooLong extends Exception { }
 
     public final int[] marker;
     private int state = STATE_START;
@@ -54,7 +54,7 @@ public class LineCoder {
     }
 
 
-    private void store(int... symbols) {
+    private void store(int... symbols) throws FrameTooLong {
         if (maxSize != NO_MAX_SIZE && (buffer.size() + symbols.length) > maxSize)
             throw new FrameTooLong();
 
@@ -62,7 +62,7 @@ public class LineCoder {
     }
 
 
-    public List<Integer> decode(int symbol) {
+    public List<Integer> decode(int symbol) throws FrameTooLong {
         try {
             switch (state) {
                 case STATE_START:
@@ -124,13 +124,14 @@ public class LineCoder {
             }
         } catch (FrameTooLong e) {
             reset(STATE_START);
+            throw e;
         }
 
         return null;
     }
 
 
-    public List<Integer> encode(List<Integer> symbols) {
+    public List<Integer> encode(List<Integer> symbols) throws FrameTooLong {
         if (maxSize != NO_MAX_SIZE && maxSize < symbols.size())
             throw new FrameTooLong();
 

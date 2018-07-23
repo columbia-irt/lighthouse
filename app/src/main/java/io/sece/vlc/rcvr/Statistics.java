@@ -55,8 +55,6 @@ public class Statistics extends AppCompatTextView {
         b.append(String.format(Locale.US, "Queue length: %.0f\n", queueLength.value));
         b.append(String.format(Locale.US, "Signal: locked=%b rate=%.0f Bd\n", signalLock, signalRate));
         b.append(String.format(Locale.US, "Transferred: %.1f %%\n", completed));
-        b.append(String.format(Locale.US, "Frames: total=%d, errors=%d\n", framesTotal, framesError));
-        b.append(String.format(Locale.US, "Receiving: %s", frameData));
 
         setText(b.toString());
     }
