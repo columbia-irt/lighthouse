@@ -7,4 +7,7 @@ package io.sece.vlc;
  * monochromatic, support frequency modulation.
  */
 public abstract class FreqModem extends Modem<Color> {
+    protected FreqModem(int states) {
+        super(states);
+    }
 }

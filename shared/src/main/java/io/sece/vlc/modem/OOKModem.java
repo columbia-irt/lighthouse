@@ -3,7 +3,7 @@ package io.sece.vlc.modem;
 
 import io.sece.vlc.Amplitude;
 import io.sece.vlc.Modem;
-import io.sece.vlc.Symbol;
+
 
 /**
  * An implementation of an On-Off Keying (OOK) modulator. This is the simplest
@@ -13,23 +13,20 @@ import io.sece.vlc.Symbol;
  * to LED interfaces that only accept binary values.
  */
 public class OOKModem extends Modem<Amplitude> {
-    private Symbol symbol;
     private Amplitude off = new Amplitude(0);
     private Amplitude on = new Amplitude(1);
 
     public OOKModem() {
-        states = 2;
-        symbol = new Symbol(states);
-        bits = symbol.bits;
+        super(2);
     }
 
     @Override
-    protected Amplitude modulate(String data, int offset) {
-        switch(symbol.fromBits(data, offset)) {
+    public Amplitude modulate(int symbol) {
+        switch(symbol) {
         case 0: return off;
         case 1: return on;
         }
-        throw new AssertionError();
+        throw new IllegalArgumentException("Bug: Invalid symbol " + symbol);
     }
 
     @Override
@@ -37,7 +34,8 @@ public class OOKModem extends Modem<Amplitude> {
         return input.nearestNeighbor(on, off);
     }
 
-    public StringBuilder demodulate(StringBuilder buf, int offset, Amplitude input) {
+    @Override
+    public int demodulate(Amplitude input) {
         // Not yet implemented
         throw new UnsupportedOperationException();
     }

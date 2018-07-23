@@ -3,45 +3,37 @@ package io.sece.vlc.modem;
 
 import io.sece.vlc.Color;
 import io.sece.vlc.FreqModem;
-import io.sece.vlc.Symbol;
+
 
 public class FSK4Modem extends FreqModem {
-    public Color n, e, s, w;
-    private Symbol symbol;
-
-
-    public FSK4Modem(int offset) {
-        this(Color.BLACK, new Color((((0 * 120) + offset)%360)), new Color((((1 * 120) + offset)%360)), new Color((((2 * 120) + offset)%360)));
-    }
+    private Color n, e, s, w;
 
     public FSK4Modem()
     {
         this(0);
     }
 
+    public FSK4Modem(int offset) {
+        this(Color.BLACK, new Color((((0 * 120) + offset) % 360)), new Color((((1 * 120) + offset) % 360)), new Color((((2 * 120) + offset) % 360)));
+    }
+
     public FSK4Modem(Color n, Color e, Color s, Color w) {
+        super(4);
         this.n = n;
         this.e = e;
         this.s = s;
         this.w = w;
-        //System.out.println("n (rgb) : " + n);
-        //System.out.println("e (rgb) : " + e);
-        //System.out.println("s (rgb) : " + s);
-        //System.out.println("w (rgb) : " + w);
-        states = 4;
-        symbol = new Symbol(states);
-        bits = symbol.bits;
     }
 
     @Override
-    protected Color modulate(String data, int offset) {
-        switch(symbol.fromBits(data, offset)) {
+    public Color modulate(int symbol) {
+        switch(symbol) {
         case 0: return n;
         case 1: return e;
         case 2: return s;
         case 3: return w;
         }
-        throw new AssertionError();
+        throw new IllegalArgumentException("Bug: Invalid symbol " + symbol);
     }
 
     @Override
@@ -50,17 +42,13 @@ public class FSK4Modem extends FreqModem {
     }
 
     @Override
-    public StringBuilder demodulate(StringBuilder buf, int offset, Color input) {
-        int sym;
-
+    public int demodulate(Color input) {
         input = detect(input);
-        if      (input.equals(n)) sym = 0;
-        else if (input.equals(e)) sym = 1;
-        else if (input.equals(s)) sym = 2;
-        else if (input.equals(w)) sym = 3;
+        if      (input.equals(n)) return 0;
+        else if (input.equals(e)) return 1;
+        else if (input.equals(s)) return 2;
+        else if (input.equals(w)) return 3;
         else
-            throw new IllegalArgumentException();
-
-        return symbol.toBits(buf, offset, sym);
+            throw new IllegalArgumentException("Bug in FSK4 demodulator");
     }
 }

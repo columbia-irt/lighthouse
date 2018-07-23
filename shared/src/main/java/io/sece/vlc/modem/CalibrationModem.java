@@ -2,7 +2,6 @@ package io.sece.vlc.modem;
 
 import io.sece.vlc.Color;
 import io.sece.vlc.FreqModem;
-import io.sece.vlc.Symbol;
 
 import static io.sece.vlc.Color.RGBtoHSB;
 
@@ -10,27 +9,23 @@ public class CalibrationModem extends FreqModem
 {
     private Color u;
     private Color d;
-    private Symbol symbol;
 
     public CalibrationModem(int hue, int saturation, int brightness) {
-
+        super(2);
         this.u = new Color(new int[]{hue, saturation, brightness});
         this.d = Color.BLACK;
-        states = 2;
-        symbol = new Symbol(states);
-        bits = symbol.bits;
         System.out.println("Red: " + u.red + " Green: " + u.green + " Blue: " + u.blue);
         int[] test = RGBtoHSB(null, u.red, u.green, u.blue);
         System.out.println("Hue: " + test[0] + " Saturation: " + test[1] + " Brightness: " + test[2]);
     }
 
     @Override
-    protected Color modulate(String data, int offset) {
-        switch(symbol.fromBits(data, offset)) {
+    public Color modulate(int symbol) {
+        switch(symbol) {
             case 0: return d;
             case 1: return u;
         }
-        throw new AssertionError();
+        throw new IllegalArgumentException("Bug: Invalid symbol " + symbol);
     }
 
     @Override
@@ -39,7 +34,7 @@ public class CalibrationModem extends FreqModem
     }
 
     @Override
-    public StringBuilder demodulate(StringBuilder buf, int offset, Color input) {
+    public int demodulate(Color input) {
         // Not yet implemented
         throw new UnsupportedOperationException();
     }

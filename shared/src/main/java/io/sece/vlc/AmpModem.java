@@ -11,4 +11,7 @@ package io.sece.vlc;
  * supports on-off states cannot amplitude-modulated.
  */
 public abstract class AmpModem extends Modem<Amplitude> {
+    protected AmpModem(int states) {
+        super(states);
+    }
 }

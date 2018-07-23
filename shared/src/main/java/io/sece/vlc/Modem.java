@@ -18,25 +18,21 @@ import java.util.List;
  * bits at a time the modulator consumers or generates.
  */
 public abstract class Modem<V extends Coordinate> {
-    public int bits;
-    public int states;
+    public final int bits;
+    public final int states;
 
-    public List<V> modulate(String data) {
-        if ((data.length() % bits) != 0)
-            throw new IllegalArgumentException("Bug: Modulator input does not have correct width");
+    protected Modem(int states) {
+        this.states = states;
+        bits = Symbol.states2bits(states);
+    }
 
+    public List<V> modulate(List<Integer> symbols) {
         List<V> rv = new ArrayList<>();
-        for(int i = 0; i < data.length(); i+= bits)
-            rv.add(modulate(data, i ));
+        for(int s : symbols) rv.add(modulate(s));
         return rv;
     }
 
-    protected abstract V modulate(String data, int offset);
-    public abstract StringBuilder demodulate(StringBuilder buf, int offset, V input);
+    public abstract V modulate(int symbol);
+    public abstract int demodulate(V input);
     public abstract V detect(V input);
-
-
-    public String demodulate(V input) {
-        return demodulate(new StringBuilder(), 0, input).toString();
-    }
 }

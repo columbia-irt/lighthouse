@@ -2,22 +2,19 @@ package io.sece.vlc.modem;
 
 import io.sece.vlc.AmpModem;
 import io.sece.vlc.Amplitude;
-import io.sece.vlc.Symbol;
+
 
 public class ASK2Modem extends AmpModem {
     private Amplitude l1, l2;
-    private Symbol symbol;
 
     public ASK2Modem() {
         this(0, 255);
     }
 
     public ASK2Modem(int l1, int l2) {
+        super(2);
         this.l1 = new Amplitude(l1);
         this.l2 = new Amplitude(l2);
-        states = 2;
-        symbol = new Symbol(states);
-        bits = symbol.bits;
     }
 
     @Override
@@ -26,18 +23,16 @@ public class ASK2Modem extends AmpModem {
     }
 
     @Override
-    protected Amplitude modulate(String data, int offset) {
-        switch (symbol.fromBits(data, offset)) {
-            case 0:
-                return l1;
-            case 1:
-                return l2;
+    public Amplitude modulate(int symbol) {
+        switch (symbol) {
+            case 0: return l1;
+            case 1: return l2;
         }
-        throw new AssertionError();
+        throw new IllegalArgumentException("Bug: Invalid symbol " + symbol);
     }
 
     @Override
-    public StringBuilder demodulate(StringBuilder buf, int offset, Amplitude input) {
+    public int demodulate(Amplitude input) {
         throw new UnsupportedOperationException();
     }
 }
