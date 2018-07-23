@@ -14,7 +14,7 @@ public class DataFrame {
     public boolean error;
 
 
-    public void unpack(BitString input) throws FrameTooShort {
+    public void unpack(BitVector input) throws FrameTooShort {
         int bytes = input.length / 8;
 
         if (bytes < MIN_SIZE)
@@ -30,7 +30,7 @@ public class DataFrame {
     }
 
 
-    public BitString pack() {
+    public BitVector pack() {
         CRC8 crc = new CRC8();
         crc.add(seqNumber).add(payload);
 
@@ -40,6 +40,6 @@ public class DataFrame {
         rv[1] = (byte)seqNumber;
         System.arraycopy(payload, 0, rv, 2, payload.length);
 
-        return new BitString(rv);
+        return new BitVector(rv);
     }
 }

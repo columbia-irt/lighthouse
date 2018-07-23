@@ -9,7 +9,6 @@ import com.google.common.eventbus.Subscribe;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-import io.sece.vlc.BitString;
 import io.sece.vlc.rcvr.processing.Frame;
 import io.sece.vlc.rcvr.processing.block.RateMonitor;
 import io.sece.vlc.rcvr.processing.Processing;
