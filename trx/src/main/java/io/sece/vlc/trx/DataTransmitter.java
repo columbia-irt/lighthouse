@@ -1,11 +1,14 @@
 package io.sece.vlc.trx;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import io.sece.vlc.BitString;
+import io.sece.vlc.BitVector;
+import io.sece.vlc.Color;
 import io.sece.vlc.DataFrame;
 import io.sece.vlc.LineCoder;
 import io.sece.vlc.RaptorQEncoder;
+import io.sece.vlc.Symbol;
 import io.sece.vlc.modem.FSK2Modem;
 import io.sece.vlc.modem.FSK4Modem;
 import io.sece.vlc.modem.FSK8Modem;
@@ -42,50 +45,59 @@ public class DataTransmitter implements Runnable {
 
     @Override
     public void run() {
-        Transmitter<?> t;
-        Modem mod;
+        Transmitter<?> trx;
+        Modem modem;
 
         System.out.println(this.getModulator());
         switch (this.getModulator()) {
             case "fsk2":
-                mod = new FSK2Modem();
+                modem = new FSK2Modem();
                 break;
 
             case "fsk4":
-                mod = new FSK4Modem();
+                modem = new FSK4Modem();
                 break;
 
             case "fsk8":
-                mod = new FSK8Modem();
+                modem = new FSK8Modem();
                 break;
 
             default:
                 throw new IllegalArgumentException("Unsupported modulator");
         }
 
-        t = new Transmitter<>(led, mod, 1000000000 / this.getFPS(), TimeUnit.NANOSECONDS);
-
-        RaptorQEncoder dataEncoder = new RaptorQEncoder(BitString.DEFAULT_DATA.data, DataFrame.MAX_PAYLOAD_SIZE);
-        LineCoder lineCoder = new LineCoder(mod, DataFrame.MAX_SIZE);
+        Symbol sym = new Symbol(modem.states);
+        RaptorQEncoder dataEncoder = new RaptorQEncoder(BitVector.DEFAULT_DATA.data, DataFrame.MAX_PAYLOAD_SIZE);
+        LineCoder lineCoder = new LineCoder(new int[] {1, 3, 2});
         DataFrame dataFrame = new DataFrame();
+
+        trx = new Transmitter<>(led, 1000000000 / this.getFPS(), TimeUnit.NANOSECONDS);
+        Thread t = new Thread(trx);
+        t.start();
 
         int i = 0;
         try {
             while (true) {
-                if (Thread.interrupted()) break;
-
                 dataFrame.seqNumber = i;
                 dataFrame.payload = dataEncoder.getPacket(i);
 
-                String bits = lineCoder.tx(dataFrame.pack());
-                System.out.println(i + "\t" + bits);
-
-                t.tx(bits);
+                BitVector frame = dataFrame.pack();
+                System.out.println(i + "\t" + frame.toString());
+                List<Integer> symbols = sym.fromBits(frame);
+                symbols = lineCoder.encode(symbols);
+                trx.enqueue(modem.modulate(symbols));
                 i = (i + 1) % 256;
             }
-        } catch (LEDException e) {
-            throw new RuntimeException(e);
         } catch (InterruptedException e) {
+            t.interrupt();
+        } catch (LineCoder.FrameTooLong e) {
+            throw new RuntimeException(e);
+        }
+
+        try {
+            t.join(1000);
+        } catch (InterruptedException e) {
+            System.out.println("Transmitter thread refused to die");
         }
     }
 }
