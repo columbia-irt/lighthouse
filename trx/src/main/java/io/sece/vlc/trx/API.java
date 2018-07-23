@@ -172,25 +172,43 @@ public class API {
             } else {
                 if (tID.equals(String.valueOf(transID.getID()))) {
                     jsonString = "you turned it off";
-                    if (threadCali != null && threadCali.isAlive()) {
-                        threadCali.stop();
-                    }
-
-                    if (threadTrans != null && threadTrans.isAlive()) {
-                        threadTrans.stop();
-                    }
-
-                    if (threadDog != null && threadDog.isAlive()) {
-                        threadDog.stop();
-                    }
-
                     try {
-                        Main.led.set(Color.BLACK);
-                    } catch (LEDException e) {
-                        throw new RuntimeException(e);
+                        if (threadCali != null && threadCali.isAlive()) {
+                            threadCali.interrupt();
+                            try {
+                                threadCali.join();
+                            } catch (InterruptedException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+
+                        if (threadTrans != null && threadTrans.isAlive()) {
+                            threadTrans.interrupt();
+                            try {
+                                threadTrans.join();
+                            } catch (InterruptedException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+
+                        if (threadDog != null && threadDog.isAlive()) {
+                            threadDog.interrupt();
+                            try {
+                                threadDog.join();
+                            } catch (InterruptedException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                    } finally {
+                        try {
+                            Main.led.set(Color.BLACK);
+                        } catch (LEDException e) {
+                            throw new RuntimeException(e);
+                        } finally {
+                            tID = "";
+                            active = false;
+                        }
                     }
-                    tID = "";
-                    active = false;
                 } else {
                     jsonString = "you are not allowed to turn the device off!";
                 }

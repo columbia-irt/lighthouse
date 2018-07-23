@@ -1,8 +1,9 @@
 package io.sece.vlc.trx;
 
 
-public class WatchDog implements Runnable {
+import io.sece.vlc.Color;
 
+public class WatchDog implements Runnable {
     private Thread thread;
     private int timeout;
     private ColorLEDInterface led;
@@ -19,15 +20,23 @@ public class WatchDog implements Runnable {
     public void run() {
         try {
             Thread.sleep(timeout * 1000);
-            if(thread != null && thread.isAlive()) {
-                thread.stop();
-            }
-            led.set(io.sece.vlc.Color.BLACK);
-
+        } catch (InterruptedException e) {
+            return;
         }
-        catch(Exception e)
-        {
-            System.out.println(e.fillInStackTrace());
+
+        System.out.println("Watchdog triggered");
+
+        if (thread != null && thread.isAlive()) {
+            thread.interrupt();
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            } finally {
+                try {
+                    led.set(Color.BLACK);
+                } catch (LEDException e) { }
+            }
         }
     }
 }
