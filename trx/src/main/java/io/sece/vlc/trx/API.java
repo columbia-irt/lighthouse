@@ -40,16 +40,19 @@ public class API {
         server.setExecutor(null);
     }
 
+
     public void start(ExecutorService executor) {
         System.out.println("Starting HTTP API on port " + port);
         server.setExecutor(executor);
         server.start();
     }
 
+
     public void stop() {
         System.out.println("Stopping HTTP API");
         server.stop(0);
     }
+
 
     static class RootHandler implements HttpHandler {
         public void handle(HttpExchange he) throws IOException {
@@ -61,52 +64,42 @@ public class API {
         }
     }
 
+
     static class calibrationHandler implements HttpHandler {
         public void handle(HttpExchange he) throws IOException {
-
             byte [] response;
 
             OutputStream os = he.getResponseBody();
 
-            if(threadDog != null && !threadDog.isAlive())
-            {
+            if (threadDog != null && !threadDog.isAlive()) {
                 active = false;
                 tID = "";
             }
 
-            if(active)
-            {
+            if(active) {
                 response = ("{ response: \"Currently Running\" }").getBytes();
-
 
                 he.sendResponseHeaders(200, response.length);
                 os.write(response);
-            }
-            else
-            {
+            } else {
                 active = true;
                 tID = String.valueOf((int)(Math.random() * 901 + 100));
                 response = ("{ tID:" + tID + " }").getBytes();
 
-
                 he.sendResponseHeaders(200, response.length);
-
 
                 try (Reader isr =  new InputStreamReader(he.getRequestBody(),"utf-8")) {
                     Gson gson = new GsonBuilder().create();
                     CalibrationTransmitter calTrx = gson.fromJson(isr, CalibrationTransmitter.class);
-                    calTrx.setLed(Main.led);
+                    calTrx.led = Main.led;
                     System.out.println(calTrx);
 
                     threadCali = new Thread(calTrx);
-                    threadDog = new Thread(new WatchDog(threadCali, calTrx.getDuration()*(calTrx.getHueValue().length), Main.led));
+                    threadDog = new Thread(new WatchDog(threadCali, calTrx.duration * calTrx.hueValue.length, Main.led));
                     threadDog.start();
                     threadCali.start();
                     os.write(response);
-                    //testing purpose, make sure that the LED is off after any transmission
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     active = false;
                     tID = "";
                     System.out.println(e.getMessage());
@@ -123,27 +116,23 @@ public class API {
         public void handle(HttpExchange he) throws IOException {
             byte [] response;
 
-            if(threadDog != null && !threadDog.isAlive())
-            {
+            if (threadDog != null && !threadDog.isAlive()) {
                 active = false;
                 tID = "";
             }
 
             OutputStream os = he.getResponseBody();
-            if(active)
-            {
+            if(active) {
                 response = ("{ response: \"Currently Running\" }").getBytes();
                 he.sendResponseHeaders(200, response.length);
                 os.write(response);
-            }
-            else
-            {
+            } else {
                 active = true;
                 tID = String.valueOf((int)(Math.random() * 901 + 100));
                 response = ("{ tID:" + tID + " }").getBytes();
                 he.sendResponseHeaders(200, response.length);
 
-                try (Reader isr =  new InputStreamReader(he.getRequestBody(),"utf-8")) {
+                try (Reader isr = new InputStreamReader(he.getRequestBody(),"utf-8")) {
                     Gson gson = new GsonBuilder().create();
                     DataTransmitter transTrx = gson.fromJson(isr, DataTransmitter.class);
                     transTrx.setLed(Main.led);
@@ -156,10 +145,7 @@ public class API {
                     threadTrans.start();
 
                     os.write(response);
-                    //testing purpose, make sure that the LED is off after any transmission
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     active = false;
                     tID = "";
                     System.out.println(e.getMessage());
@@ -170,6 +156,7 @@ public class API {
             os.close();
         }
     }
+
 
     static class offHandler implements HttpHandler {
         public void handle(HttpExchange he) throws IOException {
@@ -183,24 +170,23 @@ public class API {
             if (!active) {
                 jsonString = "Not active";
             } else {
-                if (tID.equals(String.valueOf(transID.getID())))//tID muss be transmitted by client
-                {
+                if (tID.equals(String.valueOf(transID.getID()))) {
                     jsonString = "you turned it off";
                     if (threadCali != null && threadCali.isAlive()) {
                         threadCali.stop();
                     }
+
                     if (threadTrans != null && threadTrans.isAlive()) {
                         threadTrans.stop();
                     }
+
                     if (threadDog != null && threadDog.isAlive()) {
                         threadDog.stop();
                     }
-                    try
-                    {
+
+                    try {
                         Main.led.set(Color.BLACK);
-                    }
-                    catch (LEDException e)
-                    {
+                    } catch (LEDException e) {
                         throw new RuntimeException(e);
                     }
                     tID = "";
