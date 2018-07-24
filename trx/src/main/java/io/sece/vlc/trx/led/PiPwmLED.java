@@ -16,16 +16,14 @@ public class PiPwmLED implements ContinuousLEDInterface {
     private PiGPIOPin pin;
 
 
-    public PiPwmLED(PiGPIOPin pin) throws LEDException
-    {
+    public PiPwmLED(PiGPIOPin pin) {
         // Set the PWM frequency to the maximum value by default. The library may set a lower
         // value depending on the sample rate used.
         this(pin, 40000);
     }
 
 
-    public PiPwmLED(PiGPIOPin pin, int pwmFrequency) throws LEDException
-    {
+    public PiPwmLED(PiGPIOPin pin, int pwmFrequency) {
         this.pin = pin;
         try {
             pin.setPWMFrequency(pwmFrequency);
@@ -36,8 +34,7 @@ public class PiPwmLED implements ContinuousLEDInterface {
 
 
     @Override
-    public void set(Integer value) throws LEDException
-    {
+    public void set(Integer value) {
         try {
             pin.setPWMValue(value);
         } catch (PiGPIOException e) {

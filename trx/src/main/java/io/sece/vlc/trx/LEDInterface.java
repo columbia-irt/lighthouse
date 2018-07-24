@@ -7,5 +7,5 @@ package io.sece.vlc.trx;
  * by the driver) provides an interface to set those parameters.
  */
 public interface LEDInterface<T> {
-    void set(T value) throws LEDException;
+    void set(T value);
 }

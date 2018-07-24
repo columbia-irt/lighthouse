@@ -200,14 +200,9 @@ public class API {
                             }
                         }
                     } finally {
-                        try {
-                            Main.led.set(Color.BLACK);
-                        } catch (LEDException e) {
-                            throw new RuntimeException(e);
-                        } finally {
-                            tID = "";
-                            active = false;
-                        }
+                        Main.led.set(Color.BLACK);
+                        tID = "";
+                        active = false;
                     }
                 } else {
                     jsonString = "you are not allowed to turn the device off!";

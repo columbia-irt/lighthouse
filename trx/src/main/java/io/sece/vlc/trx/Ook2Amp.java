@@ -23,7 +23,7 @@ class Ook2Amp implements DiscreteLEDInterface {
     }
 
     @Override
-    public void set(Boolean value) throws LEDException {
+    public void set(Boolean value) {
         if (value) led.set(max);
         else led.set(min);
     }

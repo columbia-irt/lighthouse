@@ -27,23 +27,19 @@ class Transmitter<T extends Coordinate> implements Runnable {
 
     @Override
     public void run() {
-        List<T> data;
         long timestamp = System.nanoTime();
 
         try {
             while (true) {
-                data = queue.take();
-                for (T v : data) {
-                    try {
-                        led.set(v);
-                    } catch (LEDException e) {
-                        System.out.println(e);
-                    }
+                for (T v : queue.take()) {
+                    led.set(v);
 
                     timestamp += interval;
                     Sleeper.sleepNanos(timestamp - System.nanoTime());
                 }
             }
-        } catch (InterruptedException e) { }
+        } catch (InterruptedException e) {
+            /* do nothing and shutdown cleanly */
+        }
     }
 }

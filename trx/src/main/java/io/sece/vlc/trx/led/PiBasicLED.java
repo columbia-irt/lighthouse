@@ -22,8 +22,7 @@ public class PiBasicLED implements DiscreteLEDInterface {
     }
 
     @Override
-    public void set(Boolean value) throws LEDException
-    {
+    public void set(Boolean value) {
         try {
             pin.setState(value);
         } catch (PiGPIOException e) {

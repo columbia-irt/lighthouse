@@ -14,17 +14,14 @@ public class CalibrationTransmitter implements Runnable {
     @Override
     public void run() {
         try {
-            for (int i = 0; i < this.hueValue.length; i++) {
-                led.set(new Color(this.hueValue[i], brightness));
+            for (int hue : this.hueValue) {
+                led.set(new Color(hue, brightness));
                 Sleeper.sleep(duration, TimeUnit.SECONDS);
             }
-        } catch (LEDException e) {
-            throw new RuntimeException(e);
         } catch (InterruptedException e) {
+            /* do nothing and terminate */
         } finally {
-            try {
-                led.set(Color.BLACK);
-            } catch(LEDException e) { }
+            led.set(Color.BLACK);
         }
     }
 

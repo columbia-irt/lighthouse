@@ -9,12 +9,12 @@ public class WatchDog implements Runnable {
     private ColorLEDInterface led;
 
 
-    public WatchDog(Thread thread, int timeout, ColorLEDInterface led)
-    {
+    public WatchDog(Thread thread, int timeout, ColorLEDInterface led) {
         this.thread = thread;
         this.timeout = timeout;
         this.led = led;
     }
+
 
     @Override
     public void run() {
@@ -26,17 +26,15 @@ public class WatchDog implements Runnable {
 
         System.out.println("Watchdog triggered");
 
-        if (thread != null && thread.isAlive()) {
-            thread.interrupt();
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            } finally {
-                try {
-                    led.set(Color.BLACK);
-                } catch (LEDException e) { }
-            }
+        if (thread == null || !thread.isAlive()) return;
+
+        thread.interrupt();
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } finally {
+            led.set(Color.BLACK);
         }
     }
 }

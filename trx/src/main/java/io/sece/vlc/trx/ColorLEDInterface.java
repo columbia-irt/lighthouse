@@ -18,29 +18,29 @@ import io.sece.vlc.Color;
  *
  * Naturally, this interface might also extend ContinuousLEDInterface and
  * DiscreteLEDInterface. The discrete variant could be implemented by turning
- * all channels on and off, the continous variant could be implemented by
+ * all channels on and off, the continuous variant could be implemented by
  * setting the same intensity on all channels. This is left to the actual
  * class implementing the interface, since neutral colors are rarely obtained
  * by setting the same intensity value on all channels.
  */
 public interface ColorLEDInterface extends LEDInterface<Color> {
 
-    static ColorLEDInterface byName(String name) throws LEDException {
+    static ColorLEDInterface byName(String name) {
         try {
             Class<? extends ColorLEDInterface> cls = Class.forName("io.sece.vlc.trx.led." + name).asSubclass(ColorLEDInterface.class);
             return cls.newInstance();
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-            throw new LEDException("Error while creating LED driver for " + name, e);
+            throw new IllegalArgumentException("Error while creating LED driver for " + name, e);
         }
     }
 
-    static ColorLEDInterface byName(String name, String arguments) throws LEDException {
+    static ColorLEDInterface byName(String name, String arguments) {
         try {
             Class<? extends ColorLEDInterface> cls = Class.forName("io.sece.vlc.trx.led." + name).asSubclass(ColorLEDInterface.class);
             Constructor<? extends ColorLEDInterface> ctor = cls.getConstructor(String.class);
             return ctor.newInstance(arguments);
         } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
-            throw new LEDException("Error while creating LED driver for " + name, e);
+            throw new IllegalArgumentException("Error while creating LED driver for " + name, e);
         }
     }
 }

@@ -1,10 +1,8 @@
 package io.sece.vlc.trx;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.sece.vlc.BitVector;
-import io.sece.vlc.Color;
 import io.sece.vlc.DataFrame;
 import io.sece.vlc.LineCoder;
 import io.sece.vlc.RaptorQEncoder;
@@ -13,6 +11,7 @@ import io.sece.vlc.modem.FSK2Modem;
 import io.sece.vlc.modem.FSK4Modem;
 import io.sece.vlc.modem.FSK8Modem;
 import io.sece.vlc.Modem;
+
 
 public class DataTransmitter implements Runnable {
     private int FPS;

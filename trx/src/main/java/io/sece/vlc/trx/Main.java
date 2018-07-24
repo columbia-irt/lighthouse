@@ -8,7 +8,7 @@ import java.util.concurrent.ExecutorService;
 public class Main {
     public static ColorLEDInterface led;
 
-    public static void main(String[] args) throws IOException, LEDException {
+    public static void main(String[] args) throws IOException {
 
         System.out.println("Starting LED transmitter");
         ExecutorService threadPool = Executors.newCachedThreadPool();
