@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <style type="text/css">
+        #container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background-color: gray;
+            display: flex;
+            align-items: center;
+        }
+
+        #controls {
+            position: absolute;
+            top: 0;
+            left: 0;
+            margin: 10px;
+        }
+
+        #led {
+            margin-left: auto;
+            margin-right: auto;
+            width: 200px;
+            height: 200px;
+            background-color: black;
+            border-radius: 100px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+        <div id="led"></div>
+    </div>
+    <form id="controls">
+        <label for="rate">Symbol rate:</label>
+        <input type="number" id="rate" size="3" step="1" min="1" max="60" required>
+    </form>
+    <script type="text/javascript">
+        var led = document.getElementById("led"),
+            i = 0,
+            next,
+            waveform,
+            rate = 30;
+
+        var rateControl = document.getElementById("rate");
+        rateControl.value = rate.toString();
+        rateControl.oninput = function(event) {
+            var v = parseInt(event.target.value);
+            if (isNaN(v)) return;
+            if (v < 1) v = 1;
+            if (v > 60) v = 60;
+            rate = v;
+        }
+
+        function loadData(callback) {
+            var r = new XMLHttpRequest();
+            r.overrideMimeType("application/json");
+            r.open('POST', '', true);
+            r.onreadystatechange = function () {
+                if (r.readyState == 4 && r.status == "200") {
+                    callback(r.responseText);
+                }
+            };
+            r.send(null);
+        }
+
+        function draw() {
+            led.style.backgroundColor = waveform[i];
+            i = (i + 1) % waveform.length;
+        }
+
+        function transmit(now) {
+            requestAnimationFrame(transmit);
+
+            if (now < next) return;
+            draw();
+
+            var t = 1000 / rate;
+            next += (Math.floor((now - next) / t) + 1) * t;
+        }
+
+        loadData(function(response) {
+            waveform = JSON.parse(response);
+            next = performance.now();
+            transmit(next);
+        });
+    </script>
+</body>
+</html>

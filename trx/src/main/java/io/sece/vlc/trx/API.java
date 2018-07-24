@@ -18,6 +18,7 @@ import com.sun.net.httpserver.HttpServer;
 import io.sece.vlc.Color;
 
 
+
 public class API {
     private int port;
     private HttpServer server;
@@ -37,6 +38,7 @@ public class API {
         server.createContext("/calibration", new calibrationHandler());
         server.createContext("/transmit", new transmissionHandler());
         server.createContext("/off", new offHandler());
+        server.createContext("/webled", new WebLED());
         server.setExecutor(null);
     }
 
