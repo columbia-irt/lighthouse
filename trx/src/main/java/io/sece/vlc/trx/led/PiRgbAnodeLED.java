@@ -10,20 +10,20 @@ import io.sece.vlc.trx.ColorLEDInterface;
  * A driver for a tri-color (RGB) LED connected to three different GPIO pins
  * on a Raspberry PI and PWM-controlled by the PiGPIO library.
  */
-public class PiRgbLED implements ColorLEDInterface {
+public class PiRgbAnodeLED implements ColorLEDInterface {
     private PiPwmLED red;
     private PiPwmLED green;
     private PiPwmLED blue;
 
 
-    public PiRgbLED(PiGPIOPin red, PiGPIOPin green, PiGPIOPin blue) {
+    public PiRgbAnodeLED(PiGPIOPin red, PiGPIOPin green, PiGPIOPin blue) {
         this.red = new PiPwmLED(red);
         this.green = new PiPwmLED(green);
         this.blue = new PiPwmLED(blue);
     }
 
 
-    public PiRgbLED(String arguments) throws PiGPIOException {
+    public PiRgbAnodeLED(String arguments) throws PiGPIOException {
         String[] args = arguments.split(",");
         if (args.length != 3)
             throw new IllegalArgumentException("Invalid arguments: " + arguments);
@@ -31,14 +31,13 @@ public class PiRgbLED implements ColorLEDInterface {
         this.red = new PiPwmLED(new PiGPIOPin(Integer.parseInt(args[0])));
         this.green = new PiPwmLED(new PiGPIOPin(Integer.parseInt(args[1])));
         this.blue = new PiPwmLED(new PiGPIOPin(Integer.parseInt(args[2])));
-
     }
 
 
     @Override
     public void set(Color color) {
-        red.set(color.red);
-        green.set(color.green);
-        blue.set(color.blue);
+        red.set(255 - color.red);
+        green.set(255 - color.green);
+        blue.set(255 - color.blue);
     }
 }
