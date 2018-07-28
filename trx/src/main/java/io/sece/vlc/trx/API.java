@@ -40,6 +40,8 @@ public class API {
         server.createContext("/off", new offHandler());
         server.createContext("/webled", new WebLED());
         server.setExecutor(null);
+
+        Main.led.set(Color.BLACK);
     }
 
 
