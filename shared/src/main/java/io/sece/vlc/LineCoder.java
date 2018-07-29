@@ -78,7 +78,9 @@ public class LineCoder {
                 case STATE_S1:
                     if (symbol == marker[1]) {
                         state = STATE_S2;
-                    } else {
+                    } else if(symbol == marker[0]){
+                        // do nothing, stay in STATE_S1
+                    }else{
                         state = STATE_START;
                     }
                     break;
