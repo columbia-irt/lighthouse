@@ -23,6 +23,7 @@ import io.sece.vlc.rcvr.processing.block.HueDetector;
 import io.sece.vlc.rcvr.processing.block.RateMonitor;
 import io.sece.vlc.rcvr.processing.block.RoIExtractor;
 import io.sece.vlc.rcvr.processing.block.TransmitMonitor;
+import io.sece.vlc.rcvr.processing.block.Writer;
 
 
 public class Processing extends HandlerThread {
@@ -44,6 +45,7 @@ public class Processing extends HandlerThread {
     private RoIExtractor roiExtractor;
     private FrameSampler sampler;
     private TransmitMonitor monitor;
+    private Writer writer;
 
     private List<ProcessingBlock> stage1;
     private List<ProcessingBlock> stage2;
@@ -62,12 +64,12 @@ public class Processing extends HandlerThread {
     public Processing(RectF roi, int baudRate, Modem modem) {
         super("Processing");
         Bus.subscribe(this);
-
         this.modem = modem;
 
         roiExtractor = new RoIExtractor(roi);
         sampler = new FrameSampler(baudRate);
         monitor = new TransmitMonitor(baudRate, modem, 10);
+        writer = new Writer();
 
         stage1 = Arrays.asList(
                 new RateMonitor("camera"),
@@ -77,6 +79,7 @@ public class Processing extends HandlerThread {
         stage2 = Arrays.asList(
                 new RateMonitor("worker"),
                 new HueDetector(),
+                writer,
                 sampler,
                 monitor
         );
