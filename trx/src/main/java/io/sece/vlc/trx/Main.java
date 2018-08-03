@@ -3,7 +3,9 @@ package io.sece.vlc.trx;
 import java.io.IOException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
+import io.sece.vlc.Color;
 
 public class Main {
     public static ColorLEDInterface led;

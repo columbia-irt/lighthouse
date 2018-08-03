@@ -26,6 +26,7 @@ public class API {
     private static boolean active;
     private static Thread threadCali;
     private static Thread threadTrans;
+    private static Thread threadExp;
     private static Thread threadDog = new Thread();
 
 
@@ -36,6 +37,7 @@ public class API {
         server = HttpServer.create(new InetSocketAddress(port), 0);
         server.createContext("/", new RootHandler());
         server.createContext("/calibration", new calibrationHandler());
+        server.createContext("/experiment", new experimentHandler());
         server.createContext("/transmit", new transmissionHandler());
         server.createContext("/off", new offHandler());
         server.createContext("/webled", new WebLED());
@@ -100,6 +102,52 @@ public class API {
 
                     threadCali = new Thread(calTrx);
                     threadDog = new Thread(new WatchDog(threadCali, calTrx.duration * calTrx.hueValue.length, Main.led));
+                    threadDog.start();
+                    threadCali.start();
+                    os.write(response);
+                } catch (Exception e) {
+                    active = false;
+                    tID = "";
+                    System.out.println(e.getMessage());
+                    response = ("{ response: \"Failed reading json\" }").getBytes();
+                    os.write(response);
+                }
+            }
+            os.close();
+        }
+    }
+
+    static class experimentHandler implements HttpHandler {
+        public void handle(HttpExchange he) throws IOException {
+            byte [] response;
+
+            OutputStream os = he.getResponseBody();
+
+            if (threadDog != null && !threadDog.isAlive()) {
+                active = false;
+                tID = "";
+            }
+
+            if(active) {
+                response = ("{ response: \"Currently Running\" }").getBytes();
+
+                he.sendResponseHeaders(200, response.length);
+                os.write(response);
+            } else {
+                active = true;
+                tID = String.valueOf((int)(Math.random() * 901 + 100));
+                response = ("{ tID:" + tID + " }").getBytes();
+
+                he.sendResponseHeaders(200, response.length);
+
+                try (Reader isr =  new InputStreamReader(he.getRequestBody(),"utf-8")) {
+                    Gson gson = new GsonBuilder().create();
+                    ExperimentTransmitter expTrx = gson.fromJson(isr, ExperimentTransmitter.class);
+                    expTrx.led = Main.led;
+                    System.out.println(expTrx);
+
+                    threadCali = new Thread(expTrx);
+                    threadDog = new Thread(new WatchDog(threadCali, ((expTrx.duration*360) + 36), Main.led));
                     threadDog.start();
                     threadCali.start();
                     os.write(response);
