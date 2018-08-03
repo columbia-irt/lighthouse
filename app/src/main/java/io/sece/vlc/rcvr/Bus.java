@@ -66,6 +66,15 @@ public class Bus extends AsyncEventBus {
         }
     }
 
+    public static class WriteEvent extends Event {
+        public boolean writingActive;
+
+        WriteEvent(boolean active) {
+            this.writingActive = active;
+        }
+    }
+
+
 
     private Bus() {
         super(runnable -> {

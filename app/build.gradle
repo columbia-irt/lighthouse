@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-
 android {
     compileSdkVersion 27
     defaultConfig {
@@ -23,6 +22,7 @@ android {
 }
 
 dependencies {
+    implementation "com.opencsv:opencsv:4.0"
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     implementation project(':shared')

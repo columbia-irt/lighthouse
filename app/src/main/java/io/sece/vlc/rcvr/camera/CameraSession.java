@@ -5,6 +5,8 @@ import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CaptureRequest;
+import android.hardware.camera2.CaptureResult;
+import android.hardware.camera2.TotalCaptureResult;
 import android.media.ImageReader;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -13,9 +15,14 @@ import android.util.Size;
 import android.view.Surface;
 import android.view.SurfaceView;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+
+import io.sece.vlc.rcvr.CSVWrite;
+import io.sece.vlc.rcvr.ViewfinderFragment;
+import io.sece.vlc.rcvr.ViewfinderModel;
 
 public class CameraSession {
     private static final String TAG = "CameraSession";
@@ -32,11 +39,13 @@ public class CameraSession {
 
     public Size frameResolution;
     public int fps;
+    private CSVWrite csvWrite;
 
 
     public CameraSession(Context context, CameraSessionParams params) {
         this.context = context;
         this.params = params;
+        csvWrite = new CSVWrite("params_");
     }
 
 
@@ -98,7 +107,20 @@ public class CameraSession {
                 @Override
                 public void onConfigured(@NonNull CameraCaptureSession session) {
                     try {
-                        session.setRepeatingRequest(builder.build(), null, null);
+                        session.setRepeatingRequest(builder.build(), new CameraCaptureSession.CaptureCallback() {
+                            @Override
+                            public void onCaptureCompleted(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, @NonNull TotalCaptureResult result) {
+                                super.onCaptureCompleted(session, request, result);
+                                String[] data = {String.valueOf(result.get(CaptureResult.SENSOR_TIMESTAMP)),String.valueOf(result.get(CaptureResult.SENSOR_EXPOSURE_TIME)),String.valueOf(result.get(CaptureResult.CONTROL_AE_EXPOSURE_COMPENSATION))
+                                ,String.valueOf(result.get(CaptureResult.SENSOR_SENSITIVITY)),String.valueOf(result.get(CaptureResult.CONTROL_AWB_MODE))
+                                ,String.valueOf(result.get(CaptureResult.LENS_FOCUS_DISTANCE)),String.valueOf(ViewfinderFragment.zooming)};
+                                try {
+                                    csvWrite.write(data);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }, null);
                         Log.d(TAG, "Camera capture session created");
                         captureSession = session;
                         rv.complete(session);

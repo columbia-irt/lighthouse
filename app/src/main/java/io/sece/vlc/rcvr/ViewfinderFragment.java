@@ -71,6 +71,7 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
     private ImageReader imageReader;
 
     private CompletableFuture<Boolean> permission;
+    private CompletableFuture<Boolean> permissionWriting;
     private ViewfinderModel model;
     private GestureControl gestureControl;
     private GraphicOverlay<GraphicOverlay.Graphic> overlay;
@@ -79,10 +80,10 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
     private TransmitterAPI trx;
     private Processing processing;
 
-    public static long timeToStartSynchronized;
+    private boolean writingActivated = false;
 
     private FSK4Modem modem = new FSK4Modem();
-
+    public static float zooming = 0;
 
     private static Size selectFrameResolution(Size[] choices, Size target) throws CameraException {
         return selectFrameResolution(choices, target, new Size(0, 0));
@@ -351,10 +352,47 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
             } else {
                 permission.complete(true);
             }
-        } else {
+        } else if (requestCode == ReceiverApp.REQUEST_WRITING_PERMISSION) {
+            if (null == permissionWriting) {
+                Log.w(TAG, "Received unexpected permissionWriting result callback");
+                return;
+            }
+
+            if (grantResults.length != 1 || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                permissionWriting.complete(false);
+            } else {
+                permissionWriting.complete(true);
+            }
+        }else{
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
+
+    private CompletableFuture<Boolean> requestWritingPermission() {
+        if (null != permissionWriting) return permissionWriting;
+
+        // If we have writing permission already, complete the future immediately and return.
+
+        Context ctx = getContext();
+        if (null == ctx) {
+            permissionWriting.completeExceptionally(new Exception("Couldn't obtain Android context"));
+            return permissionWriting;
+        }
+
+        permissionWriting = new CompletableFuture<>();
+        if (ContextCompat.checkSelfPermission(ctx, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+            permissionWriting.complete(true);
+            return permissionWriting;
+        }
+
+        // If we don't have camera permission yet, request it, and return the future that will
+        // complete after the corresponding callback has fired.
+
+        Log.d(TAG, "Requesting writing permission...");
+        requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, ReceiverApp.REQUEST_WRITING_PERMISSION);
+        return permissionWriting;
+    }
+
 
 
     @Override
@@ -364,6 +402,7 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
 
         if (model.receiver == null)
             model.receiver = new Receiver(new FSK4Modem());
+        requestWritingPermission();
     }
 
 
@@ -389,6 +428,21 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
         Bus.subscribe(this);
 
         initTrxControl(getView().findViewById(R.id.txFPS), getView().findViewById(R.id.txButton));
+
+        Button btWrite =((Button)getView().findViewById(R.id.writeButton));
+        btWrite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!writingActivated){
+                    writingActivated=true;
+                    btWrite.setText("Stop");
+                }else{
+                    writingActivated=false;
+                    btWrite.setText("Write");
+                }
+                Bus.send(new Bus.WriteEvent(writingActivated));
+            }
+        });
 
         model.receiver.start();
 
@@ -606,6 +660,8 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
 
             slider.onChange(v -> {
                 session.params.zoom((float)v / (float)SCALE_FACTOR);
+                zooming = session.params.zoom();
+                System.out.println(zooming);
                 session.sync();
             });
         }
