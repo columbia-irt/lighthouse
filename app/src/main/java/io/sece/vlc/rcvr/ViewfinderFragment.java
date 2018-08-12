@@ -83,6 +83,11 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
     private boolean writingActivated = false;
 
     private FSK4Modem modem = new FSK4Modem();
+
+    private long timestamp_session_started = 0;
+    private int amount_measurements = 1;
+    private int counter_measurements = 0;
+
     public static float zooming = 0;
 
     private static Size selectFrameResolution(Size[] choices, Size target) throws CameraException {
@@ -399,7 +404,6 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         model = ViewModelProviders.of(this).get(ViewfinderModel.class);
-
         if (model.receiver == null)
             model.receiver = new Receiver(new FSK4Modem());
         requestWritingPermission();
@@ -559,8 +563,12 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
                         model.transmissionID = obj;
                         button.setText("Stop");
                         fpsText.setEnabled(false);
+                        if(timestamp_session_started == 0){
+                            timestamp_session_started = System.nanoTime();
+                        }
                     } else {
                         button.setText("Start");
+                        resetTimeMeasurement();
                         fpsText.setEnabled(true);
                         Toast.makeText(getContext(), ex.getMessage(), Toast.LENGTH_LONG).show();
                     }
@@ -568,6 +576,7 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
                 });
             }
         });
+
 
 
 //        Spinner spinner = (Spinner) getActivity().findViewById(R.id.spModulation);
@@ -729,14 +738,35 @@ public class ViewfinderFragment extends Fragment implements ActivityCompat.OnReq
     @Subscribe
     public void onTransferCompleted(Bus.TransferCompleted ev) {
         String msg = "Failure";
-        if (hammingDistance(ev.data, BitVector.DEFAULT_DATA.data) == 0)
+        if (hammingDistance(ev.data, BitVector.DEFAULT_DATA.data) == 0){
             msg = "Success";
+            counter_measurements++;
+            if(amount_measurements == counter_measurements){
+                long diff = System.nanoTime() - timestamp_session_started;
+                msg = "Success " + diff/1000000;
+            }
+        }
 
-        ConfirmationDialog d = ConfirmationDialog.newInstance(msg, false);
-        d.show(getChildFragmentManager(), FRAGMENT_DIALOG);
-        d.completed.whenComplete((v, t) -> {
+        if(counter_measurements == amount_measurements){
+            ConfirmationDialog d = ConfirmationDialog.newInstance(msg, false);
+            d.show(getChildFragmentManager(), FRAGMENT_DIALOG);
+            d.completed.whenComplete((v, t) -> {
+                model.receiver.reset();
+                model.receiver.start();
+                resetTimeMeasurement();
+            });
+        }else{
             model.receiver.reset();
             model.receiver.start();
-        });
+            Toast.makeText(getContext(), "Completed", Toast.LENGTH_SHORT).show();
+        }
+
+
+
+    }
+
+    public void resetTimeMeasurement(){
+        counter_measurements = 0;
+        timestamp_session_started = 0;
     }
 }
