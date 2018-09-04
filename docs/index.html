@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="styles.css">
+    <title>Project Lighthouse - VLC Authentication Protocol</title>
+  </head>
+  <body>
+      <nav class="navbar navbar-expand-lg navbar-light bg-light">
+          <a class="navbar-brand" href="#">Project Lighthouse</a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+              <li class="nav-item active">
+                <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/demo">Online DEMO</a>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Downloads
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                  <a class="dropdown-item" href="#">Receiver Design and Implementation</a>
+                  <a class="dropdown-item" href="#">Transmitter Design and Implementation</a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item" href="#">Android Receiver Application</a>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </nav>
+      
+        <div class="masthead text-center d-flex">
+          <div class="container my-auto" style="padding-top: 30px">
+            <div class="row">
+              <div class="col-lg-10 mx-auto">
+                <h2 class="text-uppercase">
+                  <strong>Secure Authentication of Remote IoT Devices Using Visible Light Communication (VLC)</strong>
+                </h2>
+                <img  class="img-fluid" style="max-width: 60%; padding-top: 30px" src="img/architecture.png">
+                <div class="row" style="margin-top: 50px;"> 
+                    <div class="col-lg-12">
+                        <a class="btn btn-primary btn-xl" style="width: 220px;" href="/demo">Try the Online-DEMO</a>
+                        <a class="btn btn-dark btn-xl" style="width: 220px;" href="https://github.com/columbia-irt/lighthouse">Go to Github Repository</a>
+                    </div>
+                </div>
+                <hr style="margin-top: 60px;margin-bottom: 60px;">
+              </div>
+              <div class="col-lg-8 mx-auto">
+                <h3>Why is there a need of a new IoT authentication protocol?</h3>
+                Due to a lack of trusted Certificate Authorities (CA) for IoT devices in local networks, authentication of remote IoT devices requires physical access or trusted third parties. This project eliminates these needs and introduces a new secure authentication using VLC: <br>
+                  <ul style="list-style: none;">
+                      <li>∙ No physical access required (line-of-sight)</li>
+                      <li>∙ Low-cost transmitter extension (RGB LED)</li>
+                      <li>∙ Ordinary receiver (Android based smartphone)</li>
+                      <li>∙ Dynamic authentication data (certificate rotation)</li>
+                  </ul>
+                  
+                <hr style="margin-top: 60px;margin-bottom: 60px;">
+              </div>
+                
+              <div class="col-lg-8 mx-auto">
+                <h3>Sketch of Operation</h3>
+                  As shown in the illustration above, the smoke detector (or any other IoT device) is not easily reachable, however the device is within the line of sight. Based on this, the device cannot be authenticated without knowing a shared secret or performing proximity based approaches  like push button authentication. Often, printed labels or QR codes located on device's back serve as a shared secret. <br>
+                  Using a Wi-Fi  peer-to-peer (P2P) connection from the smartphone to the smoke detector, which is accepted automatically by any device which is not part of a Wi-Fi infrastructure, the smoke detector sends its certificate to the smartphone in order to do a transport layer security (TLS) handshake. After the handshake has completed, the connection is encrypted but not authenticated. If the certificate has not been signed by a CA that the smartphone trusts, e.g., if the certificate is self-signed, the smartphone must use a MITM-resistant channel to authenticate the certificate. <br> 
+                  The smartphone requests the fingerprint of the certificate to be sent on the visible light channel. By pointing the camera at the smoke detector, we ensure there is a direct link for transmission. After receiving the fingerprint matching the TLS certificate's fingerprint, the TLS connection is authenticated.
+                <hr style="margin-top: 60px;margin-bottom: 60px;">
+              </div>
+                
+              <div class="col-lg-8 mx-auto">
+                <h3>Research</h3>
+                  This authententication protocol is a project of the Internet Real Time Lab (IRT) at Columbia University. The design and implementation of the transmitter as well as the receiver are described in the master theses and can be downloaded here. 
+                  
+                    <div class="row" style="margin-top: 50px;"> 
+                        <div class="col-lg-12">
+                            <a class="btn btn-dark btn-xl" style="width: 220px;" href="/demo">Transmitter thesis</a>
+                            <a class="btn btn-dark btn-xl" style="width: 220px;" href="https://github.com/columbia-irt/lighthouse">Receiver thesis</a>
+                        </div>
+                    </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+      
+         <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  </body>
+</html>
