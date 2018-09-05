@@ -19,7 +19,7 @@
 
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
-              <li class="nav-item active">
+              <li class="nav-item">
                 <a class="nav-link" href="#" onclick="showMainContent()">Home <span class="sr-only">(current)</span></a>
               </li>
               <li class="nav-item">
@@ -30,7 +30,7 @@
                   Downloads
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                  <a class="dropdown-item" href="/downloads/receiver_thesis.pdf">Receiver Design and Implementation</a>
+                  <a class="dropdown-item" href="downloads/receiver_thesis.pdf">Receiver Design and Implementation</a>
                   <a class="dropdown-item" href="#">Transmitter Design and Implementation</a>
                   <div class="dropdown-divider"></div>
                   <a class="dropdown-item" href="#">Android Receiver Application</a>
@@ -51,7 +51,7 @@
                 <img  class="img-fluid" style="max-width: 60%; padding-top: 30px" src="img/architecture.png">
                 <div class="row" style="margin-top: 50px;"> 
                     <div class="col-lg-12">
-                        <a class="btn btn-primary btn-xl" style="width: 220px;" href="/webled.html">Try the Online-DEMO</a>
+                        <a class="btn btn-primary btn-xl" style="width: 220px;" href="#" onclick="showDemoContent()">Try the Online-DEMO</a>
                         <a class="btn btn-dark btn-xl" style="width: 220px;" href="https://github.com/columbia-irt/lighthouse">Go to Github Repository</a>
                     </div>
                 </div>
@@ -85,7 +85,7 @@
                     <div class="row" style="margin-top: 50px;"> 
                         <div class="col-lg-12" style="margin-bottom: 60px;">
                             <a class="btn btn-dark btn-xl" style="width: 220px;" href="#" target="_blank">Transmitter thesis</a>
-                            <a class="btn btn-dark btn-xl" style="width: 220px;" href="/downloads/receiver_thesis.pdf" target="_blank">Receiver thesis</a>
+                            <a class="btn btn-dark btn-xl" style="width: 220px;" href="downloads/receiver_thesis.pdf" target="_blank">Receiver thesis</a>
                         </div>
                     </div>
               </div>
@@ -97,7 +97,7 @@
         <div class="masthead text-center d-flex">
           <div class="container my-auto" style="padding-top: 30px" id="demo">
               <div class="col-lg-8 mx-auto">
-                <h3>Online-DEMO</h3>
+                <h3>Online-DEMO Instructions</h3>
                 Download the Android receiver application <a href="#">here</a> and install it on your smartphone. The receiver application automatically sets half the highest camera rate the smartphone is capable of for the transmission speed. <br>
                 <ol>
                    <li>Set the same transmission speed here in the web-interface</li>
@@ -109,8 +109,11 @@
           </div>
           <div class="col-lg-8 mx-auto">
             <form id="controls">
+                <h3>Transmitter Web-LED</h3>
                 <label for="rate">Symbol rate:</label>
                 <input type="number" id="rate" size="3" step="1" min="1" max="60" required>
+                <br>
+                <a class="btn btn-primary" style="width: 120px;" href="#" >Start</a>
             </form>
             <div id="container">
                 <div id="led"></div>
